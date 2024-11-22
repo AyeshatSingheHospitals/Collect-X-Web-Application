@@ -151,6 +151,7 @@
     .route-assign-table thead th {
         background-color:none;
         color: #d9006c;
+        /* color:#8e94f2; */
         font-weight: bold;
         padding: 15px;
         text-transform: uppercase;
@@ -186,7 +187,8 @@
         width: 20px;
         height: 20px;
         cursor: pointer;
-        accent-color: #4CAF50;
+        /* accent-color: #8e94f2; */
+        accent-color: #fff;
         transition: transform 0.2s ease;
     }
 
@@ -291,7 +293,7 @@ main .analyse .progresss {
 }
 
 .form-label{
-    font-size: 20px;
+    font-size: 13px;
 }
 
 @media screen and (max-width: 1200px) {
@@ -425,7 +427,7 @@ input[type="email"] {
 }
 
 input:focus {
-    border-color: #1B9C85;
+    border-color: #8e94f2;
     outline: none;
 }
 
@@ -434,7 +436,7 @@ button {
     padding: 12px 25px;
     border: none;
     border-radius: 50px;
-    background-color: #1B9C85;
+    background-color: #8e94f2;
     color: white;
     font-size: 1rem;
     cursor: pointer;

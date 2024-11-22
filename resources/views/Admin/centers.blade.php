@@ -116,6 +116,61 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+    /* Style for the form group */
+.form-group {
+    margin-bottom: 1.5rem; /* Add space between form groups */
+}
+
+/* Label styling */
+label[for="description"] {
+    /* font-size: 1rem;
+    font-weight: bold; */
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Textarea styling */
+textarea[name="description"] {
+    width: 100%; /* Make the textarea fill the width of the container */
+    padding: 10px; /* Add padding inside the textarea */
+    font-size: 1rem; /* Set the font size for the input text */
+    border: 1px solid #ccc; /* Set border color */
+    border-radius: 4px; /* Rounded corners for the textarea */
+    resize: vertical; /* Allow the user to resize vertically */
+    min-height: 100px; /* Set a minimum height for the textarea */
+    box-sizing: border-box; /* Ensure padding does not affect the width calculation */
+    transition: border-color 0.3s; /* Smooth transition for border color change */
+    border-radius:35px;
+}
+
+/* Focus effect for textarea */
+textarea[name="description"]:focus {
+    border-color: #007bff; /* Change border color when focused */
+    outline: none; /* Remove default focus outline */
+}
+
+/* Optional: Placeholder styling */
+textarea[name="description"]::placeholder {
+    color: #888; /* Light gray color for placeholder */
+}
+
+/* Optional: Responsive styling for small screens */
+@media (max-width: 576px) {
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label[for="description"] {
+        font-size: 0.9rem;
+    }
+
+    textarea[name="description"] {
+        font-size: 0.9rem;
+    }
+}
+
+
     .content {
         margin-left: 90px;
     }

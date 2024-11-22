@@ -92,4 +92,26 @@ class LabController extends Controller
 
         
     }
+
+//     public function getLabNames()
+// {
+//     $labs = \App\Models\Lab::all(); // Assuming the model is named 'Lab'
+//     return response()->json($labs);
+// }
+
+    public function getLabNames()
+    {
+        // Fetch all system users
+        $labs = Lab::select('name')->get();
+
+        // Create a list of full names with EPF
+        $labsDetails = $labs->map(function ($labs) {
+            return [
+                'name' => $labs->name,
+            ];
+        });
+
+        // Return the user details as a JSON response
+        return response()->json($labsDetails);
+    }
 }

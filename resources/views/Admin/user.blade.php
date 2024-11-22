@@ -25,30 +25,29 @@
         <!-- Left Section (Cards) -->
         <div class="left-section">
             <!-- Search Bar -->
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by name or role..."
+                onkeyup="filterCards()">
 
-            <input type="text" id="searchInput" class="form-control" placeholder="Search by name or role..."  onkeyup="filterCards()">
             @foreach($users as $user)
             <div class="card">
-                <h3 class="text"> <i class="bx bxs-user-circle"></i> {{ $user->fname }} {{ $user->lname }}</h3>
-                <p><strong>Role:</strong> {{ $user->role }}</p>
-                <p><strong>Status:</strong> {{ ucfirst($user->status) }}</p>
-                <!-- <p><strong>Contact:</strong> {{ $user->contact }}</p> -->
-                <p><strong>EPF:</strong> {{ $user->epf }}</p>
-                <!-- Display user profile image if available -->
-                <!-- @if($user->image)
-                        <img src="{{ asset('storage/' . $user->image) }}" alt="{{ $user->fname }}" class="user-image">
-                    @else
-                        <p>No profile image available</p>
-                    @endif -->
+                <div class="card-content">
+                    <h3 class="text"><i class="bx bxs-user-circle"></i> {{ $user->fname }} {{ $user->lname }}</h3>
+                    <p><strong>Role:</strong> {{ $user->role }}</p>
+                    <p><strong>Status:</strong> {{ ucfirst($user->status) }}</p>
+                    <p><strong>EPF:</strong> {{ $user->epf }}</p>
+                </div>
+                <div class="edit-icon" title="Edit" onclick="editUser(this)" data-id="{{ $user->uid }}">
+                    <i class="bx bx-edit"></i>
+                </div>
             </div>
             @endforeach
-
         </div>
+
 
         <!-- Right Section (Form) -->
         <div class="right-section1">
 
-            <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
+        <form id="userForm" action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
@@ -73,8 +72,6 @@
 
 
                             <div class="www">
-
-                                <!-- <label for="fname">Status :</label> -->
                                 <div>
                                     <input type="radio" class="checks" name="status" id="active" value="active"
                                         checked="checked" />
@@ -87,19 +84,19 @@
                                 </div>
                             </div>
 
-                            <!-- </div> -->
-
                         </div>
                     </div>
                 </div>
 
                 <br><br>
 
-                <!-- <div class="row"> -->
+                <input type="hidden" id="userId" name="userId">
+
                 <!-- First Name (fname) -->
                 <div class="form-group form-group-full-width">
                     <label for="fname">First Name</label>
-                    <input type="text" id="fname" name="fname" class="form-control" required>
+                    <input type="text" id="fname" name="fname" class="form-control" required
+                        oninput="generateUsername()">
                 </div>
 
                 <!-- Last Name (lname) -->
@@ -107,9 +104,7 @@
                     <label for="lname">Last Name</label>
                     <input type="text" id="lname" name="lname" class="form-control" required>
                 </div>
-                <!-- </div> -->
 
-                <!-- <div class="row"> -->
                 <!-- Contact -->
                 <div class="form-group form-group-full-width">
                     <label for="contact">Contact</label>
@@ -119,15 +114,14 @@
                 <!-- EPF -->
                 <div class="form-group form-group-full-width">
                     <label for="epf">EPF</label>
-                    <input type="text" id="epf" name="epf" class="form-control" required>
+                    <input type="text" id="epf" name="epf" class="form-control" required required
+                        oninput="generateUsername()">
                 </div>
-                <!-- </div> -->
 
-                <!-- <div class="row"> -->
                 <!-- Username -->
                 <div class="form-group form-group-full-width">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
+                    <input type="text" id="username" name="username" class="form-control" readonly>
                 </div>
 
                 <!-- Password -->
@@ -135,14 +129,14 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" class="form-control" required>
                 </div>
-                <!-- </div> -->
+
                 <br>
 
                 <!-- Image -->
                 <div class="form-group form-group-full-width">
                     <label for="image">Profile Image</label>
                     <input type="file" id="image" name="image" class="form-control" accept="image/*">
-
+                    <small id="imageLabel" style="display: none; color: gray;"></small>
                 </div>
                 <br><br>
 
@@ -159,7 +153,6 @@
 .content {
     margin-left: 90px;
 }
-
 
 .alert {
     padding: 15px;
@@ -244,7 +237,6 @@
     gap: 1.8rem;
     grid-template-columns: 16rem auto 6rem;
 }
-
 
 /*-------------------------Form Css-------------------------------*/
 
@@ -376,7 +368,6 @@ button:active {
     color: #ffffff;
 }
 
-
 /* ----------------------------------- Radio Button for role -------------------------  */
 .radio {
     display: inline-flex;
@@ -456,12 +447,16 @@ button:active {
 .left-section #searchInput {
     position: sticky;
     top: 0;
-    /* z-index: 10; */
-    /* margin-bottom: 10px; */
+    z-index: 1;
+    padding: 8px;
+    margin-bottom: 10px;
+
 }
 
 /* Card Style */
 .card {
+
+    position: relative;
     background-color: var(--color-white);
     padding: var(--card-padding);
     border-radius: var(--card-border-radius);
@@ -475,7 +470,32 @@ button:active {
 
 i {
     font-size: 17px;
-    color:#628ECB;
+    color: #628ECB;
+}
+
+/* Styling for the edit icon */
+.edit-icon {
+    /* position: relative; */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: none;
+    /* Hidden by default */
+    font-size: 18px;
+    color: #007bff;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.card:hover .edit-icon {
+    display: block;
+    /* Show when hovering over the card */
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.edit-icon:hover {
+    color: #0056b3;
 }
 
 
@@ -525,7 +545,6 @@ i {
     main table tbody tr td:first-child {
         display: none;
     }
-
 
 }
 
@@ -670,8 +689,6 @@ i {
         }
     }
 
-
-
     main {
         margin-top: 8rem;
         padding: 0 1rem;
@@ -737,7 +754,6 @@ i {
 }
 </style>
 
-
 <script>
 // JavaScript function to filter cards based on the search input
 function filterCards() {
@@ -755,5 +771,70 @@ function filterCards() {
         }
     });
 }
+
+//create username automatically
+function generateUsername() {
+    const fname = document.getElementById('fname').value.trim().toLowerCase();
+    const epf = document.getElementById('epf').value.trim();
+    const usernameField = document.getElementById('username');
+
+    if (fname && epf) {
+        usernameField.value = fname + epf;
+    } else {
+        usernameField.value = ''; // Clear username if one of the fields is empty
+    }
+}
+
+function editUser(element) {
+    const userId = element.getAttribute('data-id');
+
+    if (!userId) {
+        console.error('Error: userId is missing.');
+        return;
+    }
+
+    fetch(`/admin/users/${userId}/edit`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(user => {
+            // Populate the form fields
+            document.getElementById('userId').value = user.uid;
+            document.getElementById('fname').value = user.fname;
+            document.getElementById('lname').value = user.lname;
+            document.getElementById('contact').value = user.contact;
+            document.getElementById('epf').value = user.epf;
+            document.getElementById('username').value = user.username;
+            document.getElementById('password').value = user.password;
+            // Set the image input field
+            const imageInput = document.getElementById('image');
+            if (user.image) {
+                // Display the file name or a message
+                const imageLabel = document.getElementById('imageLabel');
+                imageLabel.textContent = `Current image: ${user.image}`;
+                imageLabel.style.display = 'block';
+            }
+            document.querySelector(`input[name="role"][value="${user.role}"]`).checked = true;
+            document.querySelector(`input[name="status"][value="${user.status}"]`).checked = true;
+
+            // Update form action
+            const form = document.getElementById('userForm');
+            form.action = `/admin/users/${user.uid}/update`;
+
+            const submitButton = document.getElementById('submitButton');
+            submitButton.textContent = "Update";
+        })
+        .catch(error => console.error('Error fetching user:', error));
+}
+
+document.getElementById('userForm').addEventListener('reset', () => {
+    const form = document.getElementById('userForm');
+    form.action = "{{ route('admin.users.store') }}"; // Reset to store route
+    document.getElementById('submitButton').textContent = "Register";
+});
 </script>
+
 @endsection

@@ -103,6 +103,7 @@
 
                 </div>
             </div>
+
             <!-- <div class="card">
                 <h3>Card Title 2</h3>
                 <p>Card content goes here...</p>
@@ -144,68 +145,150 @@
                         required readonly onclick="openUserModal()">
                 </div>
 
-                <!-- Modal to show the list of names -->
-                <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <!-- <div class="modal-header">
-                                <h5 class="modal-title" id="userModalLabel">Select a User</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div> -->
-                            <div class="modal-body">
-                                <ul id="userList" class="list-group">
-                                    <!-- Dynamic list of users will be inserted here -->
-                                </ul>
-                            </div>
-                        </div>
+                <!-- Modal for User Selection -->
+                <div id="userModal" class="popup-modal hidden">
+                    <div class="popup-content">
+                        <h5>Select a User</h5>
+
+                        <!-- Search Bar -->
+                        <input type="text" id="searchUserBar" class="form-control" placeholder="Search by name or EPF..."
+                            onkeyup="filterUsers()" />
+
+                        <!-- User List -->
+                        <ul id="userList" class="list-group">
+                            <!-- Dynamic list of users will be inserted here -->
+                        </ul>
+
+                        <button type="button" class="btn btn-secondary" id="close" readonly onclick="closeUserModal()">Close</button>
                     </div>
                 </div>
 
                 <br>
                 <div class="form-group form-group-full-width">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" class="form-control" required>
+                    <label for="epf">EPF</label>
+                    <input type="text" id="epf" name="epf" class="form-control" required readonly>
                 </div>
 
                 <br>
                 <div class="form-group form-group-full-width">
-                    <label for="address">Address</label>
-                    <input type="text" id="address" name="address" class="form-control" required>
+                    <label for="labname">Lab name</label>
+                    <input type="text" id="labname" name="labname" class="form-control" placeholder="Type to search name..." onclick="openLabModal()" required>
                 </div>
+
+                <!-- Modal for Lab Names -->
+                <!-- <div class="modal" id="labNamesModal" tabindex="-1" role="dialog" aria-labelledby="labNamesModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="labNamesModalLabel">Select Lab</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <ul id="labNamesList" class="list-group">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+                <!-- Modal for Lab Selection -->
+                <div id="labModal" class="popup-modal hidden">
+                    <div class="popup-content">
+                        <h5>Select a Lab</h5>
+
+                        <!-- Search Bar -->
+                        <input type="text" id="searchLabBar" class="form-control" placeholder="Search by lab name..."
+                            onkeyup="filterLabs()" />
+
+                        <!-- User List -->
+                        <ul id="labList" class="list-group">
+                            <!-- Dynamic list of users will be inserted here -->
+                        </ul>
+
+                        <button type="button" class="btn btn-secondary" id="close" onclick="closeLabModal()">Close</button>
+                    </div>
+                </div>
+
+
                 <br><br>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary" class="new" class="form-group">Register</button><br><br>
+                <button type="submit" class="btn btn-primary form-group">Register</button><br><br>
             </form>
-
-            
         </div>
     </div>
-
-
 </main>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script>
+    // Open the modal when the button is clicked
+    $('#openLabNamesModal').on('click', function() {
+        // Fetch lab names from the server
+        $.ajax({
+            url: '/get-lab-names', // Your route to fetch lab names
+            method: 'GET',
+            success: function(response) {
+                // Clear any previous list items
+                $('#labNamesList').empty();
+
+                // Loop through the response data and add each lab name to the list
+                response.forEach(function(lab) {
+                    var listItem = $('<li></li>')
+                        .addClass('list-group-item')
+                        .text(lab.name)
+                        .on('click', function() {
+                            // Set the selected lab name in the input field
+                            $('#labname').val(lab.name);
+                            // Close the modal
+                            $('#labNamesModal').modal('hide');
+                        });
+
+                    $('#labNamesList').append(listItem);
+                });
+
+                // Show the modal
+                $('#labNamesModal').modal('show');
+            },
+            error: function() {
+                alert('Error fetching lab names');
+            }
+        });
+    });
+</script> -->
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-// Function to open the modal and fetch the user names
 function openUserModal() {
+    const modal = document.getElementById('userModal');
+    modal.classList.add('visible');
+
+    // Fetch user names and EPFs and populate the modal
     $.ajax({
-        url: '{{ route("get.user.names") }}', // The route you defined to get user names
+        url: '{{ route("get.user.names") }}', // Your route for fetching user names and EPFs
         method: 'GET',
         success: function(response) {
-            // Clear previous list
-            $('#userList').empty();
+            const userList = document.getElementById('userList');
+            userList.innerHTML = ''; // Clear any existing list items
 
-            // Add each user name to the list in the modal
-            response.forEach(function(name) {
-                $('#userList').append('<li class="list-group-item" onclick="selectUser(\'' + name +
-                    '\')">' + name + '</li>');
+            // Populate the list with user names and EPFs
+            response.forEach(user => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.setAttribute('data-name', user.full_name
+                    .toLowerCase()); // Store name in lowercase for filtering
+                listItem.setAttribute('data-epf', user.epf
+                    .toLowerCase()); // Store EPF in lowercase for filtering
+                listItem.textContent = `${user.full_name} (EPF: ${user.epf})`;
+                listItem.onclick = function() {
+                    selectUser(user.full_name, user.epf);
+                };
+                userList.appendChild(listItem);
             });
-
-            // Show the modal
-            $('#userModal').modal('show');
         },
         error: function() {
             alert('Failed to fetch user names.');
@@ -213,17 +296,189 @@ function openUserModal() {
     });
 }
 
-// Function to set the selected user name in the input field
-function selectUser(name) {
-    $('#name').val(name); // Set the selected name in the input field
-    $('#userModal').modal('hide'); // Close the modal
+function openLabModal() {
+    const modal = document.getElementById('labModal');
+    modal.classList.add('visible');
+
+    // Fetch user names and EPFs and populate the modal
+    $.ajax({
+        url: '{{ route("get.lab.names") }}', // Your route for fetching user names and EPFs
+        method: 'GET',
+        success: function(response) {
+            const userList = document.getElementById('labList');
+            userList.innerHTML = ''; // Clear any existing list items
+
+            // Populate the list with lab names and EPFs
+            response.forEach(lab => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.setAttribute('data-name', lab.name
+                    .toLowerCase()); // Store name in lowercase for filtering
+                listItem.textContent = `${lab.name}`;
+                listItem.onclick = function() {
+                    selectLab(lab.name);
+                };
+                userList.appendChild(listItem);
+            });
+        },
+        error: function() {
+            alert('Failed to fetch lab names.');
+        }
+    });
+}
+
+function filterUsers() {
+    const searchBar = document.getElementById('searchUserBar');
+    const filter = searchBar.value.toLowerCase();
+    const userListItems = document.querySelectorAll('#userList .list-group-item');
+
+    // Filter by name or EPF
+    userListItems.forEach(item => {
+        const name = item.getAttribute('data-name'); // Get name attribute
+        const epf = item.getAttribute('data-epf'); // Get EPF attribute
+
+        if (name.includes(filter) || epf.includes(filter)) {
+            item.style.display = ''; // Show the item
+        } else {
+            item.style.display = 'none'; // Hide the item
+        }
+    });
+}
+
+function filterLabs() {
+    const searchBar = document.getElementById('searchLabBar');
+    const filter = searchBar.value.toLowerCase();
+    const labListItems = document.querySelectorAll('#labList .list-group-item');
+
+    labListItems.forEach(item => {
+        const labname = item.getAttribute('data-name');
+
+        if (labname.includes(filter)) {
+            item.style.display = ''; // Show the item
+        } else {
+            item.style.display = 'none'; // Hide the item
+        }
+    });
+}
+
+function closeUserModal() {
+    const modal = document.getElementById('userModal');
+    modal.classList.remove('visible');
+}
+
+function closeLabModal() {
+    const modal = document.getElementById('labModal');
+    modal.classList.remove('visible');
+}
+
+function selectUser(fullName, epf) {
+    // Set the selected user name and EPF in the input fields
+    document.getElementById('name').value = fullName;
+    document.getElementById('epf').value = epf;
+
+    // Close the modal
+    closeUserModal();
+}
+
+function selectLab(name) {
+    document.getElementById('labname').value = name;
+
+    // Close the modal
+    closeLabModal();
 }
 </script>
 
 <!-- Add Bootstrap JS for Modal functionality -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* -------------------------------------------------------------Popup------------------------------------------------------------------ */
+/* Modal Styles */
+.right-section1 .popup-modal {
+    position: fixed;
+    top: 43%;
+    left: 75%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-pop);
+    border-radius: 25px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+    /* Initially hidden */
+    padding: 0;
+    /* Remove inner padding from the modal */
+    width: 300px;
+    max-height: 345px;
+    /* Set the maximum height */
+    overflow-y: auto;
+    /* Enable vertical scrolling for the content */
+}
+
+.right-section1 .popup-modal.visible {
+    display: block;
+}
+
+.right-section1 .popup-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--color-white);
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 2;
+    /* Ensure it stays above the scrolling content */
+}
+
+.right-section1 .popup-header input[type="text"] {
+    width: 70%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: var(--color-white);
+}
+
+.right-section1 .popup-header .close-button {
+    cursor: pointer;
+    font-size: 18px;
+    color: #333;
+    background: none;
+    border: none;
+}
+
+.right-section1 .popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+    /* Add some padding for the content */
+}
+
+.right-section1 .list-group-item {
+    cursor: pointer;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.right-section1 .list-group-item:hover {
+    background-color: var(--color-pointer);
+}
+
+.right-section1 .popup-content #searchBar {
+    position: sticky;
+    top: 0;
+    /* Stick it to the top of the popup-content */
+    /* Optional: Ensure it's visually distinct */
+    z-index: 1;
+    /* Optional: Ensure it stays above the content */
+    background-color: var(--color-white);
+}
+
+/* -------------------------------------------------------------Popup------------------------------------------------------------------ */
 
 .content {
     margin-left: 90px;
@@ -299,8 +554,6 @@ function selectUser(name) {
             left: 0;
         }
     }
-
-
 
     main {
         margin-top: 8rem;
@@ -458,12 +711,8 @@ button:active {
 /*--------------------------------------------------------*/
 .form-group-full-width {
     width: 100%;
-    /* Adjust width to fit both elements side by side */
     display: inline-block;
-    /* Ensure the elements align horizontally */
     margin-right: 2%;
-    /* Adds space between the two divs */
-    /* padding-left: 7px; */
 }
 
 .form-group-full-width:last-child {
@@ -533,11 +782,6 @@ button:active {
     padding: var(--card-padding);
     border-radius: var(--card-border-radius);
     box-shadow: var(--box-shadow);
-    /* transition: all 0.3s ease; */
-    /* background-color: var(--color-white);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); */
 }
 
 .card:hover {
@@ -655,13 +899,9 @@ button:active {
     /* padding: 20px; */
     margin: 0 auto;
     width: 100%;
-    /* Adjusts to take up the available width */
     max-width: 500px;
-    /* You can set a maximum width if needed */
 
 }
-
-
 </style>
 
 @endsection

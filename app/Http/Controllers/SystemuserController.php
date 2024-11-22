@@ -50,20 +50,67 @@ class SystemuserController extends Controller
         return redirect()->route('admin.user.index')->with('success', 'User added successfully');
     }
 
+    public function editUser($id)
+    {
+        $user = Systemuser::find($id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        return response()->json($user);
+    }
+
+    public function updateUsers(Request $request, $id)
+    {
+        // Validate the request
+        $request->validate([
+            'role' => 'required|string|max:255',
+            'fname' => 'required|string|max:255',
+            'lname' => 'required|string|max:255',
+            'contact' => 'required|digits:10|unique:systemuser,contact,' . $id . ',uid',
+            'epf' => 'required|unique:systemuser,epf,' . $id . ',uid',
+            'username' => 'required|unique:systemuser,username,' . $id . ',uid|max:255',
+            'password' => 'nullable|string|min:8',
+            'status' => 'nullable|in:active,inactive',
+            'image' => 'nullable|image|max:5000',
+        ]);
+
+        $user = Systemuser::findOrFail($id);
+
+        // Update the user
+        $user->update([
+            'role' => $request->role,
+            'fname' => $request->fname,
+            'lname' => $request->lname,
+            'contact' => $request->contact,
+            'epf' => $request->epf,
+            'username' => $request->username,
+            'password' => $request->password ? bcrypt($request->password) : $user->password,
+            'status' => $request->status,
+            'image' => $request->image ? $request->image->store('images', 'public') : $user->image,
+        ]);
+
+        return redirect()->route('admin.user.index')->with('success', 'User updated successfully');
+    }
+
     
     // SystemuserController.php
-public function getUserNames()
-{
-    // Fetch all system users
-    $users = Systemuser::select('fname', 'lname')->get();
+    public function getUserNames()
+    {
+        // Fetch all system users
+        $users = Systemuser::select('fname', 'lname', 'epf')->get();
 
-    // Create a list of full names
-    $userNames = $users->map(function($user) {
-        return $user->fname . ' ' . $user->lname;
-    });
+        // Create a list of full names with EPF
+        $userDetails = $users->map(function ($user) {
+            return [
+                'full_name' => $user->fname . ' ' . $user->lname,
+                'epf' => $user->epf,
+            ];
+        });
 
-    // Return the names as a JSON response
-    return response()->json($userNames);
-}
+        // Return the user details as a JSON response
+        return response()->json($userDetails);
+    }
 
 }

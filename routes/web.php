@@ -100,16 +100,8 @@ Route::delete('/admin/routes/{rid}', [RouteController::class, 'destroyRoute'])->
 //systemuser creation
 Route::get('/admin/users', [SystemuserController::class, 'indexUser'])->name('admin.user.index');
 Route::post('admin/users/store', [SystemuserController::class, 'storeUsers'])->name('admin.users.store');
-// Route::get('/admin/user', [SystemuserController::class, 'indexUsers'])->name('admin.user.index');
-// Route::post('/admin/user/register', [SystemuserController::class, 'storeUsers'])->name('admin.user.store');
-// Route::put('/admin/user/{uid}', [SystemuserController::class, 'updateUser'])->name('admin.user.update');
-// Route::get('/admin/users', [SystemuserController::class, 'showUsers'])->name('Admin.users'); // Display all users in card view
-// Route::get('/admin/users', [SystemuserController::class, 'showUsers'])->name('Admin.users');
-
-//Lab Creation
-// Route::get('/lab/create', [LabController::class, 'create'])->name('lab.create');
-// Route::post('/lab', [LabController::class, 'store'])->name('lab.store');
-
+Route::get('admin/users/{id}/edit', [SystemuserController::class, 'editUser'])->name('admin.users.edit');
+Route::post('admin/users/{id}/update', [SystemuserController::class, 'updateUsers'])->name('admin.users.update');
 
 
 //Center Creation
@@ -128,3 +120,5 @@ Route::get('/ll', function () {
 
 Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->name('get.user.names');
 // Route::get('/systemuser/search', [SystemUserController::class, 'search'])->name('systemuser.search');
+
+Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');
