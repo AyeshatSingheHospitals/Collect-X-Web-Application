@@ -5,7 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Systemuser extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable; // Import this class
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User;
+// use Illuminate\Contracts\Auth\Authenticatable;
+
+class Systemuser extends Authenticatable
 {
     use HasFactory;
 
@@ -22,17 +27,28 @@ class Systemuser extends Model
         'username',
         'password',
         'status',
-        'image'
+        'image',
     ];
 
     protected $hidden = [
         'password',
     ];
 
-    // //hashing password
-    // public function setPasswordAttribute($value){
-    //     $this->attribute['password'] = bcrypt($value);
-    // }
+    // Hash the password automatically
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = bcrypt($value);
+    }
 
-    
+    // Full name accessor
+    public function getFullNameAttribute()
+    {
+        return $this->fname . ' ' . $this->lname;
+    }
+
+    // Image URL accessor
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
 }

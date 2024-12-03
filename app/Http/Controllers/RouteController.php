@@ -6,9 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\Route;
 use App\Models\RouteLog;
 use Illuminate\Http\Request;
-
-
 use App\Models\Lab;
+use App\Models\Systemuser;
 
 
 class RouteController extends Controller
@@ -18,7 +17,8 @@ class RouteController extends Controller
     {
         $routes = Route::all();
         $labs = Lab::all();
-        return view('Admin.route', compact('routes', 'labs')); // Make sure to create this Blade file
+        $users = Systemuser::all();
+        return view('Admin.route', compact('routes', 'labs', 'users')); // Make sure to create this Blade file
 
         }
 
@@ -27,10 +27,10 @@ class RouteController extends Controller
     {
         // Validate the request
         $request->validate([
-            // 'uid' => 'required|int|exists:systemuser,uid', 
-            // 'lid' => 'required|int|exists:lab,lid', 
-            'uid' => 'required|string|max:255',
-            'lid' => 'required|string|max:255',
+            'uid' => 'required|exists:systemuser,uid', 
+            'lid' => 'required|exists:lab,lid', 
+            // 'uid' => 'required|string|max:255',
+            // 'lid' => 'required|string|max:255',
             'routename' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
@@ -56,10 +56,8 @@ class RouteController extends Controller
     {
         // Validate the request data
         $request->validate([
-            // 'uid' => 'required|int|exists:systemuser,uid', 
-            // 'lid' => 'required|int|exists:lab,lid', 
-            'uid' => 'required|string|max:255',
-            'lid' => 'required|string|max:255',
+            'uid' => 'required|exists:systemuser,uid', 
+            'lid' => 'required|exists:lab,lid',
             'routename' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
@@ -103,7 +101,5 @@ class RouteController extends Controller
         ]);
 
         return redirect()->route('admin.route.index')->with('success', 'Route deleted successfully!');
-
-        
     }
 }

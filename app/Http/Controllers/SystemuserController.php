@@ -38,7 +38,7 @@ class SystemuserController extends Controller
             'contact' => $request->contact,
             'epf' => $request->epf,
             'username' => $request->username,
-            'password' => bcrypt($request->password), // Hash the password
+            'password' => $request->password, // Hash the password
             'status' => $request->status,
             'image' => $request->image ? $request->image->store('images', 'public') : null, // Save image if uploaded
         ]);
@@ -86,7 +86,7 @@ class SystemuserController extends Controller
             'contact' => $request->contact,
             'epf' => $request->epf,
             'username' => $request->username,
-            'password' => $request->password ? bcrypt($request->password) : $user->password,
+            'password' => $request->password ? $request->password : $user->password,
             'status' => $request->status,
             'image' => $request->image ? $request->image->store('images', 'public') : $user->image,
         ]);
@@ -94,7 +94,6 @@ class SystemuserController extends Controller
         return redirect()->route('admin.user.index')->with('success', 'User updated successfully');
     }
 
-    
     // SystemuserController.php
     public function getUserNames()
     {
@@ -112,5 +111,6 @@ class SystemuserController extends Controller
         // Return the user details as a JSON response
         return response()->json($userDetails);
     }
+
 
 }

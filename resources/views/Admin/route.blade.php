@@ -42,8 +42,8 @@
             <div class="card mb-3 custom-card">
                 <div class="card-body">
                     <h5 class="card-title">{{ $route->routename }}</h5>
-                    <p class="card-text"><strong>UID:</strong> {{ $route->uid }}</p>
-                    <p class="card-text"><strong>Lab Name:</strong> {{ $route->lid }}</p>
+                    <!-- <p class="card-text"><strong>UID:</strong> {{ $route->uid }}</p> -->
+                    <p class="card-text"><strong>Lab Name:</strong> {{ $route->lab->name ?? 'Not Assigned' }}</p>
 
                     <p class="card-text"><strong>Description:</strong>{{ $route->description }}</p>
 
@@ -78,15 +78,28 @@
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="rid" id="editRid">
+                <input type="hidden" name="uid" id="editUid" class="form-control rounded-pill" required>
 
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="editUid" class="form-label"> UID:</label>
-                    <input type="text" name="uid" id="editUid" class="form-control rounded-pill" required>
-                </div>
+                    <input type="hidden" name="uid" id="editUid" class="form-control rounded-pill" required>
+                </div> -->
 
                 <div class="mb-3">
-                    <label for="editLid" class="form-label"> Lab Name:</label>
-                    <input type="text" name="lid" id="editLid" class="form-control rounded-pill" required>
+                    <label class="form-label" for="editlabSearch">
+                        <i class="fas fa-flask me-2"></i> Search Lab Name:
+                    </label>
+                    <input type="text" id="editlabSearch" class="form-control rounded-pill"
+                        placeholder="Type to search labs...">
+
+                    <!-- Hidden input to store the selected lab ID -->
+                    <input type="hidden" id="editLid" name="lid">
+
+                    <!-- Dropdown list to display labs -->
+                    <ul id="editlabList" class="list-group mt-2"
+                        style="display: none; max-height: 200px; overflow-y: auto; position: absolute; z-index: 1000; width: 90%;">
+                        <!-- Lab names will be populated here -->
+                    </ul>
                 </div>
 
                 <div class="mb-3">
@@ -117,14 +130,6 @@
             <form action="{{ route('admin.routes.store') }}" method="POST">
                 @csrf
 
-                <!-- First Name input -->
-                <!-- <div class="mb-3">
-                    <label class="form-label" for="first_name">
-                        <i class="fas fa-user me-2"></i> RID:
-                    </label>
-                    <input type="text" name="first_name" class="form-control rounded-pill"
-                        placeholder="Enter your first name" required />
-                </div> -->
 
                 <div class="mb-3">
                     <label class="form-label" for="uid">
@@ -141,6 +146,9 @@
                     </label>
                     <input type="text" id="labSearch" class="form-control rounded-pill"
                         placeholder="Type to search labs...">
+
+                    <!-- Hidden input to store the selected lab ID -->
+                    <input type="hidden" id="selectedLabId" name="lid">
 
                     <!-- Dropdown list to display labs -->
                     <ul id="labList" class="list-group mt-2"
@@ -263,72 +271,12 @@
     box-sizing: border-box;
 }
 
-
-h1 {
-    font-weight: 800;
-    font-size: 1.8rem;
-}
-
-p {
-    color: var(--color-dark-variant);
-}
-
-b {
-    color: var(--color-dark);
-}
-
-.text-muted {
-    color: var(--color-info-dark);
-}
-
 .container {
     display: grid;
     width: 96%;
     margin: 0 auto;
     gap: 1.8rem;
     grid-template-columns: 16rem auto 6rem;
-}
-
-main {
-    margin-top: 1.4rem;
-}
-
-main .analyse {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.6rem;
-}
-
-main .analyse>div {
-    background-color: var(--color-white);
-    padding: var(--card-padding);
-    border-radius: var(--card-border-radius);
-    margin-top: 1rem;
-    box-shadow: var(--box-shadow);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-main .analyse>div:hover {
-    box-shadow: none;
-}
-
-main .analyse>div .status {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-main .analyse h3 {
-    margin-left: 0.6rem;
-    font-size: 1rem;
-}
-
-main .analyse .progresss {
-    position: relative;
-    width: 92px;
-    height: 92px;
-    border-radius: 50%;
 }
 
 /* Container for the cards */
@@ -349,18 +297,12 @@ main .analyse .progresss {
 
 /* Card styles to match the fluid, gradient look */
 .custom-card {
-    /* background: linear-gradient(135deg, #FED2B5, #FFF7D2 ); */
-    /* Gradient color */
     border: none;
-    /* border-radius: 20px; */
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 230px;
-
-    background-color: var(--color-white);
-    /* padding: var(--card-padding); */
+    background-color: var(--card-white);
     border-radius: var(--card-border-radius);
     box-shadow: var(--box-shadow);
+    height: 230px;
 }
 
 .custom-card:hover {
@@ -372,7 +314,7 @@ main .analyse .progresss {
 .card-body {
     text-align: center;
     padding: 30px;
-    color:var(--color-dark);
+    color: #464646;
     /* White text for contrast */
 }
 
@@ -381,12 +323,14 @@ main .analyse .progresss {
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 15px;
+    color: var(--color-dark);
 }
 
 .card-text {
     font-size: 1em;
     margin-bottom: 10px;
-    color:var(--color-dark);
+    color: #464646;
+    color: var(--color-dark);
 }
 
 
@@ -408,8 +352,8 @@ main .analyse .progresss {
 }
 
 .custom-card .btn i {
-    font-size: 25px;
-    color:  #628ECB;
+    font-size: 20px;
+    color: #628ECB;
 
 }
 
@@ -427,43 +371,6 @@ main .analyse .progresss {
 
 
 }
-
-
-
-/* .custom-card button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-weight: bold;
-    color: white;
-    margin: 5px;
-} */
-
-/* .btn-warning {
-    background-color: #1B9C85;
-    border: none;
-    margin-right: 10px;
-    
-}
-
-.btn-warning:hover {
-    background-color: #0f775e;
-}
-
-form button[type="submit"] {
-    background-color: #e57373;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-weight: bold;
-}
-
-form button[type="submit"]:hover {
-    background-color: #ef5350;
-} */
 
 /* Wrapper around buttons for inline display */
 .card-body .btn-container {
@@ -489,7 +396,7 @@ button:hover {
 }
 
 button:active {
-    background-color: #628ECB;
+    background-color: #0c5e48;
 }
 
 
@@ -593,20 +500,35 @@ h1 {
 }
 
 .glow-on-hover {
-    padding: 15px 32px;
-    margin: 4px 2px;
-    border: none;
-    font-size: 16px;
-    border-radius: 50px;
     background-color: #628ECB;
+    /* Button color - green */
     color: white;
-    font-size: 1rem;
+    /* Text color */
+    border: none;
+    /* Remove border */
+    padding: 15px 32px;
+    /* Padding */
+    text-align: center;
+    /* Center text */
+    text-decoration: none;
+    /* Remove underline */
+    display: inline-block;
+    /* Inline-block display */
+    font-size: 16px;
+    /* Font size */
+    margin: 4px 2px;
+    /* Margins */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    /* Pointer cursor */
+    transition: background-color 0.3s, box-shadow 0.3s;
+    /* Smooth transitions */
+    border-radius: 30px;
+    /* Rounded corners */
 }
 
 .glow-on-hover:hover {
     background-color: #365485;
+    /* Hover color - darker green */
 }
 
 
@@ -835,22 +757,6 @@ input:focus {
 }
 </style>
 
-<!-- lab search -->
-<script>
-document.getElementById('labName').addEventListener('keyup', function() {
-    let filter = this.value.toUpperCase();
-    let select = document.getElementById('labName');
-    let options = select.options;
-
-    for (let i = 0; i < options.length; i++) {
-        let txtValue = options[i].text || options[i].innerText;
-        options[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
-    }
-});
-</script>
-
-
-
 <!-- JavaScript -->
 <script>
 const openPopup = document.getElementById("openPopup");
@@ -919,18 +825,19 @@ darkMode.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode-variables');
     darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
     darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-})
-</script>
+});
 
-<script>
 function openEditModal(route) {
     // Set the form action to the update route with the user's ID
     document.getElementById("editForm").action = `/admin/routes/${route.rid}`;
 
     // Populate the modal fields with user data
-    document.getElementById("editRid").value = route.rid;
+    document.getElementById("editRid").value = route.routename;
     document.getElementById("editUid").value = route.uid;
+    document.getElementById("editlabSearch").value = route.systemuser?.username || "Not Assigned";
     document.getElementById("editLid").value = route.lid;
+    // Set the visible input for lab name
+    document.getElementById("editlabSearch").value = route.lab?.name || "Not Assigned";
     document.getElementById("editRoutename").value = route.routename;
     document.getElementById("editDescription").value = route.description;
 
@@ -941,16 +848,15 @@ function openEditModal(route) {
 function closeEditModal() {
     document.getElementById("editModal").style.display = "none";
 }
-</script>
 
-<script>
 document.addEventListener('DOMContentLoaded', function() {
     const labSearch = document.getElementById('labSearch');
     const labList = document.getElementById('labList');
+    const selectedLabId = document.getElementById('selectedLabId'); // Hidden input to store lid
     const labs = @json($labs); // Get lab data from the server
 
     labSearch.addEventListener('input', function() {
-        const query = labSearch.value.toLowerCase();
+        const query = labSearch.value.toLowerCase().trim();
 
         // Clear previous results
         labList.innerHTML = '';
@@ -958,7 +864,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Filter labs based on the query
         const filteredLabs = labs.filter(lab => lab.name.toLowerCase().includes(query));
 
-        // If there are results, show the dropdown
+        // Show the dropdown if there are results and query is not empty
         if (filteredLabs.length > 0 && query !== '') {
             labList.style.display = 'block';
 
@@ -969,12 +875,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 labItem.classList.add('list-group-item', 'list-group-item-action');
                 labItem.style.cursor = 'pointer';
 
-                // Handle click event to select lab name
+                // Handle click event to select lab
                 labItem.addEventListener('click', function() {
-                    labSearch.value = lab
-                    .name; // Set selected lab name in the search bar
+                    labSearch.value = lab.name; // Set lab name in the search bar
+                    selectedLabId.value = lab.lid; // Store the lab ID in the hidden input
                     labList.style.display = 'none'; // Hide the dropdown
-                    // You can also set a hidden input to capture the selected lab ID if needed
                 });
 
                 labList.appendChild(labItem);
@@ -991,17 +896,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-</script>
 
-
-<script>
 document.addEventListener('DOMContentLoaded', function() {
-    const labSearch = document.getElementById('labSearch');
-    const labList = document.getElementById('labList');
+    const labSearch = document.getElementById('editlabSearch');
+    const labList = document.getElementById('editlabList');
+    const selectedLabId = document.getElementById('editLid'); // Hidden input to store lid
     const labs = @json($labs); // Get lab data from the server
 
     labSearch.addEventListener('input', function() {
-        const query = labSearch.value.toLowerCase();
+        const query = labSearch.value.toLowerCase().trim();
 
         // Clear previous results
         labList.innerHTML = '';
@@ -1009,7 +912,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Filter labs based on the query
         const filteredLabs = labs.filter(lab => lab.name.toLowerCase().includes(query));
 
-        // If there are results, show the dropdown
+        // Show the dropdown if there are results and query is not empty
         if (filteredLabs.length > 0 && query !== '') {
             labList.style.display = 'block';
 
@@ -1020,12 +923,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 labItem.classList.add('list-group-item', 'list-group-item-action');
                 labItem.style.cursor = 'pointer';
 
-                // Handle click event to select lab name
+                // Handle click event to select lab
                 labItem.addEventListener('click', function() {
-                    labSearch.value = lab
-                    .name; // Set selected lab name in the search bar
+                    labSearch.value = lab.name; // Set lab name in the search bar
+                    editLid.value = lab
+                    .lid; // Store the lab ID in the hidden input
                     labList.style.display = 'none'; // Hide the dropdown
-                    // You can also set a hidden input to capture the selected lab ID if needed
                 });
 
                 labList.appendChild(labItem);

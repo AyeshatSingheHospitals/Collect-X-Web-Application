@@ -1,4 +1,4 @@
-@extends('admin.sidebar')
+@extends('supervisor.navbar')
 
 @section('content')
 

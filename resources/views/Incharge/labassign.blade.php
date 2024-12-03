@@ -1,4 +1,4 @@
-@extends('admin.sidebar')
+@extends('incharge.navbar')
 
 @section('content')
 
@@ -65,7 +65,7 @@
             <h1>Lab Assign</h1>
             <br>
 
-            <form action="{{ route('admin.labassigns.store')}}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('Incharge.labassigns.store')}}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <!-- Input for Username -->

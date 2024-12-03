@@ -37,19 +37,19 @@
             </div>
 
             <div class="sidebar">
-                <a href="/Incharge/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                <a href="/Supervisor/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">grid_view</span>
                     <h3>Dashboard</h3>
                 </a>
-                <a href="/Incharge/labassign" class="{{ request()->is('labassign') ? 'active' : '' }}">
+                <a href="/Supervisor/labassign" class="{{ request()->is('labassign') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">medical_services</span>
                     <h3>Lab Assign</h3>
                 </a>
-                <a href="/Incharge/rassign" class="{{ request()->is('rassign') ? 'active' : '' }}">
+                <a href="/Supervisor/rassign" class="{{ request()->is('rassign') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">add_road</span>
                     <h3>Route Assign</h3>
                 </a>
-                <a href="/Incharge/transaction" class="{{ request()->is('transaction') ? 'active' : '' }}">
+                <a href="/Supervisor/transaction" class="{{ request()->is('transaction') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>
@@ -88,7 +88,7 @@
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
                             <div class="profile-photo">
-                                <img src="../image/avatar1.jpg" alt="Profile">
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
                             </div>
                         </div>
                     </div>

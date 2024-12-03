@@ -6,20 +6,18 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\LabController;
-
-
-Route::get('/', [AuthController::class, 'showSignInForm'])->name('login');
-Route::post('/signin', [AuthController::class, 'signIn'])->name('signin');
-
+use App\Http\Controllers\LabAssignController;
+use App\Http\Controllers\LabAssign1Controller;
 
 Route::get('/', function () {
     return view('login');
 });
 
-Route::get('/welcome', function () {
-    return view('welcome');
-});
+// Login routes
+Route::post('/', [AuthController::class, 'login'])->name('login.form');
 
+// Logout route
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ----------------------Incharge-----------------------
 // Route::get('/', function () {
@@ -33,6 +31,56 @@ Route::get('/nav', function () {
 Route::get('/Incharge/dashboard', function () {
     return view('incharge.dashboard');
 });
+
+Route::get('/Incharge/labassign', function () {
+    return view('incharge.labassign');
+});
+
+Route::get('/Incharge/rassign', function () {
+    return view('incharge.rassign');
+});
+
+Route::get('/Incharge/transaction', function () {
+    return view('incharge.transaction');
+});
+
+//lab assign
+Route::post('/Incharge/labassigns', [LabAssign1Controller::class, 'indexLabassign'])->name('Incharge.labassign.index');
+Route::post('/Incharge/labassigns/store', [LabAssign1Controller::class, 'storeLabassigns'])->name('Incharge.labassigns.store');
+
+
+// ----------------------Supervisor-----------------------
+// Route::get('/', function () {
+//     return view('incharge.login');
+// });
+
+Route::get('/nav', function () {
+    return view('supervisor.navbar');
+});
+
+Route::get('/Supervisor/dashboard', function () {
+    return view('supervisor.dashboard');
+});
+
+Route::get('/Supervisor/labassign', function () {
+    return view('supervisor.labassign');
+});
+
+Route::get('/Supervisor/rassign', function () {
+    return view('supervisor.rassign');
+});
+
+Route::get('/Supervisor/transaction', function () {
+    return view('supervisor.transaction');
+});
+
+//lab assign
+Route::post('/Supervisor/labassigns', [LabAssign1Controller::class, 'indexLabassign'])->name('Supervisor.labassign.index');
+Route::post('/Supervisor/labassigns/store', [LabAssign1Controller::class, 'storeLabassigns'])->name('Supervisor.labassigns.store');
+
+//lab assign
+// Route::post('/Incharge/labassigns', [LabAssignController::class, 'indexLabassign'])->name('supervisor.labassign.index');
+// Route::post('/Incharge/labassigns/store', [LabAssignController::class, 'storeLabassigns'])->name('supervisor.labassigns.store');
 
 
 // -------------------admin-------------------------
@@ -108,9 +156,23 @@ Route::post('admin/users/{id}/update', [SystemuserController::class, 'updateUser
 Route::get('/admin/centers', [CenterController::class, 'indexCenter'])->name('admin.center.index');
 Route::post('/admin/centers/store', [CenterController::class, 'storeCenters'])->name('admin.centers.store');
 
+
+//lab assign
+Route::post('/admin/labassigns', [LabAssignController::class, 'indexLabassign'])->name('admin.labassign.index');
+Route::post('/admin/labassigns/store', [LabAssignController::class, 'storeLabassigns'])->name('admin.labassigns.store');
+
+Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->name('get.user.names');
+// Route::get('/systemuser/search', [SystemUserController::class, 'search'])->name('systemuser.search');
+Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');
+
 // -------------------------------------------------------
 
 
+// ---------------------------Incharge------------------------------
+
+
+
+// -------------------------------------------------------------
 
 Route::get('/ll', function () {
     return view('ll');
@@ -118,7 +180,4 @@ Route::get('/ll', function () {
 
 
 
-Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->name('get.user.names');
-// Route::get('/systemuser/search', [SystemUserController::class, 'search'])->name('systemuser.search');
 
-Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');

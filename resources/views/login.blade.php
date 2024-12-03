@@ -96,6 +96,13 @@
         color: rgba(255, 255, 255, 0.7);
     }
 
+    .form-group input:focus {
+        border: none;
+        /* Remove border on focus */
+        outline: none;
+        /* No outline on focus */
+    }
+
     .btn {
         width: 100%;
         padding: 15px;
@@ -125,6 +132,18 @@
         text-decoration: none;
     }
 
+    /* Responsive for smaller screens */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+            height: auto;
+        }
+
+        .left-panel {
+            border-radius: 0;
+        }
+    }
+
     .role-icons {
         margin-top: 20px;
         display: flex;
@@ -139,9 +158,9 @@
         justify-content: center;
         align-items: center;
         border-radius: 50%;
-        margin: 0 23px;
+        /* margin: 0 23px; */
         color: #3b8dff;
-        font-size: 20px;
+        font-size: 23px;
         transition: transform 0.3s ease;
     }
 
@@ -149,28 +168,17 @@
         transform: scale(1.1);
     }
 
-    /* Responsive for smaller screens */
-    @media (max-width: 768px) {
-        .container {
-            flex-direction: column;
-            height: auto;
-        }
-
-        .left-panel {
-            border-radius: 0;
-        }
-    }
-
     .role-icons {
         margin-top: 30px;
         display: flex;
         justify-content: center;
+        gap: 40px;
+        /* Adjust spacing between icons */
     }
 
     .role-container {
+        text-align: center;
         position: relative;
-        overflow: hidden;
-        margin: 0 0px;
     }
 
     .role-btn {
@@ -179,39 +187,39 @@
         cursor: pointer;
         color: white;
         display: flex;
+        justify-content: center;
         align-items: center;
-        font-size: 14px;
+        font-size: 30px;
+        /* Icon size */
         transition: transform 0.3s ease;
-        position: relative;
-        padding: 25px;
-        /* Adjust padding for better hover effect */
-    }
-
-    .role-btn:hover {
-        transform: translateX(-30px);
-        /* Slide left */
     }
 
     .role-label {
-        margin-left: 60px;
+        margin-top: 10px;
         /* Space between icon and label */
         opacity: 0;
         /* Hide label initially */
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        /* Animate opacity and position */
+        color: white;
+        font-size: 14px;
+        background-color: rgba(0, 0, 0, 0.6);
+        /* Background for better visibility */
+        padding: 5px 10px;
+        border-radius: 5px;
         position: absolute;
-        /* Position absolutely within the container */
+        bottom: -35px;
+        /* Position below the icon */
         left: 50%;
-        /* Center the label */
-        transform: translateX(-50%) translateY(-10px);
-        /* Adjust label position */
+        transform: translateX(-50%);
+        white-space: nowrap;
+        /* Prevent label from wrapping */
+        transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
     .role-btn:hover .role-label {
         opacity: 1;
         /* Show label on hover */
-        transform: translateX(-50%) translateY(0);
-        /* Move label into position */
+        transform: translateX(-50%) translateY(-5px);
+        /* Slight upward transition */
     }
     </style>
 </head>
@@ -227,19 +235,48 @@
 
         <!-- Right Panel (Sign In Form) -->
         <div class="right-panel">
-            <h2>Sign In</h2><br>
-            <form action="{{ route('signin') }}" method="POST">
+            <h2>Sign In</h2>
+            <form action="{{ route('login.form') }}" method="POST">
                 @csrf
                 <!-- <h2>Sign In</h2> -->
-
+                @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+                @endif
                 <!-- Display error message if available -->
                 @if(session('error'))
                 <div class="alert alert-danger">
                     {{ session('error') }}
                 </div>
                 @endif
+                <div class="role-icons">
+                    <div class="role-container">
+                        <div class="role-btn" data-role="Admin">
+                            <i class='bx bx-cog'></i>
+                            <span class="role-label">Admin</span>
+                        </div>
+                    </div>
+                    <div class="role-container">
+                        <div class="role-btn" data-role="Supervisor">
+                            <i class='bx bxs-user'></i>
+                            <span class="role-label">Supervisor</span>
+                        </div>
+                    </div>
+                    <div class="role-container">
+                        <div class="role-btn" data-role="Incharge">
+                            <i class='bx bxs-user-circle'></i>
+                            <span class="role-label">Incharge</span>
+                        </div>
+                    </div>
+                </div>
+
+                <br><br>
+
+                <input type="hidden" id="selectedRole" name="role" value="" />
+
                 <div class="form-group">
-                    <input type="text" name="username" id="username" placeholder="Username" required />
+                    <input type="text" name="username" id="username"  placeholder="Username" required />
                 </div>
                 <div class="form-group">
                     <input type="password" name="password" id="password" placeholder="Password" required />
@@ -247,44 +284,32 @@
                 <button class="btn" type="submit">Sign In</button>
             </form>
 
-            <div class="role-icons">
-                <div class="role-container">
-                    <button class="role-btn" data-role="Admin">
-                        <i class='bx bx-cog'></i>
-                        <span class="role-label">Admin</span>
-                    </button>
-                </div>
-                <div class="role-container">
-                    <button class="role-btn" data-role="Supervisor">
-                        <i class='bx bxs-user'></i>
-                        <span class="role-label"> Supervisor</span>
-                    </button>
-                </div>
-            </div>
-            <input type="hidden" id="selectedRole" name="role" value="" />
-
         </div>
     </div>
 
-    <!-- Font Awesome for social icons -->
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-
     <script>
-    // Add this script before the closing </body> tag
-    document.querySelectorAll('.role-btn').forEach(button => {
+    // Get all role buttons
+    const roleButtons = document.querySelectorAll('.role-btn');
+
+    roleButtons.forEach(button => {
         button.addEventListener('click', function() {
+            // Reset all icons to default color
+            roleButtons.forEach(btn => {
+                btn.querySelector('i').style.color = '#3b8dff'; // Default icon color
+                btn.style.backgroundColor = 'transparent'; // Reset background
+            });
+
+            // Highlight the selected icon
+            const selectedIcon = this.querySelector('i');
+            selectedIcon.style.color = '#0A2472'; // Highlight icon color
+            // Add background to selected role
+
+            // Update hidden input field with selected role
             const selectedRole = this.getAttribute('data-role');
             document.getElementById('selectedRole').value = selectedRole;
-
-            // Optionally, add visual feedback for the selected role
-            document.querySelectorAll('.role-btn').forEach(btn => {
-                btn.style.color = 'white'; // Reset color
-            });
-            this.style.color = '#000'; // Highlight selected role
         });
     });
     </script>
-
 
 </body>
 

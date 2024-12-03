@@ -102,11 +102,11 @@
 
                         <div class="profile">
                             <div class="info">
-                                <p>Hey, <b>Reza</b></p>
-                                <small class="text-muted">Admin</small>
+                                <p>Hey, <b>{{ session('fname', 'Guest') }}</b></p>
+                                <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
                             <div class="profile-photo">
-                                <img src="../image/avatar1.jpg" alt="Profile">
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
                             </div>
                         </div>
                     </div>
