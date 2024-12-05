@@ -94,23 +94,23 @@ class SystemuserController extends Controller
         return redirect()->route('admin.user.index')->with('success', 'User updated successfully');
     }
 
-    // SystemuserController.php
     public function getUserNames()
-    {
-        // Fetch all system users
-        $users = Systemuser::select('fname', 'lname', 'epf')->get();
+{
+    // Fetch all system users
+    $users = Systemuser::select('uid', 'fname', 'lname', 'epf')->get();
 
-        // Create a list of full names with EPF
-        $userDetails = $users->map(function ($user) {
-            return [
-                'full_name' => $user->fname . ' ' . $user->lname,
-                'epf' => $user->epf,
-            ];
-        });
+    // Create a list of full names with EPF and UID
+    $userDetails = $users->map(function ($user) {
+        return [
+            'uid' => $user->uid,
+            'full_name' => $user->fname . ' ' . $user->lname,
+            'epf' => $user->epf,
+        ];
+    });
 
-        // Return the user details as a JSON response
-        return response()->json($userDetails);
-    }
+    // Return the user details as a JSON response
+    return response()->json($userDetails);
+}
 
 
 }

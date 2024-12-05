@@ -71,7 +71,7 @@
                 <!-- Input for Username -->
                 <div class="form-group form-group-full-width">
                     <label for="uid" class="form-label"> Username</label>
-                    <input type="text" name="uid" id="uid" class="form-control rounded-pill" required>
+                    <input type="text" name="uid" id="uid" class="form-control rounded-pill" value="{{ session('username') }}" required readonly>
                 </div>
                 <br>
 

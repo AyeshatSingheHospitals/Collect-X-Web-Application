@@ -88,7 +88,7 @@
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
                             <div class="profile-photo">
-                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
+                            <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
                             </div>
                         </div>
                     </div>
