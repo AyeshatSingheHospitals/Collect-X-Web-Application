@@ -59,7 +59,7 @@
                     <h3>Center Creation</h3>
                     <!-- <span class="msg_count">14</span> -->
                 </a>
-                <a href="/labassign" class="{{ request()->is('labassign') ? 'active' : '' }}">
+                <a href="/admin/labassigns" class="{{ request()->is('admin/labassigns') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">medical_services</span>
                     <h3>Lab Assign</h3>
                 </a>

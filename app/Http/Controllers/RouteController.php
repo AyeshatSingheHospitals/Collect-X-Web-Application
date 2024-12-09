@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Session;
 
 
 use App\Models\Route;
@@ -18,7 +19,7 @@ class RouteController extends Controller
         $routes = Route::all();
         $labs = Lab::all();
         $users = Systemuser::all();
-        return view('Admin.route', compact('routes', 'labs', 'users')); // Make sure to create this Blade file
+        return view('Admin.route', compact('routes', 'labs', 'users' )); // Make sure to create this Blade file
 
         }
 
@@ -85,21 +86,42 @@ class RouteController extends Controller
         return redirect()->route('admin.route.index')->with('success', 'Route updated successfully!');
     }
 
-    public function destroyRoute($rid){
+    public function destroyRoute($rid)
+    {
+        try {
+            // Find the route by ID
+            $routes = Route::findOrFail($rid);
 
-        $routes = Route::findOrFail($rid);
-        $routes->delete();
+            // Delete the route
+            $routes->delete();
 
-           // update a corresponding log entry in the 'routelogs' table
-           RouteLog::create([
-            'rid' => $routes->rid,
-            'uid' => $routes->uid,
-            'lid' => $routes->lid,
-            'routename' => $routes->routename,
-            'description' => $routes->description,
-            'action' => 'deleted', // Set action as 'insert'
-        ]);
+            // Log the deletion in the 'routelogs' table with the logged-in user's UID
+            RouteLog::create([
+                'rid' => $routes->rid,
+                'uid' => session('uid'), 
+                'lid' => $routes->lid,
+                'routename' => $routes->routename,
+                'description' => $routes->description,
+                'action' => 'deleted', // Log the 'deleted' action
+            ]);
 
-        return redirect()->route('admin.route.index')->with('success', 'Route deleted successfully!');
+            return redirect()->route('admin.route.index')->with('success', 'Route deleted successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.route.index')->withErrors('Failed to delete route: ' . $e->getMessage());
+        }
     }
+
+
+
+public function getRoutes($labId)
+{
+    // Fetch routes associated with the selected lab ID
+    $routes = Route::where('lid', $labId)->get();
+
+    // Return the routes as JSON
+    return response()->json(['routes' => $routes]);
 }
+
+}
+
+

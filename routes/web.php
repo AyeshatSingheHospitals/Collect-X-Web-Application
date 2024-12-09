@@ -158,7 +158,7 @@ Route::post('/admin/centers/store', [CenterController::class, 'storeCenters'])->
 
 
 //lab assign
-Route::post('/admin/labassigns', [LabAssignController::class, 'indexLabassign'])->name('admin.labassign.index');
+Route::get('/admin/labassigns', [LabAssignController::class, 'indexLabassign'])->name('admin.labassign.index');
 // Route::post('/admin/labassigns/store', [LabAssignController::class, 'storeLabassigns'])->name('admin.labassigns.store');
 
 Route::post('/admin/labassigns/store', [LabAssignController::class, 'store'])->name('admin.labassigns.store');

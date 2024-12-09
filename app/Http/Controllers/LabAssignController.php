@@ -13,8 +13,10 @@ class LabAssignController extends Controller
 
     public function indexLabassign()
 {
+    // Fetch lab assignments with related systemuser and lab data
     $labassigns = LabAssign::with(['systemuser', 'lab'])->get();
 
+    // Passing $labassigns to the view
     return view('Admin.labassign', compact('labassigns'));
 }
 

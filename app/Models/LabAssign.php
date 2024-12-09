@@ -23,9 +23,10 @@ class LabAssign extends Model
   
     //relationship to systemuser
 
-    public function systemuser(){
-        return $this->belongsTo(Systemuser::class, 'uid');
-      }
+    public function systemuser()
+    {
+        return $this->belongsTo(Systemuser::class, 'uid_assign', 'uid');
+    }
 
     //relationship to lab
 

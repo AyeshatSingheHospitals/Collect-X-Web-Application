@@ -58,6 +58,10 @@
                             onsubmit="return confirm('Are you sure you want to delete this route?');">
                             @csrf
                             @method('DELETE')
+
+                            <!-- Use session('uid') for the logged-in user ID -->
+                            <!-- <input type="hidden" name="uid" value="{{ session('uid') }}" required> -->
+
                             <button class="btn delete-btn" type="submit"><i class='bx bx-message-square-x'></i></button>
                         </form>
                     </div>
@@ -78,12 +82,15 @@
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="rid" id="editRid">
-                <input type="hidden" name="uid" id="editUid" class="form-control rounded-pill" required>
+                <!-- <input type="hidden" name="uid" id="editUid" class="form-control rounded-pill" required> -->
 
-                <!-- <div class="mb-3">
-                    <label for="editUid" class="form-label"> UID:</label>
-                    <input type="hidden" name="uid" id="editUid" class="form-control rounded-pill" required>
-                </div> -->
+                <div class="mb-3">
+                    <label class="form-label" for="editUid" class="form-label"> UID:</label>
+                    <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('username') }}"
+                        readonly required />
+                </div>
+
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
 
                 <div class="mb-3">
                     <label class="form-label" for="editlabSearch">
@@ -135,9 +142,12 @@
                     <label class="form-label" for="uid">
                         <i class="fas fa-user me-2"></i> UID:
                     </label>
-                    <input type="text" name="uid" class="form-control rounded-pill" placeholder="Enter your last name"
-                        required />
+                    <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('username') }}"
+                        readonly required />
                 </div>
+
+                <!-- Hidden field for uid -->
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
 
 
                 <div class="mb-3">
@@ -198,7 +208,6 @@
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
-
 
 .content {
     margin-left: 90px;
@@ -833,7 +842,7 @@ function openEditModal(route) {
 
     // Populate the modal fields with user data
     document.getElementById("editRid").value = route.routename;
-    document.getElementById("editUid").value = route.uid;
+    //document.getElementById("editUid").value = route.uid;
     document.getElementById("editlabSearch").value = route.systemuser?.username || "Not Assigned";
     document.getElementById("editLid").value = route.lid;
     // Set the visible input for lab name
@@ -878,7 +887,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Handle click event to select lab
                 labItem.addEventListener('click', function() {
                     labSearch.value = lab.name; // Set lab name in the search bar
-                    selectedLabId.value = lab.lid; // Store the lab ID in the hidden input
+                    selectedLabId.value = lab
+                        .lid; // Store the lab ID in the hidden input
                     labList.style.display = 'none'; // Hide the dropdown
                 });
 
@@ -927,7 +937,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 labItem.addEventListener('click', function() {
                     labSearch.value = lab.name; // Set lab name in the search bar
                     editLid.value = lab
-                    .lid; // Store the lab ID in the hidden input
+                        .lid; // Store the lab ID in the hidden input
                     labList.style.display = 'none'; // Hide the dropdown
                 });
 

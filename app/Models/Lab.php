@@ -34,5 +34,13 @@ class Lab extends Model
         return $this->belongsTo(Systemuser::class, 'uid');
       }
 
+    //   public function labassign(){
+    //     return $this->hasMany(LabAssign::class, 'lid');
+    // }
+
+    public function labassign(){
+        return $this->belongsTo(LabAssign::class, 'lid');
+    }
+
   
 }

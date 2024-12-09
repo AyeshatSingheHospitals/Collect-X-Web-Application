@@ -51,4 +51,8 @@ class Systemuser extends Authenticatable
     {
         return $this->image ? asset('storage/' . $this->image) : null;
     }
+
+    public function labassigns(){
+        return $this->hasMany(LabAssign::class, 'uid');
+    }
 }

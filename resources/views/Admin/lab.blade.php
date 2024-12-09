@@ -53,7 +53,7 @@
                             onsubmit="return confirm('Are you sure you want to delete this Laboratory?');">
                             @csrf
                             @method('DELETE')
-                            <button class="btn delete-btn" type="submit"><i class='bx bx-message-square-x'></i></button>
+                            <button class="btn delete-btn" type="submit"><i class='bx bx-message-square-x'></i></i></button>
                         </form>
                     </div>
 
@@ -74,10 +74,21 @@
                 @method('PUT')
                 <input type="hidden" name="lid" id="lid">
 
-                <div class="form-group">
-                    <label for="name">UID: </label>
-                    <input type="text" name="uid" id="uid" class="form-control rounded-pill" required>
+                <!-- <div class="form-group">
+                    <label  class="form-label" for="editUid" class="form-label">UID: </label>
+                    <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('usernme') }}" readonly required>
                 </div>
+
+                <input type="hidden" name="uid" value="{{ session('uid') }}"> -->
+
+                <div class="form-group">
+                    <label class="form-label" for="editUid" class="form-label"> UID:</label>
+                    <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('username') }}" readonly
+                        required />
+                </div>
+
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
+
 
                 <div class="form-group">
                     <label for="name">Laboratory Name</label>
@@ -106,8 +117,11 @@
 
                 <div class="form-group">
                     <label for="uid">UID: </label>
-                    <input type="text" name="uid" id="uid" class="form-control" required>
+                    <input type="text" name="uid" id="uid" class="form-control" value="{{ session('username') }}"  required>
                 </div>
+
+                <!-- Hidden field for uid -->
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
 
                 <div class="form-group">
                     <label for="name">Laboratory Name</label>
@@ -181,8 +195,8 @@
 }
 
 .alert-success:hover {
-    border-color: #365485;
-    background-color: #628ECB;
+    border-color: #98c68a;
+    background-color: #c3e6cb;
 }
 
 .alert-danger:hover {
@@ -286,18 +300,12 @@ main .analyse .progresss {
 
 /* Card styles to match the fluid, gradient look */
 .custom-card {
-    /* background: linear-gradient(135deg, #FED2B5, #FFF7D2 ); */
-    /* Gradient color */
     border: none;
-    /* border-radius: 20px; */
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-height:230px;
-
-background-color: var(--color-white);
-    /* padding: var(--card-padding); */
+background-color:var(--card-white);
     border-radius: var(--card-border-radius);
     box-shadow: var(--box-shadow);
+    height: 230px;
 }
 
 .custom-card:hover {
@@ -309,7 +317,7 @@ background-color: var(--color-white);
 .card-body {
     text-align: center;
     padding: 30px;
-    color:var(--color-dark);
+    color: #464646;
     /* White text for contrast */
 }
 
@@ -318,12 +326,13 @@ background-color: var(--color-white);
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 15px;
+    color: var(--color-dark);
 }
 
 .card-text {
     font-size: 1em;
     margin-bottom: 10px;
-    color:var(--color-dark);
+    color: var(--color-dark);
 }
 
 
@@ -339,65 +348,29 @@ background-color: var(--color-white);
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0; /* Remove padding on icon */
+    padding: 0; 
     margin: 0; 
 }
 
 .custom-card .btn i {
-    font-size: 25px;
-    color:  #628ECB;
+    font-size: 20px;
+    color: #628ECB;
+
 }
 
-/* Style for delete icon in the cards view */
+
 .custom-card .btn-container .btn.delete-btn i {
-    color: #628ECB; /* Set your desired color here, like a red tone */
+    color:#628ECB; 
 }
 
-/* Hover effect for delete icon */
+
 .custom-card .btn-container .btn.delete-btn:hover i,
 .custom-card .btn-container .btn.edit-btn:hover i {
-    /* transition:  transform 0.3s ease; */
+    
     transform: scale(1.05);
 
 
 }
-
-
-
-/* .custom-card button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-weight: bold;
-    color: white;
-    margin: 5px;
-} */
-
-/* .btn-warning {
-    background-color: #1B9C85;
-    border: none;
-    margin-right: 10px;
-    
-}
-
-.btn-warning:hover {
-    background-color: #0f775e;
-}
-
-form button[type="submit"] {
-    background-color: #e57373;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 30px;
-    font-weight: bold;
-}
-
-form button[type="submit"]:hover {
-    background-color: #ef5350;
-} */
 
 /* Wrapper around buttons for inline display */
 .card-body .btn-container {
@@ -419,11 +392,11 @@ button {
 }
 
  button:hover {
-    background-color: #365485;
+    background-color:  #365485;
 }
 
 button:active {
-    background-color: #628ECB;
+    background-color: #0c5e48;
 } 
 
 
@@ -527,41 +500,38 @@ h1 {
 }
 
 .glow-on-hover {
-    padding: 15px 32px;
-    margin: 4px 2px;
-    border: none;
-    font-size: 16px;
-    border-radius: 50px;
     background-color: #628ECB;
     color: white;
-    font-size: 1rem;
+    border: none;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    border-radius: 30px;
+   
 }
 
 .glow-on-hover:hover {
     background-color: #365485;
+   
 }
 
 
 /* Popup styles */
 .popup {
     display: none;
-    /* Hidden by default */
     position: fixed;
-    /* Stay in place */
     z-index: 1;
-    /* Sit on top */
     left: 0;
     top: 0;
     width: 100%;
-    /* Full width */
     height: 100%;
-    /* Full height */
     overflow: auto;
-    /* Enable scroll if needed */
     background-color: rgba(0, 0, 0, 0.5);
-    /* Black background with opacity */
 }
 
 .popup-content {
@@ -839,7 +809,7 @@ function openEditModal(lab) {
 
     document.getElementById("editForm").action = `/admin/labs/${lab.lid}`;
     document.getElementById("lid").value = lab.lid;
-    document.getElementById("uid").value = lab.uid;
+    // document.getElementById("uid").value = lab.uid;
     document.getElementById("name").value = lab.name;
     document.getElementById("address").value = lab.address;
 

@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Session;
+
 
 use Illuminate\Http\Request;
 use App\Models\Lab;
@@ -20,18 +22,14 @@ class LabController extends Controller
     public function storeLabs(Request $request)
     {
         $request->validate([
-            'uid' => 'required|string|max:255',
+            'uid' => 'required|exists:systemuser,uid', 
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
         ]);
 
         // Create a new lab entry
 
-        $labs=Lab::create([
-            'uid' => $request->input('uid'),
-            'name' => $request->input('name'),
-            'address' => $request->input('address'),
-        ]);
+            $labs=Lab::create($request->all());
 
           // Create a corresponding log entry in the 'lablogs' table
           LabLog::create([
@@ -49,13 +47,14 @@ class LabController extends Controller
     public function updateLabs(Request $request, $lid)
     {
         $request->validate([
-            'uid' => 'required|string|max:255',
+            'uid' => 'required|exists:systemuser,uid', 
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
         ]);
 
          // Find and update the lab
          $labs = Lab::findOrFail($lid);
+         $labs->uid = $request->uid;
          $labs->name = $request->name;
          $labs->address = $request->address;
          $labs->save();
@@ -82,33 +81,23 @@ class LabController extends Controller
            // update a corresponding log entry in the 'lablogs' table
            LabLog::create([
             'lid' => $labs->lid,
-            'uid' => $labs->uid,
+            'uid' => session('uid'),
             'name' => $labs->name,
             'address' => $labs->address,           
             'action' => 'deleted', // Set action as 'insert'
         ]);
 
         return redirect()->route('admin.lab.index')->with('success', 'Lab deleted successfully!');
-
-        
     }
-
-//     public function getLabNames()
-// {
-//     $labs = \App\Models\Lab::all(); // Assuming the model is named 'Lab'
-//     return response()->json($labs);
-// }
 
     public function getLabNames()
     {
         // Fetch all system users
-        $labs = Lab::select('lid','name')->get();
-        // $users = Systemuser::select('uid', 'fname', 'lname', 'epf')->get();
+        $labs = Lab::select('name')->get();
 
         // Create a list of full names with EPF
         $labsDetails = $labs->map(function ($labs) {
             return [
-                'lid' => $labs->lid,
                 'name' => $labs->name,
             ];
         });
@@ -116,5 +105,4 @@ class LabController extends Controller
         // Return the user details as a JSON response
         return response()->json($labsDetails);
     }
-
 }
