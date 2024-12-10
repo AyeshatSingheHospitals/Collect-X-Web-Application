@@ -90,14 +90,17 @@ class LabController extends Controller
         return redirect()->route('admin.lab.index')->with('success', 'Lab deleted successfully!');
     }
 
+   
     public function getLabNames()
     {
         // Fetch all system users
-        $labs = Lab::select('name')->get();
+        $labs = Lab::select('lid','name')->get();
+        // $users = Systemuser::select('uid', 'fname', 'lname', 'epf')->get();
 
         // Create a list of full names with EPF
         $labsDetails = $labs->map(function ($labs) {
             return [
+                'lid' => $labs->lid,
                 'name' => $labs->name,
             ];
         });
@@ -105,4 +108,7 @@ class LabController extends Controller
         // Return the user details as a JSON response
         return response()->json($labsDetails);
     }
+
+
+
 }

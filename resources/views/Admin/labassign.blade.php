@@ -5,8 +5,15 @@
 <!-- Registration Form -->
 <main>
     <div class="container1">
+
         <!-- Left Section (Cards) -->
         <div class="left-section">
+
+            <div class="search">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search by name or role..."
+                    onkeyup="filterCards()">
+            </div><br><br><br>
+
             @foreach($labassigns as $labassign)
             <div class="card">
                 <div class="image">
@@ -24,19 +31,33 @@
                     </div>
 
                     <div class="row1">
-                        <button class="btn1">Edit</button>
-                        <button class="btn1">Delete</button>
+                    <button class="btn1" onclick="openEditForm({{ $labassign->laid }})">Edit</button>
+
+                        <!-- <button class="btn1 edit-btn" data-name="{{ $labassign->systemuser->full_name }}"
+                            data-role="{{ $labassign->systemuser->role }}" data-lab-name="{{ $labassign->lab->name }}"
+                            data-uid="{{ $labassign->systemuser->uid }}" data-epf="{{ $labassign->systemuser->epf }}"
+                            data-lid="{{ $labassign->lab->lid }}">
+                            Edit
+                        </button> -->
+                        
+                        <!-- Delete Button -->
+                        <form action="{{ route('admin.labassigns.destroy', $labassign->laid) }}" method="POST" 
+                            onsubmit="return confirm('Are you sure you want to delete this Lab Assign?');">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn1">Delete</button>
+                        </form>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
-        
+
 
         <!-- Right Section (Form) -->
         <div class="right-section1">
             <br>
-            <h1>Lab Assign</h1>
+            <h1>Lab Assign</h1><br>
 
             @if(session('success'))
             <div class="alert alert-success">
@@ -103,7 +124,7 @@
                 </div>
 
                 <br>
-               
+
                 <div class="form-group form-group-full-width">
                     <label for="lab_name">Lab name</label>
                     <input type="text" id="lab_name" name="lab_name" class="form-control"
@@ -143,6 +164,24 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
+// JavaScript function to filter cards based on the search input
+function filterCards() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    let cards = document.querySelectorAll('.left-section .card');
+
+    cards.forEach(card => {
+        let name = card.querySelector('h2').innerText.toLowerCase();
+        let role = card.querySelector('p').innerText.toLowerCase();
+        let lab = card.querySelector('h3').innerText.toLowerCase();
+
+        if (name.includes(input) || role.includes(input) || lab.includes(input)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
 function openUserModal() {
     const modal = document.getElementById('userModal');
     modal.classList.remove('hidden');
@@ -248,6 +287,51 @@ function selectLab(name, lid) {
     document.getElementById('lab_name').value = name;
     document.getElementById('lid').value = lid;
     closeLabModal();
+}
+
+// Function to open the edit form and populate it with lab assignment details
+function openEditForm(labAssignId) {
+    // Fetch lab assignment details using AJAX
+    fetch(`/admin/labassigns/${labAssignId}/edit`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const labAssign = data.data;
+
+                // Populate the form fields
+                // document.getElementById('uid').value = labAssign.uid; // User ID
+                document.getElementById('assign_name').value = `${labAssign.systemuser.fname} ${labAssign.systemuser.lname}`; // Assigned User Name
+                document.getElementById('uid_assign').value = labAssign.uid_assign; // Assigned User ID
+                document.getElementById('epf').value = labAssign.systemuser.epf; // EPF
+                document.getElementById('lab_name').value = labAssign.lab.name; // Lab Name
+                document.getElementById('lid').value = labAssign.lid; // Lab ID
+
+                // Update the form action and method for the update operation
+                const form = document.querySelector('form');
+                form.action = `/admin/labassigns/${labAssignId}/update`;
+                form.method = 'POST';
+
+                // Ensure the PUT method is set via a hidden input
+                let methodInput = document.querySelector('input[name="_method"]');
+                if (!methodInput) {
+                    methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    form.appendChild(methodInput);
+                }
+                methodInput.value = 'PUT';
+
+                // Scroll to the form for editing
+                form.scrollIntoView({ behavior: 'smooth' });
+
+            } else {
+                alert('Failed to fetch lab assignment details.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching lab assignment details:', error);
+            alert('An error occurred while fetching lab assignment details.');
+        });
 }
 </script>
 
@@ -627,12 +711,59 @@ button:active {
     padding: 1.8rem;
 }
 
+.search {
+    display: grid;
+    /* grid-template-columns: 0.5fr 0.5fr; */
+    gap: 7em 1.8rem;
+    height: 20px;
+    width: 200%;
+}
+
 /* Left Section (Cards) */
 .left-section {
     display: grid;
     grid-template-columns: 0.5fr 0.5fr;
     gap: 7em 1.8rem;
-    height: 20px;
+    /* height: 20px; */
+    max-height: 750px;
+    /* Set a fixed height */
+    overflow-y: auto;
+    /* Add vertical scrollbar */
+    padding-right: 10px;
+    /* Space for scrollbar */
+}
+
+/* Optional: Styling the Scrollbar */
+.left-section::-webkit-scrollbar {
+    width: 8px;
+    /* Width of the scrollbar */
+    display: none;
+}
+
+.left-section::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Color of the scroll thumb */
+    border-radius: 4px;
+    /* Rounded edges for the thumb */
+}
+
+.left-section::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+    /* Darker on hover */
+}
+
+.left-section::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* Background of the scrollbar track */
+
+}
+
+.search {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px;
+    margin-bottom: 10px;
 }
 
 /* Card Style */
