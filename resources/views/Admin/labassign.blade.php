@@ -31,7 +31,7 @@
                     </div>
 
                     <div class="row1">
-                    <button class="btn1" onclick="openEditForm({{ $labassign->laid }})">Edit</button>
+                    <button class="btn2" onclick="openEditForm({{ $labassign->laid }})">Edit</button>
 
                         <!-- <button class="btn1 edit-btn" data-name="{{ $labassign->systemuser->full_name }}"
                             data-role="{{ $labassign->systemuser->role }}" data-lab-name="{{ $labassign->lab->name }}"
@@ -854,6 +854,31 @@ button:active {
     height: 45px;
     outline: none;
     border: 2px solid #8e94f2;
+    /* background: #8e94f2; */
+    color: #8e94f2;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: 0.5s;
+    background: #fff;
+}
+
+.btn1:hover {
+    box-shadow: 0 0 15px #8e94f2;
+    background: #fff;
+}
+
+.btn1:nth-child(2) {
+    background: #fff;
+    color: #8e94f2;
+}
+
+.btn2 {
+    width: 100%;
+    height: 45px;
+    outline: none;
+    border: 2px solid #8e94f2;
     background: #8e94f2;
     color: #fff;
     cursor: pointer;
@@ -863,12 +888,12 @@ button:active {
     transition: 0.5s;
 }
 
-.btn1:hover {
+.btn2:hover {
     box-shadow: 0 0 15px #8e94f2;
     background: #8e94f2;
 }
 
-.btn1:nth-child(2) {
+.btn2:nth-child(2) {
     background: none;
     color: #8e94f2;
 }

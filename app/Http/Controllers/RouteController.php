@@ -112,7 +112,6 @@ class RouteController extends Controller
     }
 
 
-
 public function getRoutes($labId)
 {
     // Fetch routes associated with the selected lab ID

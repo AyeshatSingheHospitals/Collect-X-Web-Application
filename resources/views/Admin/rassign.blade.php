@@ -2,221 +2,188 @@
 
 @section('content')
 
-<!-- Registration Form -->
 <main>
     <div class="top-bar">
         <h1>Route Assign</h1>
     </div>
 
-<br><br>
+    <br><br>
 
     <div class="mb-3">
         <label class="form-label" for="labSearch">
             Search Lab Name:
         </label>
         <br>
-        <input type="text" id="labSearch" class="form-control rounded-pill" placeholder="Type to search labs...">
-
-        <!-- Dropdown list to display labs -->
-        <ul id="labList" class="list-group mt-2" name="lid"
-            style="display: none; max-height: 200px; overflow-y: auto; position: absolute; z-index: 1000; width: 90%;">
-            <!-- Lab names will be populated here -->
-        </ul>
+        <input type="text" id="labSearch" class="form-control rounded-pill" placeholder="Type to search labs..."
+            onkeyup="searchLabs()">
     </div>
 
     <br><br>
 
-     <!-- Table Structure -->
-     <!-- <div class="table-container">
+    <!-- Dynamic Table for Routes and Users -->
+    <div class="table-container">
         <table class="route-assign-table">
             <thead>
-                <tr>
-                    <th></th>
-                    <th >Option</th>
-                    <th >Option</th>
-                    <th>Option</th>
-                    <th >Option</th>
-                    <th >Option</th>
-                    <th >Option</th>
-                    <th >Option</th>
-                    <th >Option</th>
+                <tr id="routeHeaders">
+                    <th>User</th>
+                    <!-- Routes will be dynamically added here -->
                 </tr>
-            
             </thead>
-            <tbody>
-                <tr>
-                    <td>Default</td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-
-                    
-                </tr>
-                <tr>
-                    <td>Sun</td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-
-                   
-                </tr>
-                 <tr>
-                    <td>Sun</td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="checkbox"></td>
-
-                   
-                </tr>
-            
+            <tbody id="userList">
+                <!-- Assigned users will be dynamically added here -->
             </tbody>
         </table>
-    </div> -->
-
-    <div class="table-container">
-    <table class="route-assign-table">
-        <thead>
-            <tr>
-                <th></th>
-                <th>Option 1</th>
-                <th>Option 2</th>
-                <th>Option 3</th>
-                <th>Option 4</th>
-                <th>Option 5</th>
-                <th>Option 6</th>
-                <th>Option 7</th>
-                <th>Option 8</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Default</td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-            </tr>
-            <tr>
-                <td>Sun</td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-                <td><input type="checkbox" class="styled-checkbox"></td>
-            </tr>
-            <!-- Additional rows as needed -->
-        </tbody>
-    </table>
-</div>
+    </div>
 </main>
 
+<script>
+    async function searchLabs() {
+        const searchQuery = document.getElementById('labSearch').value;
+
+        if (!searchQuery) {
+            return; // Do nothing if the input is empty
+        }
+
+        try {
+            const response = await fetch(`/route-assign/search?name=${searchQuery}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                renderTable(data.users, data.routes);
+            } else {
+                alert(data.message || 'Lab not found');
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    function renderTable(users, routes) {
+        const routeHeaders = document.getElementById('routeHeaders');
+        const userList = document.getElementById('userList');
+
+        // Clear existing headers and rows
+        routeHeaders.innerHTML = '<th>User</th>';
+        userList.innerHTML = '';
+
+        // Add route headers
+        routes.forEach(route => {
+            const th = document.createElement('th');
+            th.textContent = route.name;
+            routeHeaders.appendChild(th);
+        });
+
+        // Add user rows with checkboxes for each route
+        users.forEach(user => {
+            const tr = document.createElement('tr');
+
+            // User name column
+            const nameCell = document.createElement('td');
+            nameCell.textContent = user.name;
+            tr.appendChild(nameCell);
+
+            // Checkbox columns for each route
+            routes.forEach(route => {
+                const checkboxCell = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = `assign[${user.id}][${route.id}]`;
+                checkboxCell.appendChild(checkbox);
+                tr.appendChild(checkboxCell);
+            });
+
+            userList.appendChild(tr);
+        });
+    }
+</script>
 
 <style>
-    .table-container {
-        overflow-x: auto;
-        margin-top: 20px;
-    }
+.table-container {
+    overflow-x: auto;
+    margin-top: 20px;
+}
 
-    .route-assign-table {
-        width: 100%;
-        border-collapse: collapse;
-        background-color: #ffffff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+.route-assign-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
+.route-assign-table thead th {
+    background-color: none;
+    color: #d9006c;
+    /* color:#8e94f2; */
+    font-weight: bold;
+    padding: 15px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.route-assign-table tbody tr {
+    transition: background-color 0.3s ease;
+}
+
+.route-assign-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.route-assign-table tbody td {
+    padding: 12px;
+    /* border-bottom: 1px solid #e0e0e0; */
+    font-size: 14px;
+    color: #333;
+    justify-content: center;
+    align-items: center;
+}
+
+.route-assign-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.route-assign-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Styled checkboxes */
+.styled-checkbox {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    /* accent-color: #8e94f2; */
+    accent-color: #fff;
+    transition: transform 0.2s ease;
+
+}
+
+.styled-checkbox:checked {
+    transform: scale(1.1);
+}
+
+.route-assign-table thead th:first-child,
+.route-assign-table tbody td:first-child {
+    font-weight: bold;
+    color: #9a4fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
     .route-assign-table thead th {
-        background-color:none;
-        color: #d9006c;
-        /* color:#8e94f2; */
-        font-weight: bold;
-        padding: 15px;
-        text-transform: uppercase;
-        font-size: 14px;
-    }
-
-    .route-assign-table tbody tr {
-        transition: background-color 0.3s ease;
-    }
-
-    .route-assign-table tbody tr:hover {
-        background-color: #f1f1f1;
+        font-size: 12px;
+        padding: 10px;
     }
 
     .route-assign-table tbody td {
-        padding: 12px;
-        /* border-bottom: 1px solid #e0e0e0; */
-        font-size: 14px;
-        color: #333;
+        padding: 10px;
+        font-size: 13px;
     }
-
-    .route-assign-table tbody tr:nth-child(even) {
-        background-color: #fafafa;
-    }
-
-    .route-assign-table tbody tr:last-child td {
-        border-bottom: none;
-    }
-
-    /* Styled checkboxes */
-    .styled-checkbox {
-        position: relative;
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        /* accent-color: #8e94f2; */
-        accent-color: #fff;
-        transition: transform 0.2s ease;
-    }
-
-    .styled-checkbox:checked {
-        transform: scale(1.1);
-    }
-
-    .route-assign-table thead th:first-child,
-    .route-assign-table tbody td:first-child {
-        font-weight: bold;
-        color: #9a4fff;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .route-assign-table thead th {
-            font-size: 12px;
-            padding: 10px;
-        }
-        
-        .route-assign-table tbody td {
-            padding: 10px;
-            font-size: 13px;
-        }
-    }
+}
 </style>
 
-    
+
 
 
 <style>
@@ -292,7 +259,7 @@ main .analyse .progresss {
     border-radius: 50%;
 }
 
-.form-label{
+.form-label {
     font-size: 13px;
 }
 
@@ -342,13 +309,13 @@ main .analyse .progresss {
         padding: 0 var(--padding-1);
     }
 
-@keyframes showMenu {
+    @keyframes showMenu {
         to {
             left: 0;
         }
     }
 
-   
+
 
     main {
         margin-top: 8rem;

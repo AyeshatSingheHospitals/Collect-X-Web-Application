@@ -18,29 +18,19 @@ class Lab extends Model
         'uid',
         'name',
         'address',
-    
     ];
-
-    protected $hidden = [
-        'password',
-    ];
-
-    // //hashing password
-    // public function setPasswordAttribute($value){
-    //     $this->attribute['password'] = bcrypt($value);
-    // }
 
     public function systemuser(){
         return $this->belongsTo(Systemuser::class, 'uid');
       }
 
-    //   public function labassign(){
-    //     return $this->hasMany(LabAssign::class, 'lid');
-    // }
-
     public function labassign(){
         return $this->belongsTo(LabAssign::class, 'lid');
     }
 
-  
+  public function users()
+{
+    return $this->belongsToMany(User::class);
+}
+
 }

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-
 class Center extends Model
 {
     use HasFactory;
@@ -28,20 +27,21 @@ class Center extends Model
         'longitude',
     ];
 
-    //relationship to systemuser
+    // Relationship to Systemuser
+    public function systemuser()
+    {
+        return $this->belongsTo(Systemuser::class, 'uid');
+    }
 
-  public function systemuser(){
-    return $this->belongsTo(Systemuser::class, 'uid');
-  }
-
-     //relationship to route
-
-     public function route(){
+    // Relationship to Route
+    public function route()
+    {
         return $this->belongsTo(Route::class, 'rid');
-      }
+    }
 
-      
-     public function lab(){
-      return $this->belongsTo(Lab::class, 'lid');
+    // Relationship to Lab
+    public function lab()
+    {
+        return $this->belongsTo(Lab::class, 'lid');
     }
 }

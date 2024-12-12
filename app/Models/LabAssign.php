@@ -14,13 +14,11 @@ class LabAssign extends Model
     protected $primaryKey = 'laid';
 
     protected $fillable = [
-    
         'uid',
         'lid',
         'uid_assign'
     ];
 
-  
     //relationship to systemuser
 
     public function systemuser()

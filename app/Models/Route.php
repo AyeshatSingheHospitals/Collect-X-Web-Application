@@ -18,9 +18,7 @@ class Route extends Model
         'uid',
         'lid',
         'routename',
-        'description',
-        
-       
+        'description', 
     ];
 
     //relationship to systemuser

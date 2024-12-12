@@ -794,6 +794,22 @@
                 </div>
             </div>
         </div>
+        <div class="searches">
+            <div class="status">
+                <div class="info">
+                    <h3>Total Laboratories</h3>
+                    <h1>14,147</h1>
+                </div>
+                <div class="progresss">
+                    <svg>
+                        <circle cx="38" cy="38" r="36"></circle>
+                    </svg>
+                    <div class="percentage">
+                    <i class='bx bx-buildings'></i>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="visits">
             <div class="status">
                 <div class="info">
@@ -834,22 +850,22 @@
     <!-- End of New Users Section -->
 <br>
     <!-- Recent Orders Table -->
-    <div class="recent-orders">
+    <!-- <div class="recent-orders">
         <h2>Today Route Assigns</h2>
         <table>
             <thead>
                 <tr>
-                    <th>Course Name</th>
-                    <th>Course Number</th>
-                    <th>Payment</th>
-                    <th>Status</th>
+                    <th>Laboratory Name</th>
+                    <th>Route Name</th>
+                    <th>Relationship Officer</th>
+                    <th>Contact No:</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
         <a href="#">Show All</a>
-    </div>
+    </div> -->
     <!-- End of Recent Orders -->
 
 </main>

@@ -120,8 +120,6 @@ class LabAssignController extends Controller
                 ->withErrors(['error' => 'Failed to update lab assignment.']);
         }
 
-        
-
     }
 
     public function destroyLabassign($id){

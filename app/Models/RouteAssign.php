@@ -14,17 +14,15 @@ class RouteAssign extends Model
     protected $primaryKey = 'raid';
 
     protected $fillable = [
-    
         'uid',
         'rid',
         'uid_ro',
     ];
 
-  
     //relationship to systemuser
 
     public function systemuser(){
-        return $this->belongsTo(Systemuser::class, 'uid');
+        return $this->belongsTo(Systemuser::class, 'uid_ro', 'uid');
       }
 
     //relationship to route
