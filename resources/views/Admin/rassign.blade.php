@@ -20,12 +20,15 @@
 
     <br><br>
 
+    <div id="loadingIndicator" style="display: none;">Loading...</div>
+    <form id="assignForm" action="{{ route('admin.routeassigns.store') }}" method="POST">
+    @csrf
     <!-- Dynamic Table for Routes and Users -->
     <div class="table-container">
         <table class="route-assign-table">
             <thead>
                 <tr id="routeHeaders">
-                    <th>User</th>
+                    <!-- <th>User</th> -->
                     <!-- Routes will be dynamically added here -->
                 </tr>
             </thead>
@@ -34,15 +37,26 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Submit Button -->
+    <div class="submit-button-container" id="submitButtonContainer">
+        <p> Hey {{ session('fname', 'Guest') }} ! You can update now</p>
+        <input type="hidden" name="uid" value="{{ session('uid') }}">
+        <button type="button" id="submitAssignments" >Submit</button>
+    </div>
+    </form>
 </main>
 
 <script>
     async function searchLabs() {
         const searchQuery = document.getElementById('labSearch').value;
+        const loadingIndicator = document.getElementById('loadingIndicator');
 
         if (!searchQuery) {
             return; // Do nothing if the input is empty
         }
+
+        loadingIndicator.style.display = 'block'; // Show loading indicator
 
         try {
             const response = await fetch(`/route-assign/search?name=${searchQuery}`);
@@ -55,16 +69,30 @@
             }
         } catch (error) {
             console.error('Error fetching data:', error);
+        } finally {
+            loadingIndicator.style.display = 'none'; // Hide loading indicator
         }
     }
 
     function renderTable(users, routes) {
         const routeHeaders = document.getElementById('routeHeaders');
         const userList = document.getElementById('userList');
+        const submitButtonContainer = document.getElementById('submitButtonContainer');
 
         // Clear existing headers and rows
         routeHeaders.innerHTML = '<th>User</th>';
         userList.innerHTML = '';
+
+        // Check if there are users and routes to display
+        if (users && users.length > 0 && routes && routes.length > 0) {
+            submitButtonContainer.hidden = false; // Show submit button container
+        } else {
+            submitButtonContainer.hidden = true; // Hide submit button container
+
+            // Add placeholder message
+            userList.innerHTML = '<tr><td colspan="100%">No data found. Try a different search.</td></tr>';
+            return; // Exit the function
+        }
 
         // Add route headers
         routes.forEach(route => {
@@ -88,6 +116,8 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.name = `assign[${user.id}][${route.id}]`;
+                checkbox.dataset.routeId = route.id; // Add data attribute for the route
+                checkbox.addEventListener('change', handleColumnSelection); // Add event listener
                 checkboxCell.appendChild(checkbox);
                 tr.appendChild(checkboxCell);
             });
@@ -95,9 +125,139 @@
             userList.appendChild(tr);
         });
     }
+
+    function handleColumnSelection(event) {
+        const checkbox = event.target;
+        const routeId = checkbox.dataset.routeId;
+
+        // Get all checkboxes in the same column
+        const columnCheckboxes = document.querySelectorAll(`input[data-route-id="${routeId}"]`);
+
+        // If the current checkbox is being checked, uncheck all others in the column
+        if (checkbox.checked) {
+            columnCheckboxes.forEach(cb => {
+                if (cb !== checkbox) {
+                    cb.checked = false;
+                }
+            });
+        }
+    }
+
+    async function submitAssignments() {
+    const routeAssignments = [];
+
+    // Collect all selected checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+
+    checkboxes.forEach(checkbox => {
+        const userIdRo = checkbox.name.match(/\[(\d+)\]/)[1]; // Extract user ID (uid_ro)
+        const routeId = checkbox.dataset.routeId; // Get route ID (rid)
+        const userId = document.querySelector('input[name="uid"]').value; // Current user ID (uid)
+
+        routeAssignments.push({
+            uid: userId,
+            uid_ro: userIdRo,
+            rid: routeId
+        });
+    });
+
+    // If no checkboxes are selected, show an alert
+    if (routeAssignments.length === 0) {
+        alert('No assignments selected.');
+        return;
+    }
+
+    // Send the data to the server
+    try {
+        const response = await fetch('/admin/routeassigns/store', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ assignments: routeAssignments })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert('Assignments saved successfully!');
+            location.reload(); // Reload to reflect changes
+        } else {
+            alert(data.message || 'Error saving assignments');
+        }
+    } catch (error) {
+        console.error('Error submitting assignments:', error);
+        alert('An error occurred while submitting the assignments.');
+    }
+}
 </script>
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+.submit-button-container {
+    display: flex;
+    /* Enables Flexbox */
+    justify-content: space-between;
+    /* Align items with space between them */
+    align-items: center;
+    /* Vertically align items */
+    margin-top: 1rem;
+    /* Add spacing above */
+    padding: 0.5rem;
+    /* Add some padding */
+    border-radius: 5px;
+    /* Rounded corners */
+    gap: 40px;
+}
+
+.updated-by-text {
+    margin: 0;
+    /* Remove default margin */
+    font-size: 16px;
+    /* Adjust text size */
+    color: #555;
+    /* Subtle text color */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .submit-button-container {
+        flex-direction: column;
+        /* Stack items vertically on small screens */
+        align-items: flex-start;
+        /* Align items to the start */
+    }
+
+    #submitAssignments {
+        margin-top: 0.5rem;
+        /* Add spacing above the button in stacked view */
+        width: 100%;
+        /* Make the button full-width on small screens */
+    }
+}
+
+td {
+    text-align: center;
+    /* Horizontally center content */
+    vertical-align: middle;
+    /* Vertically center content */
+}
+
+.table-container {
+    position: relative;
+    /* Ensure the submit button is placed relative to the table */
+    margin-bottom: 2rem;
+    /* Add spacing below the table */
+}
+
+.submit-button-container {
+    display: flex;
+    justify-content: flex-end;
+    /* Align the button to the right */
+    margin-top: 1rem;
+}
+
 .table-container {
     overflow-x: auto;
     margin-top: 20px;
@@ -181,13 +341,6 @@
         font-size: 13px;
     }
 }
-</style>
-
-
-
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 .content {
     margin-left: 90px;
@@ -430,8 +583,6 @@ button:active {
     color: #555;
 }
 
-
-
 /* Responsive Styling */
 @media (max-width: 768px) {
     h1 {
@@ -516,10 +667,4 @@ button:active {
 </style> -->
 
 <!-- JavaScript -->
-
-
-
-<!-- FontAwesome for icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
 @endsection

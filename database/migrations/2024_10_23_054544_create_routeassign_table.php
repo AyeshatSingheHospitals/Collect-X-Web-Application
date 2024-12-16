@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('routeassign', function (Blueprint $table) {
             $table->id('raid');
             $table->foreignId('uid')->constrained('systemuser')->onDelete('cascade'); // add onDelete as needed
-            $table->foreignId('uid_ro')->constrained('user')->onDelete('cascade');
+            $table->foreignId('uid_ro')->constrained('systemuser')->onDelete('cascade');
             $table->foreignId('rid')->constrained('route')->onDelete('cascade');
             $table->timestamps();
         });

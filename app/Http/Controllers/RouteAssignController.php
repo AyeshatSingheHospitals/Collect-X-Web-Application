@@ -10,33 +10,6 @@ use App\Models\Systemuser;
 
 class RouteAssignController extends Controller
 {
-    // public function searchLab($searchValue)
-    // {
-    //     // Search for labs by name
-    //     $labs = Lab::where('name', 'LIKE', '%' . $searchValue . '%')->get();
-    
-    //     $response = [];
-        
-    //     foreach ($labs as $lab) {
-    //         $labRoutes = Route::where('lid', $lab->lid)->get(); // Fetch routes for this lab
-    //         $assignedUsers = LabAssign::where('lid', $lab->lid)
-    //             ->with(['systemuser' => function ($query) {
-    //                 $query->where('role', 'RO'); // Filter users with role "RO"
-    //             }])->get();
-            
-    //         // Prepare the data to send back
-    //         $response['labs'][] = [
-    //             'lab' => $lab,
-    //             'routes' => $labRoutes,
-    //             'users' => $assignedUsers->map(function($assign) {
-    //                 return $assign->systemuser; // Return only Systemuser data
-    //             })->filter() // Remove null entries (users without the role "RO")
-    //         ];
-    //     }
-        
-    //     return response()->json($response);
-    // }
-
     public function searchLab(Request $request)
     {
         $labName = $request->input('name');
@@ -77,6 +50,40 @@ class RouteAssignController extends Controller
         ];
 
         return response()->json($response);
+    }
+
+    public function store(Request $request)
+    {
+        // Validate incoming data
+        $validator = Validator::make($request->all(), [
+            'assignments' => 'required|array',
+            'assignments.*.uid' => 'required|exists:systemuser,uid',
+            'assignments.*.uid_ro' => 'required|exists:systemuser,uid',
+            'assignments.*.rid' => 'required|exists:route,rid',
+        ], [
+            'assignments.*.uid.required' => 'User ID is required.',
+            'assignments.*.uid_ro.required' => 'Assigned User ID is required.',
+            'assignments.*.rid.required' => 'Route ID is required.',
+        ]);              
+
+        if ($validator->fails()) {
+            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        }
+
+        $assignments = $request->input('assignments');
+
+        foreach ($assignments as $assignment) {
+            RouteAssign::updateOrCreate(
+                [
+                    'uid' => $assignment['uid'],
+                    'uid_ro' => $assignment['uid_ro'],
+                    'rid' => $assignment['rid'],
+                ],
+                [] // If additional fields are needed, include them here
+            );
+        }
+
+        return response()->json(['message' => 'Assignments saved successfully']);
     }
     
 }

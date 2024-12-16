@@ -288,13 +288,49 @@
     }
 
     main .analyse .visits svg circle {
-        stroke: var(--color-danger);
+        stroke: var(--color-primary);
+        stroke-dashoffset: -30;
+        stroke-dasharray: 200;
+    }
+
+    main .analyse .centers svg circle {
+        stroke: var(--color-warning);
         stroke-dashoffset: -30;
         stroke-dasharray: 200;
     }
 
     main .analyse .searches svg circle {
-        stroke: var(--color-primary);
+        stroke: var(--color-danger);
+        stroke-dashoffset: -30;
+        stroke-dasharray: 200;
+    }
+
+    main .analyse .ros svg circle {
+        stroke: var(--color-pink);
+        stroke-dashoffset: -30;
+        stroke-dasharray: 200;
+    }
+
+    main .analyse .labassigns svg circle {
+        stroke: var(--color-orange);
+        stroke-dashoffset: -30;
+        stroke-dasharray: 200;
+    }
+
+    main .analyse .routeassigns svg circle {
+        stroke: var(--color-purple);
+        stroke-dashoffset: -30;
+        stroke-dasharray: 200;
+    }
+
+    main .analyse .supervisors svg circle {
+        stroke: var(--color-green);
+        stroke-dashoffset: -30;
+        stroke-dasharray: 200;
+    }
+
+    main .analyse .incharges svg circle {
+        stroke: var(--color-blue);
         stroke-dashoffset: -30;
         stroke-dasharray: 200;
     }
@@ -805,7 +841,7 @@
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bx-buildings'></i>
+                    <i class='bx bxs-building-house' ></i>
                     </div>
                 </div>
             </div>
@@ -826,7 +862,7 @@
                 </div>
             </div>
         </div>
-        <div class="searches">
+        <div class="centers">
             <div class="status">
                 <div class="info">
                     <h3>Total Centers</h3>
@@ -842,7 +878,90 @@
                 </div>
             </div>
         </div>
+        <div class="labassigns">
+            <div class="status">
+                <div class="info">
+                    <h3>Total Laboratory Assigns</h3>
+                    <h1>14,147</h1>
+                </div>
+                <div class="progresss">
+                    <svg>
+                        <circle cx="38" cy="38" r="36"></circle>
+                    </svg>
+                    <div class="percentage">
+                    <i class='bx bx-building-house' ></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="routeassigns">
+            <div class="status">
+                <div class="info">
+                    <h3>Total Route Assigns</h3>
+                    <h1>14,147</h1>
+                </div>
+                <div class="progresss">
+                    <svg>
+                        <circle cx="38" cy="38" r="36"></circle>
+                    </svg>
+                    <div class="percentage">
+                    <i class='bx bx-location-plus' ></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ros">
+            <div class="status">
+                <div class="info">
+                    <h3>Total Supervisors</h3>
+                    <h1>14,147</h1>
+                </div>
+                <div class="progresss">
+                    <svg>
+                        <circle cx="38" cy="38" r="36"></circle>
+                    </svg>
+                    <div class="percentage">
+                    <i class='bx bxs-user'></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="supervisors">
+            <div class="status">
+                <div class="info">
+                    <h3>Total Incharges</h3>
+                    <h1>14,147</h1>
+                </div>
+                <div class="progresss">
+                    <svg>
+                        <circle cx="38" cy="38" r="36"></circle>
+                    </svg>
+                    <div class="percentage">
+                    <i class='bx bx-user' ></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="incharges">
+            <div class="status">
+                <div class="info">
+                    <h3>Total Relationship Officers</h3>
+                    <h1>14,147</h1>
+                </div>
+                <div class="progresss">
+                    <svg>
+                        <circle cx="38" cy="38" r="36"></circle>
+                    </svg>
+                    <div class="percentage">
+                    <i class='bx bxs-user-voice' ></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
+
     <!-- End of Analyses -->
 
     <!-- New Users Section -->
