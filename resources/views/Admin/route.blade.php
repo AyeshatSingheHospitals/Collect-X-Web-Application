@@ -9,12 +9,20 @@
 
     </div>
     <br>
+    <div class="row">
+
     <!-- Button to trigger the pop-up -->
     <div class="text-left mb-3">
         <button id="openPopup" class="glow-on-hover btn btn-info rounded-pill" type="button">
             <i class="fas fa-info-circle me-2"></i> Add
         </button>
     </div>
+    <div class="search-container">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterLabs()" />
+            
+        </div>
+        </div>
+
 
 
     @if(session('success'))
@@ -36,8 +44,19 @@
     <br>
     <br>
     <!-- Display list of routes in card format -->
+    
+    @if($routes->isEmpty())
+    <div class="col-12 mt-5 center-align-container">
+        <!-- Display the image -->
+        <img src="{{ asset('../image/Map Animated.gif') }}" alt="No Records" class="img-fluid mb-3" style="max-width: 400px; border-radius:50%;">
+        <!-- Display the "No record here" message -->
+        <h4 class="text-muted">No record here</h4>
+    </div>
+
+    @else
     <div class="row">
         @foreach($routes as $route)
+        
         <div class="col-md-4">
             <div class="card mb-3 custom-card">
                 <div class="card-body">
@@ -70,6 +89,7 @@
             </div>
         </div>
         @endforeach
+        @endif
     </div>
 
     <!-- Edit Modal (hidden by default) -->
@@ -209,6 +229,20 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+
+.center-align-container {
+    display: flex;
+    justify-content: center;
+    /* Horizontally center */
+    align-items: center;
+    /* Vertically center */
+    text-align: center;
+    /* Align the text in the center */
+    flex-direction: column;
+    /* Stack the image and text vertically */
+    padding-top:6%;
+}
+
 .content {
     margin-left: 90px;
 }
@@ -286,6 +320,16 @@
     margin: 0 auto;
     gap: 1.8rem;
     grid-template-columns: 16rem auto 6rem;
+}
+
+#searchInput {
+    width: 350px;
+    height: 50px;
+    /* margin-left: 340px; */
+}
+
+.search-container{
+    margin-left: 65%;
 }
 
 /* Container for the cards */
@@ -684,6 +728,8 @@ input[type="email"] {
     margin-bottom: 15px;
     width: 100%;
     transition: border 0.3s ease;
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 input:focus {
@@ -805,36 +851,36 @@ window.onclick = function(event) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.querySelector('.dark-mode');
-    const body = document.body;
+// document.addEventListener('DOMContentLoaded', function() {
+//     const darkModeToggle = document.querySelector('.dark-mode');
+//     const body = document.body;
 
-    darkModeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode-active');
-    });
-});
+//     darkModeToggle.addEventListener('click', function() {
+//         body.classList.toggle('dark-mode-active');
+//     });
+// });
 </script>
 
 <script>
-const sideMenu = document.querySelector('aside');
-const menuBtn = document.getElementById('menu-btn');
-const closeBtn = document.getElementById('close-btn');
+// const sideMenu = document.querySelector('aside');
+// const menuBtn = document.getElementById('menu-btn');
+// const closeBtn = document.getElementById('close-btn');
 
-const darkMode = document.querySelector('.dark-mode');
+// const darkMode = document.querySelector('.dark-mode');
 
-menuBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'block';
-});
+// menuBtn.addEventListener('click', () => {
+//     sideMenu.style.display = 'block';
+// });
 
-closeBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'none';
-});
+// closeBtn.addEventListener('click', () => {
+//     sideMenu.style.display = 'none';
+// });
 
-darkMode.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode-variables');
-    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-});
+// darkMode.addEventListener('click', () => {
+//     document.body.classList.toggle('dark-mode-variables');
+//     darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
+//     darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
+// });
 
 function openEditModal(route) {
     // Set the form action to the update route with the user's ID

@@ -19,7 +19,7 @@ Route::get('/', function () {
 Route::post('/', [AuthController::class, 'login'])->name('login.form');
 
 // Logout route
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ----------------------Incharge-----------------------
 // Route::get('/', function () {
@@ -153,14 +153,15 @@ Route::get('/getRoutes/{labId}', [RouteController::class, 'getRoutes']);
 Route::get('/admin/centers', [CenterController::class, 'indexCenter'])->name('admin.center.index');
 Route::post('/admin/centers/store', [CenterController::class, 'storeCenters'])->name('admin.centers.store');
 Route::get('/getRouteById/{rid}', [CenterController::class, 'getRouteById'])->name('routes.getById');
-Route::put('/admin/centers/{cid}', [CenterController::class, 'updateCenter'])->name('admin.center.update');
+Route::put('/admin/centers/{cid}', [CenterController::class, 'updateCenters'])->name('admin.center.update');
 Route::delete('/admin/centers/{cid}', [CenterController::class, 'destroycenter'])->name('admin.center.destroy');
 
 //lab assign
 Route::get('/admin/labassigns', [LabAssignController::class, 'indexLabassign'])->name('admin.labassign.index');
 Route::post('/admin/labassigns/store', [LabAssignController::class, 'storeLabassign'])->name('admin.labassigns.store');
-Route::get('/admin/labassigns/{id}/edit', [LabAssignController::class, 'editLabassign'])->name('admin.labassigns.edit');
-Route::put('/admin/labassigns/{id}/update', [LabAssignController::class, 'updateLabassign'])->name('admin.labassigns.update');
+// Route::get('/admin/labassigns/{id}/edit', [LabAssignController::class, 'editLabassign'])->name('admin.labassigns.edit');
+// Route::put('/admin/labassigns/{id}/update', [LabAssignController::class, 'updateLabassign'])->name('admin.labassigns.update');
+Route::put('/admin/labassigns/{laid}', [LabAssignController::class, 'updateLabassign'])->name('admin.labassigns.update');
 Route::delete('/admin/labassigns/{id}', [LabAssignController::class, 'destroyLabassign'])->name('admin.labassigns.destroy');
 
 //Route Assign
@@ -170,6 +171,7 @@ Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->na
 // Route::get('/systemuser/search', [SystemUserController::class, 'search'])->name('systemuser.search');
 Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');
 // Route::get('/admin/routeassigns', [RouteAssignController::class, 'index'])->name('admin.outeassigns.index');
+// Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
 Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
 
 

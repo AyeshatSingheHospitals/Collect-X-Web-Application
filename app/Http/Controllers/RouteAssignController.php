@@ -52,38 +52,35 @@ class RouteAssignController extends Controller
         return response()->json($response);
     }
 
+    // Store route assignment
     public function store(Request $request)
     {
-        // Validate incoming data
-        $validator = Validator::make($request->all(), [
-            'assignments' => 'required|array',
-            'assignments.*.uid' => 'required|exists:systemuser,uid',
-            'assignments.*.uid_ro' => 'required|exists:systemuser,uid',
-            'assignments.*.rid' => 'required|exists:route,rid',
-        ], [
-            'assignments.*.uid.required' => 'User ID is required.',
-            'assignments.*.uid_ro.required' => 'Assigned User ID is required.',
-            'assignments.*.rid.required' => 'Route ID is required.',
-        ]);              
+        $request->validate([
+            'rid' => 'required|exists:route,rid', // Validate Route ID
+            'uid' => 'required|exists:systemuser,uid', // Validate User ID
+        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 422);
+        try {
+            // Check if this route assignment already exists
+            $exists = RouteAssign::where('rid', $request->rid)
+                                 ->where('uid', $request->uid)
+                                 ->exists();
+
+            if ($exists) {
+                return response()->json(['message' => 'Assignment already exists.'], 422);
+            }
+
+            // Create a new route assignment
+            RouteAssign::create([
+                'rid' => $request->rid,
+                'uid' => $request->uid,
+                'uid_ro' => auth()->id(), // Assuming current user is the assigner
+            ]);
+
+            return response()->json(['message' => 'Route assigned successfully!'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to assign route.', 'error' => $e->getMessage()], 500);
         }
-
-        $assignments = $request->input('assignments');
-
-        foreach ($assignments as $assignment) {
-            RouteAssign::updateOrCreate(
-                [
-                    'uid' => $assignment['uid'],
-                    'uid_ro' => $assignment['uid_ro'],
-                    'rid' => $assignment['rid'],
-                ],
-                [] // If additional fields are needed, include them here
-            );
-        }
-
-        return response()->json(['message' => 'Assignments saved successfully']);
     }
-    
 }

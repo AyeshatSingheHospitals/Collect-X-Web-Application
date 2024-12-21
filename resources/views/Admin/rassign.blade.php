@@ -266,14 +266,15 @@ td {
 .route-assign-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
+    background-color: var(--color-white);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .route-assign-table thead th {
-    background-color: none;
+    background-color: var(--color-white);
     color: #d9006c;
     /* color:#8e94f2; */
     font-weight: bold;
@@ -287,7 +288,7 @@ td {
 }
 
 .route-assign-table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: var(--color-table);
 }
 
 .route-assign-table tbody td {
@@ -300,7 +301,7 @@ td {
 }
 
 .route-assign-table tbody tr:nth-child(even) {
-    background-color: #fafafa;
+    background-color: var(--color-thover);
 }
 
 .route-assign-table tbody tr:last-child td {
@@ -469,14 +470,12 @@ main .analyse .progresss {
     }
 
 
-
     main {
         margin-top: 8rem;
         padding: 0 1rem;
     }
 
 }
-
 
 .dark-mode-active .popup-content {
     background-color: #202528;
@@ -505,7 +504,6 @@ main .analyse .progresss {
     border: 1px solid #677483;
     /* Optional: border for checkboxes */
 }
-
 
 @keyframes fadeIn {
     from {
@@ -544,6 +542,8 @@ input[type="email"] {
     margin-bottom: 15px;
     width: 100%;
     transition: border 0.3s ease;
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 input:focus {
@@ -564,12 +564,11 @@ button {
 }
 
 button:hover {
-    background-color: #0f775e;
+    background-color:rgb(113, 119, 204);
 }
 
 button:active {
-    background-color: #0c5e48;
-}
+    background-color:rgb(160, 166, 250);
 
 /* Radio Button and Label */
 .form-check-input {

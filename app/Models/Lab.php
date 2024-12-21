@@ -27,10 +27,4 @@ class Lab extends Model
     public function labassign(){
         return $this->belongsTo(LabAssign::class, 'lid');
     }
-
-  public function users()
-{
-    return $this->belongsToMany(User::class);
-}
-
 }

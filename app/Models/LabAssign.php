@@ -11,6 +11,8 @@ class LabAssign extends Model
 
     protected $table = 'labassign';
 
+    public $incrementing = true; 
+
     protected $primaryKey = 'laid';
 
     protected $fillable = [

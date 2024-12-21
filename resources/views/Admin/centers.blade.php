@@ -10,11 +10,19 @@
     </div>
     <br>
     <!-- Button to trigger the pop-up -->
+    <div class="row">
+
     <div class="text-left mb-3">
         <button id="openPopup" class="glow-on-hover btn btn-info rounded-pill" type="button">
             <i class="fas fa-info-circle me-2"></i> Add
         </button>
     </div>
+    <div class="search-container">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterLabs()" />
+            
+        </div>
+        </div>
+
 
     @if(session('success'))
     <div class="alert alert-success">
@@ -34,6 +42,16 @@
 
     <br><br>
 
+    
+    @if($centers->isEmpty())
+    <div class="col-12 mt-5 center-align-container">
+        <!-- Display the image -->
+        <img src="{{ asset('../image/Motion.gif') }}" alt="No Records" class="img-fluid mb-3" style="max-width: 300px; border-radius:50%;">
+        <!-- Display the "No record here" message -->
+        <h4 class="text-muted">No record here</h4>
+    </div>
+
+    @else
     <div class="row">
         @foreach($centers as $center)
         <div class="col-md-4">
@@ -61,6 +79,7 @@
             </div>
         </div>
         @endforeach
+        @endif
     </div>
 
     <!-- The pop-up (initially hidden) -->
@@ -85,7 +104,7 @@
                 <!-- Hidden field for uid -->
                 <input type="hidden" name="uid" value="{{ session('uid') }}">
 
-                <div class="row">
+                <div class="raw">
                     <div class="mb-3">
                         <label class="form-label" for="labSearch">
                             <i class="fas fa-flask me-2"></i> Search Lab Name:
@@ -105,14 +124,14 @@
                         <label class="form-label">
                             <i class="fas fa-route me-2"></i> Select Route:
                         </label>
-                        <select id="routeDropdown" class="form-control rounded-pill" name="rid">
-                            <option value="">Select a route</option>
+                        <select id="routeDropdown" class="form-control rounded-pill" name="rid" class="select">
+                            <option value="" class="fonts">Select a route</option>
                         </select>
                     </div>
                 </div>
 
                 <br>
-                <div class="row">
+                <div class="raw">
                     <div class="form-group">
                         <label for="centername">Center Name</label>
                         <input type="text" name="centername" id="centername" class="form-control" required>
@@ -124,7 +143,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="raw">
                     <div class="form-group">
                         <label for="authorizedcontact">Authorized Contact</label>
                         <input type="text" name="authorizedcontact" id="authorizedcontact" class="form-control"
@@ -157,7 +176,7 @@
                     <textarea name="description" id="description" class="form-control"></textarea>
                 </div>
 
-                <div class="row">
+                <div class="raw">
                     <div class="form-group">
                         <label for="latitude">Latitude</label>
                         <input type="text" name="latitude" id="latitude" class="form-control" required>
@@ -180,7 +199,7 @@
             <span class="close" onclick="closeEditModal()">&times;</span>
 
             <!-- Edit Form -->
-            <form action="{{ route('admin.center.update', ['cid' => $center->cid]) }}" method="POST" id="editForm">
+            <form action="{{ route('admin.centers.store') }}" method="POST" id="editForm">
                 @csrf
                 @method('PUT')
                 <input type="hidden" id="editCid" name="cid">
@@ -196,7 +215,7 @@
                 <!-- Hidden field for uid -->
                 <input type="hidden" name="uid" value="{{ session('uid') }}">
 
-                <div class="row">
+                <div class="raw">
                     <div class="mb-3">
                         <label class="form-label" for="editlabSearch">
                             <i class="fas fa-flask me-2"></i> Search Lab Name:
@@ -204,7 +223,7 @@
                         <input type="text" id="editlabSearch" class="form-control rounded-pill"
                             placeholder="Type to search labs...">
 
-                        <input type="hidden" id="editSelectedLabId" name="lid" value="{{ $center->lid }}">
+                        <input type="hidden" id="editSelectedLabId" name="lid" value="">
 
                         <!-- Dropdown list to display labs -->
                         <ul id="editlabList" class="list-group mt-2"
@@ -222,7 +241,7 @@
                 </div>
 
                 <br>
-                <div class="row">
+                <div class="raw">
                     <div class="form-group">
                         <label for="editCentername">Center Name</label>
                         <input type="text" name="centername" id="editCentername" class="form-control" required>
@@ -235,7 +254,7 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="raw">
                     <div class="form-group">
                         <label for="editAuthorizedcontact">Authorized Contact</label>
                         <input type="text" name="authorizedcontact" id="editAuthorizedcontact" class="form-control"
@@ -268,7 +287,7 @@
                     <textarea name="description" id="editDescription" class="form-control"></textarea>
                 </div>
 
-                <div class="row">
+                <div class="raw">
                     <div class="form-group">
                         <label for="editlatitude">Latitude</label>
                         <input type="text" name="latitude" id="editlatitude" class="form-control" required>
@@ -312,14 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Dark mode toggle
-    // const darkModeToggle = document.querySelector('.dark-mode');
-    // const body = document.body;
-    // darkModeToggle.addEventListener('click', function() {
-    //     body.classList.toggle('dark-mode-variables');
-    //     darkModeToggle.querySelectorAll('span').forEach(span => span.classList.toggle('active'));
-    // });
-
+    
     // Side menu functionality
     const sideMenu = document.querySelector('aside');
     const menuBtn = document.getElementById('menu-btn');
@@ -579,44 +591,11 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openEditModal = openEditModal;
     window.closeEditModal = closeEditModal;
 });
+
+
 </script>
-
-<script>
-const sideMenu = document.querySelector('aside');
-const menuBtn = document.getElementById('menu-btn');
-const closeBtn = document.getElementById('close-btn');
-
-const darkMode = document.querySelector('.dark-mode');
-
-menuBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'block';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'none';
-});
-
-darkMode.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode-variables');
-    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.querySelector('.dark-mode');
-    const body = document.body;
-
-    darkModeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode-active');
-    });
-});
-</script>
-
 
 <!-- me tika awe selected contact search ek create krnkota  -->
-<!-- Include Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-
 <!-- Include jQuery (if not already included) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -627,8 +606,26 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+.center-align-container {
+    display: flex;
+    justify-content: center;
+    /* Horizontally center */
+    align-items: center;
+    /* Vertically center */
+    text-align: center;
+    /* Align the text in the center */
+    flex-direction: column;
+    /* Stack the image and text vertically */
+    padding-top:6%;
+}
+
 .content {
     margin-left: 90px;
+}
+
+select{
+    font-family: 'Poppins', sans-serif;
+    color:#677483;
 }
 
 .alert {
@@ -764,6 +761,15 @@ main .analyse .progresss {
     width: 92px;
     height: 92px;
     border-radius: 50%;
+}
+#searchInput {
+    width: 350px;
+    height: 50px;
+    /* margin-left: 340px; */
+}
+
+.search-container{
+    margin-left: 65%;
 }
 
 /* Container for the cards */
@@ -942,31 +948,41 @@ h1 {
     font-size: 24px;
 }
 
+/* Popup styles */
 .popup {
     display: none;
-    /* Hidden by default */
     position: fixed;
-    z-index: 1000;
-    /* Sit on top */
+    z-index: 1;
     left: 0;
     top: 0;
     width: 100%;
-    /* Full width */
     height: 100%;
-    /* Full height */
+    overflow: auto;
     background-color: rgba(0, 0, 0, 0.5);
-    /* Black w/ opacity */
+}
+
+.raw {
+    display: inline-flex;
+    gap:10px;
 }
 
 .popup-content {
-    background-color: #fff;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.2);
+    /* max-width: 500px; 
+                */
+    /* width: 100%; */
+    width: 600px;
+    position: relative;
+    animation: fadeIn 0.4s ease-in-out;
+
     margin: 15% auto;
-    /* 15% from the top and centered */
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
-    /* Could be more or less, depending on screen size */
-    position: relative;
+    /* width: 80%; */
+    /* max-width: 500px; */
 }
 
 .close {
@@ -1002,30 +1018,6 @@ h1 {
 .glow-on-hover:hover {
     background-color: #365485;
 
-}
-
-
-/* Popup styles */
-.popup {
-    display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.popup-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    /* 15% from the top and centered */
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    /* Could be more or less, depending on screen size */
 }
 
 .close {
@@ -1077,33 +1069,6 @@ h1 {
     /* Optional: border for checkboxes */
 }
 
-
-
-/* Popup Styling */
-.popup {
-    display: none;
-    position: fixed;
-    z-index: 999;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-}
-
-.popup-content {
-    background: #fff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.2);
-    max-width: 500px;
-    width: 100%;
-    position: relative;
-    animation: fadeIn 0.4s ease-in-out;
-}
-
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -1141,13 +1106,24 @@ input[type="email"] {
     margin-bottom: 15px;
     width: 100%;
     transition: border 0.3s ease;
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 input:focus {
-    border-color: #1B9C85;
+    border-color:  #628ECB;
     outline: none;
 }
 
+#routeDropdown, #editrouteDropdown{
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 100%;
+    transition: border 0.3s ease;
+}
 
 
 /* Radio Button and Label */
@@ -1210,6 +1186,101 @@ input:focus {
     text-align: center;
     margin-bottom: 20px;
 }
+
+
+#labList li,
+#editLabSearch li {
+    padding: 5px;
+    background-color: #F7E7FB;
+}
+
+#labList li:hover {
+    background-color: #D53D70;
+}
+
+/* Optional: Customize Select2 dropdown width */
+.select2-container--default .select2-selection--single {
+    width: 100% !important;
+}
+
+/* Optional: Styling for the contact input field */
+#selectedcontact {
+    border: 1px solid #ccc;
+    font-size: 14px;
+    padding: 8px;
+}
+
+
+/* ----------------------------description-------------------------------- */
+/* Style for the form group */
+.form-group {
+    margin-bottom: 1.5rem;
+    /* Add space between form groups */
+}
+
+/* Label styling */
+label[for="description"] {
+    /* font-size: 1rem;
+                font-weight: bold; */
+    color: #333;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Textarea styling */
+textarea[name="description"] {
+    width: 100%;
+    /* Make the textarea fill the width of the container */
+    padding: 10px;
+    /* Add padding inside the textarea */
+    font-size: 1rem;
+    /* Set the font size for the input text */
+    border: 1px solid #ccc;
+    /* Set border color */
+    border-radius: 4px;
+    /* Rounded corners for the textarea */
+    resize: vertical;
+    /* Allow the user to resize vertically */
+    min-height: 100px;
+    /* Set a minimum height for the textarea */
+    box-sizing: border-box;
+    /* Ensure padding does not affect the width calculation */
+    transition: border-color 0.3s;
+    /* Smooth transition for border color change */
+    border-radius: 25px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Focus effect for textarea */
+textarea[name="description"]:focus {
+    border-color: #007bff;
+    /* Change border color when focused */
+    outline: none;
+    /* Remove default focus outline */
+}
+
+/* Optional: Placeholder styling */
+textarea[name="description"]::placeholder {
+    color: #888;
+    /* Light gray color for placeholder */
+}
+
+/* Optional: Responsive styling for small screens */
+@media (max-width: 576px) {
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label[for="description"] {
+        font-size: 0.9rem;
+    }
+
+    textarea[name="description"] {
+        font-size: 0.9rem;
+    }
+}
+
+/* -------------------end description ------------------- */
 </style>
 
 

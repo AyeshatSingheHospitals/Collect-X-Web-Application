@@ -9,6 +9,10 @@
     <!-- <link rel="stylesheet" href="style.css"> -->
     <link rel="stylesheet" href="../css/sidebar.css">
 
+    <!-- me tika awe selected contact search ek create krnkota  -->
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+
 
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -53,7 +57,7 @@
                     <span class="material-symbols-sharp">person_add</span>
                     <h3>User Creation</h3>
                 </a>
-                
+
                 <a href="/admin/centers" class="{{ request()->is('admin/centers') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">location_city</span>
                     <h3>Center Creation</h3>
@@ -71,7 +75,7 @@
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>
-                <a href="#">
+                <a href="/">
                     <span class="material-symbols-sharp">logout</span>
                     <h3>Logout</h3>
                 </a>
@@ -106,7 +110,8 @@
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
                             <div class="profile-photo">
-                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
+                                    onerror="this.style.display='none'; this.parentNode.innerHTML += '<i class=\'bx bxs-user-circle\' style=\'font-size: 40px; color: rgb(156,161,221);\'></i>';">
                             </div>
                         </div>
                     </div>
@@ -186,10 +191,10 @@
     darkMode.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode-variables');
         const isDarkMode = document.body.classList.contains('dark-mode-variables');
-        
+
         // Save the current mode in local storage
         localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        
+
         // Toggle active states on the dark mode icons
         darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
         darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
@@ -219,7 +224,7 @@
     closeBtn.addEventListener('click', () => {
         sideMenu.style.display = 'none';
     });
-</script>
+    </script>
 
 
 </body>

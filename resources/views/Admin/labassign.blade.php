@@ -31,17 +31,11 @@
                     </div>
 
                     <div class="row1">
-                    <button class="btn2" onclick="openEditForm({{ $labassign->laid }})">Edit</button>
-
-                        <!-- <button class="btn1 edit-btn" data-name="{{ $labassign->systemuser->full_name }}"
-                            data-role="{{ $labassign->systemuser->role }}" data-lab-name="{{ $labassign->lab->name }}"
-                            data-uid="{{ $labassign->systemuser->uid }}" data-epf="{{ $labassign->systemuser->epf }}"
-                            data-lid="{{ $labassign->lab->lid }}">
-                            Edit
-                        </button> -->
-                        
+                        <!-- <button class="btn2" onclick="openEditForm({{ $labassign->laid }})">Edit</button> -->
+                        <button class="btn2"
+                            onclick="populateForm('{{ $labassign->laid }}', '{{ $labassign->systemuser->uid }}', '{{ $labassign->systemuser->full_name }}', '{{ $labassign->systemuser->epf }}', '{{ $labassign->lab->lid }}', '{{ $labassign->lab->name }}')">Edit</button>
                         <!-- Delete Button -->
-                        <form action="{{ route('admin.labassigns.destroy', $labassign->laid) }}" method="POST" 
+                        <form action="{{ route('admin.labassigns.destroy', $labassign->laid) }}" method="POST"
                             onsubmit="return confirm('Are you sure you want to delete this Lab Assign?');">
                             @csrf
                             @method('DELETE')
@@ -75,19 +69,22 @@
             </div>
             @endif
 
-            <form action="{{ route('admin.labassigns.store')}}" method="POST" enctype="multipart/form-data">
+            <form id="labAssignForm" action="{{ route('admin.labassigns.store') }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
+                <!-- Hidden input for the method (will be dynamically set by JavaScript) -->
+                <input type="hidden" name="_method" id="formMethod" value="POST">
+
+                <input type="hidden" name="laid" id="laid">
 
                 <!-- Input for Username -->
                 <div class="form-group form-group-full-width">
-                    <label for="uid" class="form-label"> Username</label>
+                    <label for="uid" class="form-label">Username</label>
                     <input type="text" name="uid" id="uid" class="form-control rounded-pill"
                         value="{{ session('username') }}" required readonly>
                 </div>
 
                 <input type="hidden" name="uid" value="{{ session('uid') }}">
-
-                <br>
 
                 <!-- Input for Name -->
                 <div class="form-group form-group-full-width">
@@ -102,7 +99,6 @@
                 <div id="userModal" class="popup-modal hidden">
                     <div class="popup-content">
                         <h5>Select a User</h5>
-
                         <!-- Search Bar -->
                         <input type="text" id="searchUserBar" class="form-control"
                             placeholder="Search by name or EPF..." onkeyup="filterUsers()" />
@@ -111,20 +107,17 @@
                         <ul id="userList" class="list-group">
                             <!-- Dynamic list of users will be inserted here -->
                         </ul>
-
                         <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Close</button>
                     </div>
                 </div>
 
-                <br>
                 <!-- Input for EPF -->
                 <div class="form-group form-group-full-width">
                     <label for="epf">EPF</label>
                     <input type="text" id="epf" name="epf" class="form-control" required readonly>
                 </div>
 
-                <br>
-
+                <!-- Input for Lab Name -->
                 <div class="form-group form-group-full-width">
                     <label for="lab_name">Lab name</label>
                     <input type="text" id="lab_name" name="lab_name" class="form-control"
@@ -137,7 +130,6 @@
                 <div id="labModal" class="popup-modal hidden">
                     <div class="popup-content">
                         <h5>Select a Lab</h5>
-
                         <!-- Search Bar -->
                         <input type="text" id="searchLabBar" class="form-control" placeholder="Search by lab name..."
                             onkeyup="filterLabs()" />
@@ -146,7 +138,6 @@
                         <ul id="labList" class="list-group">
                             <!-- Dynamic list of labs will be inserted here -->
                         </ul>
-
                         <button type="button" class="btn btn-secondary" onclick="closeLabModal()">Close</button>
                     </div>
                 </div>
@@ -158,8 +149,6 @@
         </div>
     </div>
 </main>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -289,49 +278,42 @@ function selectLab(name, lid) {
     closeLabModal();
 }
 
-// Function to open the edit form and populate it with lab assignment details
-function openEditForm(labAssignId) {
-    // Fetch lab assignment details using AJAX
-    fetch(`/admin/labassigns/${labAssignId}/edit`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const labAssign = data.data;
+let laidValue = null; // Variable to store 'laid' value
 
-                // Populate the form fields
-                // document.getElementById('uid').value = labAssign.uid; // User ID
-                document.getElementById('assign_name').value = `${labAssign.systemuser.fname} ${labAssign.systemuser.lname}`; // Assigned User Name
-                document.getElementById('uid_assign').value = labAssign.uid_assign; // Assigned User ID
-                document.getElementById('epf').value = labAssign.systemuser.epf; // EPF
-                document.getElementById('lab_name').value = labAssign.lab.name; // Lab Name
-                document.getElementById('lid').value = labAssign.lid; // Lab ID
+// Populate the form for editing and switch to PUT method
+function populateForm(laid, uid, fullName, epf, lid, labName) {
+    // Populate other form fields
+    document.getElementById('assign_name').value = fullName;
+    document.getElementById('epf').value = epf;
+    document.getElementById('uid_assign').value = uid;
+    document.getElementById('lab_name').value = labName;
+    document.getElementById('lid').value = lid;
+    document.getElementById('laid').value = laid;
 
-                // Update the form action and method for the update operation
-                const form = document.querySelector('form');
-                form.action = `/admin/labassigns/${labAssignId}/update`;
-                form.method = 'POST';
+    // Store the 'laid' value in the JavaScript variable
+    laidValue = laid;
 
-                // Ensure the PUT method is set via a hidden input
-                let methodInput = document.querySelector('input[name="_method"]');
-                if (!methodInput) {
-                    methodInput = document.createElement('input');
-                    methodInput.type = 'hidden';
-                    methodInput.name = '_method';
-                    form.appendChild(methodInput);
-                }
-                methodInput.value = 'PUT';
+    // Change the form action to the update route
+    const form = document.getElementById('labAssignForm');
+    form.action = `/admin/labassigns/${laidValue}`; // Use the 'laid' value for the route
 
-                // Scroll to the form for editing
-                form.scrollIntoView({ behavior: 'smooth' });
+    // Change the form method to PUT for updating
+    form.method = 'POST'; // Ensure the method is POST
+    document.getElementById('formMethod').value = 'PUT'; // Simulate PUT method
+}
 
-            } else {
-                alert('Failed to fetch lab assignment details.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching lab assignment details:', error);
-            alert('An error occurred while fetching lab assignment details.');
-        });
+function resetForm() {
+    // Reset the form for new entry
+    const form = document.getElementById('labAssignForm');
+    form.action = "{{ route('admin.labassigns.store') }}"; // Set to store route
+    form.method = 'POST'; // Default method is POST
+    document.getElementById('formMethod').value = 'POST'; // Simulate POST method
+
+    // Clear form fields
+    form.reset();
+
+    // Reset the laid value in the JavaScript variable
+    laidValue = null; // Clear the stored 'laid' value
 }
 </script>
 

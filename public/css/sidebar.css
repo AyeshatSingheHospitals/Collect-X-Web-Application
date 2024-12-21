@@ -17,6 +17,9 @@
     --color-background: #f6f6f9;
     --color-pop: #fff;
     --color-pointer:#f0f0f0;
+    --color-table:#f1f1f1;
+    --color-thover:#fafafa;
+    --color-input:#ddd;
 
     --card-border-radius: 2rem;
     --border-radius-1: 0.4rem;
@@ -29,6 +32,7 @@
 }
 
 .dark-mode-variables{
+    --color-input:#646464;
     --color-background: #181a1e;
     --color-white: #202528;
     --color-dark: #edeffd;
@@ -37,6 +41,8 @@
     --box-shadow: 0 2rem 3rem var(--color-light);
     --color-pop:  #181a1e;
     --color-pointer:#363949;
+    --color-table:#15181a;
+    --color-thover:#181a1e;
 }
 
 .top-bar {

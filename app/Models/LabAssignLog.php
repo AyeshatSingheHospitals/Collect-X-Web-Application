@@ -11,7 +11,6 @@ class LabAssignLog extends Model
 
     protected $table = 'labassignlogs';
 
-
     protected $fillable = [
         'laid',
         'uid',
@@ -19,7 +18,6 @@ class LabAssignLog extends Model
         'uid_assign',
         'action'
     ];
-
   
     //relationship to systemuser
 
