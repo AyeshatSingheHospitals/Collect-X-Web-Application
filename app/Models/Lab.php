@@ -20,9 +20,13 @@ class Lab extends Model
         'address',
     ];
 
-    public function systemuser(){
-        return $this->belongsTo(Systemuser::class, 'uid');
-      }
+    public function systemuser()
+    {
+        return $this->belongsTo(Systemuser::class, 'uid')->withDefault([
+            'fname' => 'No',
+            'lname' => 'User Assigned',
+        ]);
+    }
 
     public function labassign(){
         return $this->belongsTo(LabAssign::class, 'lid');

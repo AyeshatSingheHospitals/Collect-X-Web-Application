@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <!-- <link rel="stylesheet" href="style.css"> -->
@@ -67,7 +68,7 @@
                     <span class="material-symbols-sharp">medical_services</span>
                     <h3>Lab Assign</h3>
                 </a>
-                <a href="/rassign" class="{{ request()->is('rassign') ? 'active' : '' }}">
+                <a href="/admin/routeassigns" class="{{ request()->is('admin/routeassigns') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">check_circle</span>
                     <h3>Route Assign</h3>
                 </a>

@@ -9,17 +9,40 @@ use App\Models\Lab;
 use App\Models\LabAssignLog;
 use DB;
 
+use Illuminate\Support\Facades\Log;
+
 class LabAssignController extends Controller
 {
 
     public function indexLabassign()
-    {
+{
+    try {
         // Fetch lab assignments with related systemuser and lab data
         $labassigns = LabAssign::with(['systemuser', 'lab'])->get();
 
+        // Check for empty lab assignments
+        if ($labassigns->isEmpty()) {
+            return view('Admin.labassign', compact('labassigns'))
+                ->with('warning', 'No lab assignments available at the moment.');
+        }
+
+        // Log warning if any lab or systemuser is missing
+        foreach ($labassigns as $labassign) {
+            if (!$labassign->systemuser) {
+                Log::warning("Systemuser not found for LabAssign ID: {$labassign->id}");
+            }
+            if (!$labassign->lab) {
+                Log::warning("Lab not found for LabAssign ID: {$labassign->id}");
+            }
+        }
+
         // Passing $labassigns to the view
         return view('Admin.labassign', compact('labassigns'));
+    } catch (\Exception $e) {
+        Log::error("Error fetching lab assignments: " . $e->getMessage());
+        return redirect()->back()->with('error', 'An error occurred while fetching lab assignments.');
     }
+}
 
     public function storeLabassign(Request $request)
     {
@@ -102,4 +125,5 @@ class LabAssignController extends Controller
         return redirect()->route('admin.labassign.index')->with('success', 'Lab assignment deleted successfully!');
     }
 
+    
 }

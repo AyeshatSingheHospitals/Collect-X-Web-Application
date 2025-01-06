@@ -21,19 +21,27 @@
                 </div>
 
                 <div class="content1">
-                    <h2 class="name">{{ $labassign->systemuser->full_name }}</h2>
-                    <p class="job">{{ $labassign->systemuser->role }}</p>
+                    <h2 class="name">{{ optional($labassign->systemuser)->full_name ?? 'User not Assigned' }}</h2>
+                    <p class="job">{{ optional($labassign->systemuser)->role ?? 'Role not Defined' }}</p>
 
                     <div class="row1">
                         <div class="col">
-                            <h3>| {{ $labassign->lab->name }} |</h3>
+                            <h3 class="{{ optional($labassign->lab)->name ? '' : 'lab-not-assigned' }}">
+                                | {{ optional($labassign->lab)->name ?? 'Lab not Assigned' }} |
+                            </h3>
                         </div>
                     </div>
 
+
                     <div class="row1">
                         <!-- <button class="btn2" onclick="openEditForm({{ $labassign->laid }})">Edit</button> -->
-                        <button class="btn2"
-                            onclick="populateForm('{{ $labassign->laid }}', '{{ $labassign->systemuser->uid }}', '{{ $labassign->systemuser->full_name }}', '{{ $labassign->systemuser->epf }}', '{{ $labassign->lab->lid }}', '{{ $labassign->lab->name }}')">Edit</button>
+                        <button class="btn2" onclick="populateForm(
+                            '{{ $labassign->laid }}', 
+                            '{{ optional($labassign->systemuser)->uid ?? '' }}', 
+                            '{{ optional($labassign->systemuser)->full_name ?? '' }}', 
+                            '{{ optional($labassign->systemuser)->epf ?? '' }}', 
+                            '{{ optional($labassign->lab)->lid ?? '' }}', 
+                            '{{ optional($labassign->lab)->name ?? '' }}')">Edit</button>
                         <!-- Delete Button -->
                         <form action="{{ route('admin.labassigns.destroy', $labassign->laid) }}" method="POST"
                             onsubmit="return confirm('Are you sure you want to delete this Lab Assign?');">
@@ -83,6 +91,7 @@
                     <input type="text" name="uid" id="uid" class="form-control rounded-pill"
                         value="{{ session('username') }}" required readonly>
                 </div>
+                <br>
 
                 <input type="hidden" name="uid" value="{{ session('uid') }}">
 
@@ -92,6 +101,7 @@
                     <input type="text" id="assign_name" name="assign_name" class="form-control"
                         placeholder="Type to search name..." required readonly onclick="openUserModal()">
                 </div>
+                <br>
 
                 <input type="hidden" name="uid_assign" id="uid_assign">
 
@@ -116,6 +126,7 @@
                     <label for="epf">EPF</label>
                     <input type="text" id="epf" name="epf" class="form-control" required readonly>
                 </div>
+                <br>
 
                 <!-- Input for Lab Name -->
                 <div class="form-group form-group-full-width">
@@ -142,7 +153,7 @@
                     </div>
                 </div>
 
-                <br><br>
+                <br><br><br>
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary form-group">Register</button><br><br>
             </form>
@@ -322,6 +333,10 @@ function resetForm() {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+.lab-not-assigned {
+    color: #FF0060;
+}
 
 /* -------------------------------------------------------------Popup------------------------------------------------------------------ */
 /* Modal Styles */
@@ -545,6 +560,8 @@ input[type="email"] {
     margin-bottom: 15px;
     width: 100%;
     transition: border 0.3s ease;
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 input:focus {
@@ -843,12 +860,12 @@ button:active {
     font-weight: 500;
     border-radius: 10px;
     transition: 0.5s;
-    background: #fff;
+    background: var(--color-white);
 }
 
 .btn1:hover {
     box-shadow: 0 0 15px #8e94f2;
-    background: #fff;
+    background: var(--color-background);
 }
 
 .btn1:nth-child(2) {
@@ -947,6 +964,276 @@ button:active {
     border-color: #f1a2a5;
     background-color: #f5c6cb;
 }
+
+/* Right Section (Form) */
+.right-section1 {
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    /* padding: 20px; */
+    margin: 0 auto;
+    width: 100%;
+    max-width: 500px;
+
+}
+
+@media screen and (max-width: 1200px) {
+    .container1 {
+        width: 95%;
+        grid-template-columns: 7rem auto 23rem;
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    main .container1 {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        position: absolute;
+        left: 5%;
+        /* transform: t */
+        /* width: 65%; */
+        /* grid-template-columns: 7rem auto 23rem; */
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 40%;
+    }
+
+    main .container1 {
+        width: 94%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 2rem 0 0 0.8rem;
+    }
+
+    main .right-section1 form {
+        width: 83vw;
+    }
+
+    main table thead tr th:last-child,
+    main table thead tr th:first-child {
+        display: none;
+    }
+
+    main table tbody tr td:last-child,
+    main table tbody tr td:first-child {
+        display: none;
+    }
+
+}
+
+@media screen and (max-width: 1200px) {
+    .container1 {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section1 {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    .container1 {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section1 {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+}
+
 </style>
 
 @endsection

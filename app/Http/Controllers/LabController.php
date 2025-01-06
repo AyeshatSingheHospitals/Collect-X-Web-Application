@@ -15,6 +15,17 @@ class LabController extends Controller
     {
         try {
             $labs = Lab::all();
+
+            if ($labs->isEmpty()) {
+                return view('Admin.lab', compact('labs'))
+                    ->with('warning', 'No labs available at the moment.');
+            }
+
+            foreach ($labs as $lab) {
+                $systemUserName = optional($lab->systemuser)->name ?? 'No user assigned';
+                Log::info("Lab {$lab->name} is managed by: {$systemUserName}");
+            }
+
             return view('Admin.lab', compact('labs'));
         } catch (\Exception $e) {
             Log::error("Error fetching labs: " . $e->getMessage());

@@ -97,7 +97,7 @@ class SystemuserController extends Controller
     public function getUserNames()
 {
     // Fetch all system users
-    $users = Systemuser::select('uid', 'fname', 'lname', 'epf')->get();
+    $users = Systemuser::where('status', 'active')->select('uid', 'fname', 'lname', 'epf')->get();
 
     // Create a list of full names with EPF and UID
     $userDetails = $users->map(function ($user) {

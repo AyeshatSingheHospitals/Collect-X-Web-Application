@@ -9,6 +9,7 @@ use App\Http\Controllers\LabController;
 use App\Http\Controllers\LabAssignController;
 use App\Http\Controllers\LabAssign1Controller;
 use App\Http\Controllers\RouteAssignController;
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
@@ -104,9 +105,9 @@ Route::get('/transaction', function () {
     return view('admin.transaction');
 });
 
-Route::get('/rassign', function () {
-    return view('admin.rassign');
-});
+// Route::get('admin/routeassigns', function () {
+//     return view('admin.rassign');
+// });
 
 Route::get('/user', function () {
     return view('admin.user');
@@ -129,6 +130,8 @@ Route::get('/labassign', function () {
 });
 
 // ------------------------ [ Admin ]------------------------------
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index']);
 
 //Lab creation
 Route::get('/admin/labs', [LabController::class, 'indexLab'])->name('admin.lab.index');
@@ -165,14 +168,20 @@ Route::put('/admin/labassigns/{laid}', [LabAssignController::class, 'updateLabas
 Route::delete('/admin/labassigns/{id}', [LabAssignController::class, 'destroyLabassign'])->name('admin.labassigns.destroy');
 
 //Route Assign
+Route::get('admin/routeassigns', function () {
+    return view('admin.rassign');
+});
 Route::get('/route-assign/search', [RouteAssignController::class, 'searchLab']);
+Route::get('admin/routeassigns', [RouteAssignController::class, 'showAssignedRoutes']);
+Route::post('/route-assign/store', [RouteAssignController::class, 'storeAssignments'])->name('route.assign.store');
 
 Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->name('get.user.names');
 // Route::get('/systemuser/search', [SystemUserController::class, 'search'])->name('systemuser.search');
 Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');
-// Route::get('/admin/routeassigns', [RouteAssignController::class, 'index'])->name('admin.outeassigns.index');
+// Route::get('/admin/routeassigns', [RouteAssignController::class, 'index'])->name('admin.routeassigns.index');
 // Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
-Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
+// Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
+// Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
 
 
 // -------------------------------------------------------
@@ -184,3 +193,5 @@ Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store']
 Route::get('/ll', function () {
     return view('ll');
 });
+
+
