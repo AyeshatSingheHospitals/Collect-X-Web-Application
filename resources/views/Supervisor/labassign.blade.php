@@ -1,4 +1,4 @@
-@extends('supervisor.navbar')
+@extends('Supervisor.sidebar')
 
 @section('content')
 
@@ -6,248 +6,83 @@
 <main>
     <div class="container1">
         <!-- Left Section (Cards) -->
-        <div class="left-section">
+        <br><br><br>
+        <div class="row">
+            <input type="hidden" name="uid" value="{{ session('uid') }}">
 
-            <div class="card">
-                <div class="image">
-                    <img src="../image/44.jpg" alt="" />
+            <!-- Assigned Labs Dropdown -->
+            <div class="form-group">
+                <label for="labDropdown">Select Lab</label>
+                <select name="lid" id="labDropdown" class="form-control" required>
+                    <option value="" disabled selected>Loading...</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <br><br><br><br><br><br><br><br>
+
+    <div class="left-section">
+        <div class="card">
+            <div class="image">
+                <img src="../image/44.jpg" alt="" />
+            </div>
+
+            <div class="content1">
+                <h2 class="name">Emplyee Name 2</h2>
+                <p class="job">Role Name</p>
+
+                <div class="row1">
+                    <div class="col">
+                        <h3>Lab Name 1 |</h3>
+                        
+                    </div>
+                    <div class="col">
+                        <h3>Lab Name 2 |</h3>
+                       
+                    </div>
+                    <div class="col">
+                        <h3>Lab Name 3 </h3>
+                    </div>
                 </div>
-
-                <div class="content1">
-                    <h2 class="name">Emplyee Name 1</h2>
-                    <p class="job">Role Name</p>
-
-                    <div class="row1">
-                        <div class="col">
-                            <h3>Lab Name 1 |</h3>
-                            <!-- <p> | </p> -->
-                        </div>
-                        <div class="col">
-                            <h3>Lab Name 2 |</h3>
-                            <!-- <p> | </p> -->
-                        </div>
-                        <div class="col">
-                            <h3>Lab Name 3 </h3>
-                            <!-- <p> | </p> -->
-                        </div>
-                    </div>
-
-                    <div class="row1">
-                        <button class="btn1"> Edit </button>
-                        <button class="btn1"> Delete </button>
-                    </div>
-
+                <div class="row1">
+                    <button class="btn1"> Edit </button>
+                    <button class="btn1"> Delete </button>
                 </div>
             </div>
 
-        </div>
-
-        @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-        @endif
-
-        @if($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-
-        <!-- Right Section (Form) -->
-        <div class="right-section1">
-            <br>
-            <h1>Lab Assign</h1>
-            <br>
-
-            <form action="{{ route('admin.labassigns.store')}}" method="POST" enctype="multipart/form-data">
-                @csrf
-
-                <!-- Input for Username -->
-                <div class="form-group form-group-full-width">
-                    <label for="uid" class="form-label"> Username</label>
-                    <input type="text" name="uid" id="uid" class="form-control rounded-pill" value="{{ session('username') }}" required readonly>
-                </div>
-                <br>
-
-                <!-- Input for Name -->
-                <div class="form-group form-group-full-width">
-                    <label for="uid_assign">Name</label>
-                    <input type="text" id="uid_assign" name="uid_assign" class="form-control"
-                        placeholder="Type to search name..." required readonly onclick="openUserModal()">
-                </div>
-
-                <!-- Modal for User Selection -->
-                <div id="userModal" class="popup-modal hidden">
-                    <div class="popup-content">
-                        <h5>Select a User</h5>
-
-                        <!-- Search Bar -->
-                        <input type="text" id="searchUserBar" class="form-control"
-                            placeholder="Search by name or EPF..." onkeyup="filterUsers()" />
-
-                        <!-- User List -->
-                        <ul id="userList" class="list-group">
-                            <!-- Dynamic list of users will be inserted here -->
-                        </ul>
-
-                        <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Close</button>
-                    </div>
-                </div>
-
-                <br>
-                <!-- Input for EPF -->
-                <div class="form-group form-group-full-width">
-                    <label for="epf">EPF</label>
-                    <input type="text" id="epf" name="epf" class="form-control" required readonly>
-                </div>
-
-                <br>
-                <!-- Input for Lab -->
-                <div class="form-group form-group-full-width">
-                    <label for="lid">Lab name</label>
-                    <input type="text" id="lid" name="lid" class="form-control" placeholder="Type to search lab name..."
-                        required readonly onclick="openLabModal()">
-                </div>
-
-                <!-- Modal for Lab Selection -->
-                <div id="labModal" class="popup-modal hidden">
-                    <div class="popup-content">
-                        <h5>Select a Lab</h5>
-
-                        <!-- Search Bar -->
-                        <input type="text" id="searchLabBar" class="form-control" placeholder="Search by lab name..."
-                            onkeyup="filterLabs()" />
-
-                        <!-- Lab List -->
-                        <ul id="labList" class="list-group">
-                            <!-- Dynamic list of labs will be inserted here -->
-                        </ul>
-
-                        <button type="button" class="btn btn-secondary" onclick="closeLabModal()">Close</button>
-                    </div>
-                </div>
-
-                <br><br>
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary form-group">Register</button><br><br>
-            </form>
-        </div>
+        </div>      
     </div>
 </main>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
-function openUserModal() {
-    const modal = document.getElementById('userModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('visible');
+    document.addEventListener('DOMContentLoaded', function () {
+        const uid = document.querySelector('input[name="uid"]').value;
+        const labDropdown = document.getElementById('labDropdown');
 
-    // Fetch user names and EPFs
-    $.ajax({
-        url: '{{ route("get.user.names") }}',
-        method: 'GET',
-        success: function(response) {
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
+        // Fetch assigned labs
+        fetch(`/supervisor/assigned-labs`)
+            .then(response => response.json())
+            .then(data => {
+                labDropdown.innerHTML = ''; // Clear existing options
 
-            response.forEach(user => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                
-                listItem.setAttribute('data-name', user.full_name.toLowerCase());
-                listItem.setAttribute('data-epf', user.epf.toLowerCase());
-                listItem.textContent = `${user.full_name} (EPF: ${user.epf})`;
-                listItem.onclick = () => selectUser(user.full_name, user.epf);
-                userList.appendChild(listItem);
+                if (data.length === 0) {
+                    labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
+                } else {
+                    labDropdown.innerHTML = `<option value="" disabled selected>Select a lab</option>`;
+                    data.forEach(lab => {
+                        labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching labs:', error);
+                labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
             });
-        },
-        error: function() {
-            alert('Failed to fetch user names.');
-        }
     });
-}
-
-function openLabModal() {
-    const modal = document.getElementById('labModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('visible');
-
-    // Fetch lab names
-    $.ajax({
-        url: '{{ route("get.lab.names") }}',
-        method: 'GET',
-        success: function(response) {
-            const labList = document.getElementById('labList');
-            labList.innerHTML = '';
-
-            response.forEach(lab => {
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                listItem.setAttribute('data-name', lab.name.toLowerCase());
-                listItem.textContent = lab.name;
-                listItem.onclick = () => selectLab(lab.name);
-                labList.appendChild(listItem);
-            });
-        },
-        error: function() {
-            alert('Failed to fetch lab names.');
-        }
-    });
-}
-
-function filterUsers() {
-    const filter = document.getElementById('searchUserBar').value.toLowerCase();
-    const items = document.querySelectorAll('#userList .list-group-item');
-    items.forEach(item => {
-        const name = item.getAttribute('data-name');
-        const epf = item.getAttribute('data-epf');
-        item.style.display = name.includes(filter) || epf.includes(filter) ? '' : 'none';
-    });
-}
-
-function filterLabs() {
-    const filter = document.getElementById('searchLabBar').value.toLowerCase();
-    const items = document.querySelectorAll('#labList .list-group-item');
-    items.forEach(item => {
-        const name = item.getAttribute('data-name');
-        item.style.display = name.includes(filter) ? '' : 'none';
-    });
-}
-
-function closeUserModal() {
-    const modal = document.getElementById('userModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('visible');
-}
-
-function closeLabModal() {
-    const modal = document.getElementById('labModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('visible');
-}
-
-function selectUser(fullName, epf) {
-    document.getElementById('uid_assign').value = fullName;
-    document.getElementById('epf').value = epf;
-    document.getElementById('uid').value = uid;
-    closeUserModal();
-}
-
-function selectLab(name) {
-    document.getElementById('lid').value = name;
-    document.getElementById('lab_id').value = lid;
-    closeLabModal();
-}
 </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Add Bootstrap JS for Modal functionality -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -256,88 +91,33 @@ function selectLab(name) {
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 /* -------------------------------------------------------------Popup------------------------------------------------------------------ */
-/* Modal Styles */
-.right-section1 .popup-modal {
-    position: fixed;
-    top: 43%;
-    left: 75%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color-pop);
-    border-radius: 25px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    display: none;
-    /* Initially hidden */
-    padding: 0;
-    /* Remove inner padding from the modal */
-    width: 300px;
-    max-height: 345px;
-    /* Set the maximum height */
-    overflow-y: auto;
-    /* Enable vertical scrolling for the content */
+/* .row {
+    width: 260%;
+} */
+
+.search {
+    display: grid;
+    /* grid-template-columns: 0.5fr 0.5fr; */
+    gap: 7em 1.8rem;
+    height: 20px;
+    width: 160%;
+
 }
 
-.right-section1 .popup-modal.visible {
-    display: block;
-}
-
-.right-section1 .popup-header {
-    position: sticky;
-    top: 0;
-    background-color: var(--color-white);
-    padding: 10px 15px;
-    border-bottom: 1px solid #ddd;
+/* Container for the cards */
+/* Container for the cards */
+.row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 2;
-    /* Ensure it stays above the scrolling content */
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 300px;
 }
 
-.right-section1 .popup-header input[type="text"] {
-    width: 70%;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: var(--color-white);
+.dropdown {
+    /* margin-left: 113%; */
+
 }
 
-.right-section1 .popup-header .close-button {
-    cursor: pointer;
-    font-size: 18px;
-    color: #333;
-    background: none;
-    border: none;
-}
-
-.right-section1 .popup-content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 10px;
-    /* Add some padding for the content */
-}
-
-.right-section1 .list-group-item {
-    cursor: pointer;
-    padding: 8px 12px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-}
-
-.right-section1 .list-group-item:hover {
-    background-color: var(--color-pointer);
-}
-
-.right-section1 .popup-content #searchBar {
-    position: sticky;
-    top: 0;
-    /* Stick it to the top of the popup-content */
-    /* Optional: Ensure it's visually distinct */
-    z-index: 1;
-    /* Optional: Ensure it stays above the content */
-    background-color: var(--color-white);
-}
 
 /* -------------------------------------------------------------Popup------------------------------------------------------------------ */
 
@@ -622,17 +402,17 @@ button:active {
 <style>
 /* Main Container */
 .container1 {
-    display: grid;
-    grid-template-columns: 1.4fr 1.2fr;
+    /* display: grid; */
+    /* grid-template-columns: 1.4fr ; */
     /* 1fr for cards, 2fr for form */
-    gap: 2rem;
-    padding: 1.8rem;
+    /* gap: 2rem;
+    padding: 1.8rem; */
 }
 
 /* Left Section (Cards) */
 .left-section {
     display: grid;
-    grid-template-columns: 0.5fr 0.5fr;
+    grid-template-columns: 0.5fr 0.5fr 0.5fr;
     gap: 7em 1.8rem;
     height: 20px;
 }
@@ -747,22 +527,6 @@ button:active {
 /* ======================================== */
 
 /* Right Section (Form) */
-.right-section1 {
-    background-color: var(--color-white);
-    padding: var(--card-padding);
-    border-radius: var(--card-border-radius);
-    box-shadow: var(--box-shadow);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    /* padding: 20px; */
-    margin: 0 auto;
-    width: 100%;
-    max-width: 500px;
-
-}
 </style>
 
 @endsection

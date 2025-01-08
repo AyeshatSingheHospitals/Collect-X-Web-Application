@@ -1,4 +1,4 @@
-@extends('supervisor.navbar')
+@extends('Supervisor.sidebar')
 
 @section('content')
 <style>

@@ -125,5 +125,32 @@ class LabAssignController extends Controller
         return redirect()->route('admin.labassign.index')->with('success', 'Lab assignment deleted successfully!');
     }
 
+
+      //-----------------------------------------Supervisor's Functions------------------------------------------------------------
+
+
+      public function getAssignedLabs(Request $request)
+      {
+          $uid = session('uid'); // Get the logged-in user's UID
+          if (!$uid) {
+              return response()->json(['error' => 'User not logged in'], 401);
+          }
+  
+          // Fetch lab assignments for the logged-in user
+          $assignedLabs = LabAssign::where('uid_assign', $uid)
+              ->with('lab') // Eager load the related lab
+              ->get();
+  
+          // Return the labs in a suitable format for the dropdown
+          $labs = $assignedLabs->map(function ($assignment) {
+              return [
+                  'lid' => $assignment->lab->lid,
+                  'name' => $assignment->lab->name,
+              ];
+          });
+  
+          return response()->json($labs);
+      }
+  
     
 }

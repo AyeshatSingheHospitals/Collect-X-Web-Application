@@ -772,7 +772,6 @@
         }
 
     }
-
     @media screen and (max-width: 1200px) {
         .container1 {
             width: 100%;
@@ -889,7 +888,6 @@
 
 
     }
-
     @media screen and (max-width: 768px) {
         .container1 {
             width: 100%;
@@ -999,7 +997,6 @@
         }
 
     }
-
     @media screen and (max-width: 480px) {
         .container1 {
             width: 100%;
@@ -1092,8 +1089,103 @@
             flex: 1;
         }
     }
-
     @media screen and (max-width: 1200px) {
+     
+        @keyframes showMenu {
+            to {
+                left: 0;
+            }
+        }
+
+        aside .logo {
+            margin-left: 1rem;
+        }
+
+        aside .logo h2 {
+            display: inline;
+        }
+
+        aside .sidebar h3 {
+            display: inline;
+        }
+
+        aside .sidebar a {
+            width: 100%;
+            height: 3.4rem;
+        }
+
+        aside .sidebar a:last-child {
+            position: absolute;
+            bottom: 5rem;
+        }
+
+        aside .toggle .close {
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        main {
+            margin-top: 8rem;
+            padding: 0 1rem;
+        }
+
+        main .new-users .user-list .user {
+            flex-basis: 35%;
+        }
+
+        main .recent-orders {
+            position: relative;
+            margin: 3rem 0 0 0;
+            width: 100%;
+        }
+
+        main .recent-orders table {
+            width: 100%;
+            margin: 0;
+        }
+
+        .right-section1 {
+            width: 94%;
+            margin: 0 auto 4rem;
+        }
+
+        .right-section .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            align-items: center;
+            background-color: var(--color-white);
+            padding: 0 var(--padding-1);
+            height: 4.6rem;
+            width: 100%;
+            z-index: 2;
+            box-shadow: 0 1rem 1rem var(--color-light);
+            margin: 0;
+        }
+
+        .right-section .nav .dark-mode {
+            width: 4.4rem;
+            position: absolute;
+            left: 66%;
+        }
+
+        .right-section .profile .info {
+            display: none;
+        }
+
+        .right-section .nav button {
+            display: inline-block;
+            background-color: transparent;
+            cursor: pointer;
+            color: var(--color-dark);
+            position: absolute;
+            left: 1rem;
+        }
+
+        .right-section .nav button span {
+            font-size: 2rem;
+        }
+
         .container {
             width: 95%;
             grid-template-columns: 7rem auto 23rem;
@@ -1144,7 +1236,6 @@
         }
 
     }
-
     @media screen and (max-width: 768px) {
         .container {
             width: 100%;
@@ -1211,7 +1302,6 @@
 
     }
     /* Media Queries for Responsive Design */
-
     /* For Extra Large Screens (1200px and above) */
     @media (min-width: 1200px) {
         .col-md-4 {
@@ -1219,7 +1309,6 @@
             max-width: 18%;
         }
     }
-
     /* For Large Screens (992px to 1199px) */
     @media (min-width: 992px) and (max-width: 1199px) {
         .col-md-4 {
@@ -1230,7 +1319,6 @@
             margin-left: 50%; /* Adjust search bar alignment */
         }
     }
-
     /* For Medium Screens (768px to 991px) */
     @media (min-width: 768px) and (max-width: 991px) {
         .col-md-4 {
@@ -1247,7 +1335,6 @@
             width: 300px; /* Smaller search input */
         }
     }
-
     /* For Small Screens (576px to 767px) */
     @media (min-width: 576px) and (max-width: 767px) {
         .col-md-4 {
@@ -1265,7 +1352,6 @@
             height: 45px;
         }
     }
-
     /* For Extra Small Screens (up to 575px) */
     @media (max-width: 575px) {
         .col-md-4 {
@@ -1294,7 +1380,6 @@
             font-size: 1em; /* Smaller font size */
         }
     }
-
     @media (min-width: 849px) and (max-width: 1301px) {
         /* Card Layout Adjustments */
         .col-md-4 {
@@ -1330,7 +1415,6 @@
             font-size: 18px; /* Adjust icon size */
         }
     }
-
     @media (min-width: 1300px) and (max-width: 1588px) {
         /* Adjust card layout for the specific screen size */
         .col-md-4 {

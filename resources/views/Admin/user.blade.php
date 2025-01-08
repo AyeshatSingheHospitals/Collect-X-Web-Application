@@ -47,7 +47,7 @@
         <!-- Right Section (Form) -->
         <div class="right-section1">
 
-        <form id="userForm" action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="userForm" action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
@@ -498,10 +498,64 @@ i {
     color: #0056b3;
 }
 
+@media (min-width: 1200px) and (max-width: 1587px) {
+    .container1 {
+        display: grid;
+        /* padding: 0 var(--padding-1); */
+        /* width: 100%; */
+        grid-template-columns: 1.5fr 2.5fr;
+        /* 1fr for cards, 2fr for form */
+        gap: 2rem;
+        padding: 1.8rem;
+    }
+
+    main {
+        /* margin-top: 8rem; */
+        padding: 0 1rem;
+    }
+
+    .card {
+
+        position: relative;
+        background-color: var(--color-white);
+        padding: var(--card-padding);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--box-shadow);
+        transition: all 0.3s ease;
+    }
+
+    .www {
+        padding-left: 5px;
+        /* Corrected the typo: removed the extra "/" */
+        display: inline-flex;
+        /* Keeps the flex layout but with inline behavior */
+        gap: 10px;
+        /* Space between items */
+        flex-wrap: wrap;
+    }
+
+    .row {
+        padding-left: 5px;
+        /* Corrected the typo: removed the extra "/" */
+        display: inline-flex;
+        /* Keeps the flex layout but with inline behavior */
+        gap: 10px;
+        /* Space between items */
+        flex-wrap: wrap;
+    }
+
+}
+
+/* @media (min-width: 1200px) and (max-width: 1587px) {
+    
+} */
 
 /* New media queries */
-@media screen and (max-width: 1500px) {
-    aside .logo {
+@media screen and (max-width: 1200px)
+
+/* @media (min-width: 1248px) and (max-width: 1587px) */
+    {
+    /* aside .logo {
         margin-left: 1rem;
     }
 
@@ -526,7 +580,7 @@ i {
     aside .toggle .close {
         display: inline-block;
         cursor: pointer;
-    }
+    } */
     /* .container1 {
         width: 100%;
         grid-template-columns: 1fr;
@@ -534,11 +588,11 @@ i {
     } */
 
     .container1 {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    /* 1fr for cards, 2fr for form */
-    gap: 2rem;
-    padding: 1.8rem;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        /* 1fr for cards, 2fr for form */
+        gap: 2rem;
+        padding: 1.8rem;
     }
 
 
@@ -555,37 +609,7 @@ i {
     }
 
     /* Left Section (Cards) */
-    .left-section {
-        display: flex;
-        /* flex-direction: column; */
-        gap: 1.8rem;
-        width:350px;
-    }
 
-    .left-section {
-        max-height: 667px;
-        /* Set a fixed height for the left section */
-        overflow-y: auto;
-        /* Enable vertical scrolling */
-        padding-right: 10px;
-        /* Add some padding to avoid hiding content behind the scrollbar */
-    }
-
-    .left-section::-webkit-scrollbar {
-        display: none;
-        /* Hide scrollbar in Chrome, Safari, and Edge */
-    }
-
-
-    /* Fixed positioning for the search bar */
-    .left-section #searchInput {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        padding: 8px;
-        margin-bottom: 10px;
-
-    }
 
     /* Card Style */
     .card {
@@ -632,7 +656,7 @@ i {
         color: #0056b3;
     }
 
-    aside {
+    /* aside {
         position: fixed;
         background-color: var(--color-white);
         width: 15rem;
@@ -642,7 +666,7 @@ i {
         left: -100%;
         display: none;
         animation: showMenu 0.4s ease forwards;
-    }
+    } */
 
     @keyframes showMenu {
         to {
@@ -698,10 +722,10 @@ i {
     }
 
     .www {
-    padding-left: 100px;
-    display: inline-flex;
-    gap: 10px;
-}
+        padding-left: 100px;
+        display: inline-flex;
+        gap: 10px;
+    }
 
 }
 
@@ -978,17 +1002,23 @@ i {
     }
 
     .www {
-    padding-left: 5px;   /* Corrected the typo: removed the extra "/" */
-    display: inline-flex;   /* Keeps the flex layout but with inline behavior */
-    gap: 10px;              /* Space between items */
-    flex-wrap: wrap; 
+        padding-left: 5px;
+        /* Corrected the typo: removed the extra "/" */
+        display: inline-flex;
+        /* Keeps the flex layout but with inline behavior */
+        gap: 10px;
+        /* Space between items */
+        flex-wrap: wrap;
     }
 
     .row {
-        padding-left: 5px;   /* Corrected the typo: removed the extra "/" */
-        display: inline-flex;   /* Keeps the flex layout but with inline behavior */
-        gap: 10px;              /* Space between items */
-        flex-wrap: wrap; 
+        padding-left: 5px;
+        /* Corrected the typo: removed the extra "/" */
+        display: inline-flex;
+        /* Keeps the flex layout but with inline behavior */
+        gap: 10px;
+        /* Space between items */
+        flex-wrap: wrap;
     }
 
 }
@@ -1019,7 +1049,7 @@ function generateUsername() {
     const usernameField = document.getElementById('username');
 
     if (fname && epf) {
-        usernameField.value = fname + epf;
+        usernameField.value = fname + "-" + epf;
     } else {
         usernameField.value = ''; // Clear username if one of the fields is empty
     }

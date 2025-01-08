@@ -76,13 +76,6 @@ Route::get('/Supervisor/transaction', function () {
     return view('supervisor.transaction');
 });
 
-//lab assign
-Route::post('/Supervisor/labassigns', [LabAssign1Controller::class, 'indexLabassign'])->name('Supervisor.labassign.index');
-Route::post('/Supervisor/labassigns/store', [LabAssign1Controller::class, 'storeLabassigns'])->name('Supervisor.labassigns.store');
-
-//lab assign
-// Route::post('/Incharge/labassigns', [LabAssignController::class, 'indexLabassign'])->name('supervisor.labassign.index');
-// Route::post('/Incharge/labassigns/store', [LabAssignController::class, 'storeLabassigns'])->name('supervisor.labassigns.store');
 
 // -------------------admin-------------------------
 Route::get('/sidebar', function () {
@@ -184,14 +177,24 @@ Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.l
 // Route::post('/admin/routeassigns/store', [RouteAssignController::class, 'store'])->name('admin.routeassigns.store');
 
 
-// -------------------------------------------------------
 
-// ---------------------------Incharge------------------------------
-
-// -------------------------------------------------------------
 
 Route::get('/ll', function () {
     return view('ll');
 });
+
+// ----------------------supervisor-----------------------
+Route::get('supervisor/dashboard', function () {
+    return view('supervisor.dashboard');
+});
+
+
+//Lab View
+Route::get('Supervisor/labassign', function () {
+    return view('supervisor.labassign');
+});
+
+Route::get('/supervisor/assigned-labs', [LabAssignController::class, 'getAssignedLabs'])->name('supervisor.assigned-labs');
+
 
 
