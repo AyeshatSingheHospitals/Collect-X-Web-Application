@@ -12,7 +12,7 @@
             <div class="search">
                 <input type="text" id="searchInput" class="form-control" placeholder="Search by name or role..."
                     onkeyup="filterCards()">
-            </div><br><br><br>
+            </div><br><br>
 
             @foreach($labassigns as $labassign)
             <div class="card">
@@ -1234,6 +1234,87 @@ button:active {
     }
 }
 
+@media (min-width: 1200px) and (max-width: 1600px) {
+
+    /* Left Section (Cards) */
+    .left-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 7em 1.8rem;
+        /* height: 20px; */
+        max-height: 750px;
+        /* Set a fixed height */
+        overflow-y: auto;
+        /* Add vertical scrollbar */
+        padding-right: 10px;
+        /* Space for scrollbar */
+    }
+
+    /* Optional: Styling the Scrollbar */
+    .left-section::-webkit-scrollbar {
+        width: 8px;
+        /* Width of the scrollbar */
+        display: none;
+    }
+
+    .left-section::-webkit-scrollbar-thumb {
+        background-color: #888;
+        /* Color of the scroll thumb */
+        border-radius: 4px;
+        /* Rounded edges for the thumb */
+    }
+
+    .left-section::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+        /* Darker on hover */
+    }
+
+    .left-section::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        /* Background of the scrollbar track */
+
+    }
+
+    .search {
+        display: grid;
+        /* grid-template-columns: 0.5fr 0.5fr; */
+        gap: 7em 1.8rem;
+        height: 20px;
+        width: 100%;
+    }
+
+    .container1 {
+        display: grid;
+        grid-template-columns: 1.2fr 1.8fr;
+        /* 1fr for cards, 2fr for form */
+        gap: 2rem;
+        padding: 0.5rem;
+    }
+}
+
+@media screen and (max-width: 604px) {
+    .left-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 7em 1.8rem;
+        /* height: 20px; */
+        max-height: 750px;
+        /* Set a fixed height */
+        overflow-y: auto;
+        /* Add vertical scrollbar */
+        padding-right: 10px;
+        /* Space for scrollbar */
+        width: 90%;
+    }
+
+    .search {
+        display: grid;
+        /* grid-template-columns: 0.5fr 0.5fr; */
+        gap: 7em 1.8rem;
+        height: 20px;
+        width: 100%;
+    }
+}
 </style>
 
 @endsection

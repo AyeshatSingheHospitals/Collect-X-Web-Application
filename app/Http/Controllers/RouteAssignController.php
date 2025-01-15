@@ -11,10 +11,61 @@ use App\Models\RouteAssign;
 
 class RouteAssignController extends Controller
 {
-    public function searchLab(Request $request)
+//     public function searchLab(Request $request)
+// {
+//     $labName = $request->input('name');
+    
+//     // Search for the lab by name
+//     $lab = Lab::where('name', 'like', '%' . $labName . '%')->first();
+
+//     if (!$lab) {
+//         return response()->json(['message' => 'Lab not found'], 404);
+//     }
+
+//     // Get users assigned to the lab (role=RO)
+//     $assignedUsers = LabAssign::with('systemuser')
+//         ->where('lid', $lab->lid)
+//         ->whereHas('systemuser', function ($query) {
+//             $query->where('role', 'RO');
+//         })
+//         ->get();
+
+//     // Get routes related to the lab
+//     $routes = Route::where('lid', $lab->lid)->get();
+
+//     // Get existing route assignments for users in the lab
+//     $existingAssignments = RouteAssign::whereIn('uid', $assignedUsers->pluck('systemuser.uid'))
+//         ->get()
+//         ->groupBy('uid')
+//         ->map(function ($assignments) {
+//             return $assignments->pluck('rid')->toArray();
+//         });
+
+//     // Prepare data for the response
+//     $response = [
+//         'lab' => $lab,
+//         'users' => $assignedUsers->map(function ($assignment) {
+//             return [
+//                 'id' => $assignment->systemuser->uid,
+//                 'name' => $assignment->systemuser->full_name,
+//             ];
+//         }),
+//         'routes' => $routes->map(function ($route) {
+//             return [
+//                 'id' => $route->rid,
+//                 'name' => $route->routename,
+//             ];
+//         }),
+//         'assignments' => $existingAssignments,
+//     ];
+
+//     return response()->json($response);
+// }
+
+public function searchLab(Request $request)
 {
     $labName = $request->input('name');
-    
+
     // Search for the lab by name
     $lab = Lab::where('name', 'like', '%' . $labName . '%')->first();
 
@@ -34,9 +85,9 @@ class RouteAssignController extends Controller
     $routes = Route::where('lid', $lab->lid)->get();
 
     // Get existing route assignments for users in the lab
-    $existingAssignments = RouteAssign::whereIn('uid', $assignedUsers->pluck('systemuser.uid'))
+    $existingAssignments = RouteAssign::whereIn('uid_ro', $assignedUsers->pluck('systemuser.uid'))
         ->get()
-        ->groupBy('uid')
+        ->groupBy('uid_ro')
         ->map(function ($assignments) {
             return $assignments->pluck('rid')->toArray();
         });
@@ -56,11 +107,12 @@ class RouteAssignController extends Controller
                 'name' => $route->routename,
             ];
         }),
-        'assignments' => $existingAssignments,
+        'assignments' => $existingAssignments, // Assignments grouped by user
     ];
 
     return response()->json($response);
 }
+
 
 public function showAssignedRoutes()
 {

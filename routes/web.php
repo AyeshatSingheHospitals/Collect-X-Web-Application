@@ -168,6 +168,7 @@ Route::get('/route-assign/search', [RouteAssignController::class, 'searchLab']);
 Route::get('admin/routeassigns', [RouteAssignController::class, 'showAssignedRoutes']);
 Route::post('/route-assign/store', [RouteAssignController::class, 'storeAssignments'])->name('route.assign.store');
 
+
 Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->name('get.user.names');
 // Route::get('/systemuser/search', [SystemUserController::class, 'search'])->name('systemuser.search');
 Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');

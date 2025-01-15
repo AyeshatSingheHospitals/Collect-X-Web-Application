@@ -546,6 +546,19 @@ i {
 
 }
 
+@media (min-width: 1058px) and (max-width: 1200px) {
+    .container1 {
+        display: grid;
+        /* padding: 0 var(--padding-1); */
+        /* width: 100%; */
+        grid-template-columns: 1.5fr 2.5fr;
+        /* 1fr for cards, 2fr for form */
+        gap: 2rem;
+        padding: 1.8rem;
+    }
+
+}
+
 /* @media (min-width: 1200px) and (max-width: 1587px) {
     
 } */
@@ -588,11 +601,11 @@ i {
     } */
 
     .container1 {
-        display: grid;
+        /* display: grid;
         grid-template-columns: 1fr 2fr;
         /* 1fr for cards, 2fr for form */
-        gap: 2rem;
-        padding: 1.8rem;
+        /* gap: 2rem;
+        padding: 1.8rem; */ 
     }
 
 
@@ -730,13 +743,13 @@ i {
 }
 
 @media screen and (max-width: 1200px) {
-    .container1 {
+    /* .container1 {
         width: 95%;
         grid-template-columns: 7rem auto 23rem;
         width: 100%;
         grid-template-columns: 1fr;
         padding: 0 var(--padding-1);
-    }
+    } */
 
     main .container1 {
         grid-template-columns: 1fr;
@@ -777,11 +790,11 @@ i {
 }
 
 @media screen and (max-width: 1200px) {
-    .container1 {
+    /* .container1 {
         width: 100%;
         grid-template-columns: 1fr;
         padding: 0 var(--padding-1);
-    }
+    } */
 
     aside {
         position: fixed;
