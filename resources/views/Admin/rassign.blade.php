@@ -37,129 +37,133 @@
                 onkeyup="searchLabs()">
         </div>
 
-        <div id="loadingIndicator" style="display: none;">Loading...</div>
+        <!-- Loading GIF -->
+        <div id="loadingIndicator">
+            <img src="{{ asset('../image/rassign.gif') }}" alt="No Records" class="img-fluid mb-3"
+                style="max-width: 300px; height: 300px; border-radius:50%;">
+        </div>
+
         <form id="assignForm" method="POST" action="{{ route('route.assign.store') }}" style="display: none;">
-    @csrf
-    <!-- Hidden input to preserve search query -->
-    <input type="hidden" name="searchQuery" id="searchQuery" value="{{ request('name', '') }}">
+            @csrf
+            <!-- Hidden input to preserve search query -->
+            <input type="hidden" name="searchQuery" id="searchQuery" value="{{ request('name', '') }}">
 
-    <!-- Dynamic Table for Routes and Users -->
-    <div class="table-container">
-        <table class="route-assign-table">
-            <thead>
-                <tr id="routeHeaders">
-                    <th>User</th>
-                </tr>
-            </thead>
-            <tbody id="userList" class="userList">
-                <!-- Assigned users will be dynamically added here -->
-            </tbody>
-        </table>
-    </div>
+            <!-- Dynamic Table for Routes and Users -->
+            <div class="table-container">
+                <table class="route-assign-table">
+                    <thead>
+                        <tr id="routeHeaders">
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userList" class="userList">
+                        <!-- Assigned users will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
 
-    <!-- Submit Button -->
-    <div class="submit-button-container" id="submitButtonContainer" hidden>
-        <p>Hey {{ session('fname', 'Guest') }}! You can update now</p>
-        <input type="hidden" name="uid" value="{{ session('uid') }}">
-        <button type="submit" id="submitAssignments">Submit</button>
-    </div>
-</form>
+            <!-- Submit Button -->
+            <div class="submit-button-container" id="submitButtonContainer" hidden>
+                <p>Hey {{ session('fname', 'Guest') }}! You can update now</p>
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
+                <button type="submit" id="submitAssignments">Submit</button>
+            </div>
+        </form>
 
     </div>
 </main>
 
 <script>
-async function searchLabs() {
-    const searchQuery = document.getElementById('labSearch').value || new URLSearchParams(window.location.search).get('name');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const assignForm = document.getElementById('assignForm');
-    const submitButtonContainer = document.getElementById('submitButtonContainer');
+    async function searchLabs() {
+        const searchQuery = document.getElementById('labSearch').value || new URLSearchParams(window.location.search)
+            .get('name');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const assignForm = document.getElementById('assignForm');
+        const submitButtonContainer = document.getElementById('submitButtonContainer');
+        const tableContainer = document.querySelector('.table-container');
 
-    if (!searchQuery) {
-        assignForm.style.display = 'none'; // Hide form if the search query is empty
-        return;
-    }
-
-    loadingIndicator.style.display = 'block'; // Show loading indicator
-
-    try {
-        const response = await fetch(`/route-assign/search?name=${searchQuery}`);
-        const data = await response.json();
-
-        if (response.ok) {
-            assignForm.style.display = 'block'; // Show form after data is loaded
-            renderTable(data.users, data.routes, data.assignments);
-            // Update the hidden search input
-            document.getElementById('searchQuery').value = searchQuery;
-        } else {
-            alert(data.message || 'Lab not found');
-            assignForm.style.display = 'none'; // Hide form if lab is not found
+        if (!searchQuery) {
+            assignForm.style.display = 'none'; // Hide form if the search query is empty
+            loadingIndicator.style.display = 'block'; // Show the loading GIF
+            return;
         }
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    } finally {
-        loadingIndicator.style.display = 'none'; // Hide loading indicator
-    }
-}
-function renderTable(users, routes, assignments = {}) {
-    const routeHeaders = document.getElementById('routeHeaders');
-    const userList = document.getElementById('userList');
-    const submitButtonContainer = document.getElementById('submitButtonContainer');
 
-    // Clear existing headers and rows
-    routeHeaders.innerHTML = '<th>User</th>';
-    userList.innerHTML = '';
+        loadingIndicator.style.display = 'block'; // Show loading indicator
 
-    // Check if there are users and routes to display
-    if (users && users.length > 0 && routes && routes.length > 0) {
-        submitButtonContainer.hidden = false; // Show submit button container
-    } else {
-        submitButtonContainer.hidden = true; // Hide submit button container
+        try {
+            const response = await fetch(`/route-assign/search?name=${searchQuery}`);
+            const data = await response.json();
 
-        // Add placeholder message
-        userList.innerHTML = '<tr><td colspan="100%">No data found. Try a different search.</td></tr>';
-        return; // Exit the function
-    }
-
-    // Add route headers
-    routes.forEach(route => {
-        const th = document.createElement('th');
-        th.textContent = route.name;
-        routeHeaders.appendChild(th);
-    });
-
-    // Add user rows with checkboxes for each route
-    users.forEach(user => {
-        const tr = document.createElement('tr');
-        tr.classList.add('user-row'); // Add class for row management
-
-        // User name column
-        const nameCell = document.createElement('td');
-        nameCell.textContent = user.name;
-        tr.appendChild(nameCell);
-
-        // Checkbox columns for each route
-        routes.forEach((route, columnIndex) => {
-            const checkboxCell = document.createElement('td');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.name = `assign[${user.id}][${route.id}]`;
-            checkbox.value = 1;
-            checkbox.dataset.columnIndex = columnIndex; // Add column index as a data attribute
-
-            // Check if this user is already assigned to this route
-            if (assignments[user.id] && assignments[user.id].includes(route.id)) {
-                checkbox.checked = true;
+            if (response.ok) {
+                assignForm.style.display = 'block'; // Show form after data is loaded
+                loadingIndicator.style.display = 'none'; // Hide the loading GIF
+                renderTable(data.users, data.routes, data.assignments);
+                // Update the hidden search input
+                document.getElementById('searchQuery').value = searchQuery;
+            } else {
+                alert(data.message || 'Lab not found');
+                assignForm.style.display = 'none'; // Hide form if lab is not found
+                loadingIndicator.style.display = 'none'; // Hide the loading GIF
             }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            loadingIndicator.style.display = 'none'; // Hide the loading GIF in case of an error
+        }
+    }
 
-            // Add event listener to enforce one checkbox per column
-            checkbox.addEventListener('change', (e) => {
+    function renderTable(users, routes, assignments = {}) {
+        const routeHeaders = document.getElementById('routeHeaders');
+        const userList = document.getElementById('userList');
+        const submitButtonContainer = document.getElementById('submitButtonContainer');
+
+        // Clear existing headers and rows
+        routeHeaders.innerHTML = '<th>User</th>';
+        userList.innerHTML = '';
+
+        // Check if there are users and routes to display
+        if (users && users.length > 0 && routes && routes.length > 0) {
+            submitButtonContainer.hidden = false; // Show submit button container
+        } else {
+            submitButtonContainer.hidden = true; // Hide submit button container
+
+            // Add placeholder message
+            userList.innerHTML = '<tr><td colspan="100%">No data found. Try a different search.</td></tr>';
+            return; // Exit the function
+        }
+
+        // Add route headers
+        routes.forEach(route => {
+            const th = document.createElement('th');
+            th.textContent = route.name;
+            routeHeaders.appendChild(th);
+        });
+
+        // Add default "Inactive" user as the first user row
+        const defaultUser = {
+            id: '0',
+            name: 'Inactive', // Default user
+        };
+        const trDefault = document.createElement('tr');
+        trDefault.classList.add('user-row');
+
+        const nameCellDefault = document.createElement('td');
+        nameCellDefault.textContent = defaultUser.name;
+        trDefault.appendChild(nameCellDefault);
+
+        routes.forEach((route, columnIndex) => {
+            const checkboxCellDefault = document.createElement('td');
+            const checkboxDefault = document.createElement('input');
+            checkboxDefault.type = 'checkbox';
+            checkboxDefault.name = `assign[${defaultUser.id}][${route.id}]`;
+            checkboxDefault.value = 1;
+            checkboxDefault.dataset.columnIndex = columnIndex;
+
+            checkboxDefault.addEventListener('change', (e) => {
                 if (e.target.checked) {
+                    // Uncheck all checkboxes in the same column except the current one
                     const allCheckboxes = document.querySelectorAll(
                         `input[type="checkbox"][data-column-index="${columnIndex}"]`
                     );
-
-                    // Uncheck all checkboxes in the same column except the current one
                     allCheckboxes.forEach(cb => {
                         if (cb !== e.target) {
                             cb.checked = false;
@@ -168,21 +172,76 @@ function renderTable(users, routes, assignments = {}) {
                 }
             });
 
-            checkboxCell.appendChild(checkbox);
-            tr.appendChild(checkboxCell);
+            checkboxCellDefault.appendChild(checkboxDefault);
+            trDefault.appendChild(checkboxCellDefault);
         });
+        userList.appendChild(trDefault);
 
-        userList.appendChild(tr);
-    });
-}
+        // Add user rows with checkboxes for each route
+        users.forEach(user => {
+            const tr = document.createElement('tr');
+            tr.classList.add('user-row'); // Add class for row management
 
+            // User name column
+            const nameCell = document.createElement('td');
+            nameCell.textContent = user.name;
+            tr.appendChild(nameCell);
+
+            // Checkbox columns for each route
+            routes.forEach((route, columnIndex) => {
+                const checkboxCell = document.createElement('td');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = `assign[${user.id}][${route.id}]`;
+                checkbox.value = 1;
+                checkbox.dataset.columnIndex = columnIndex; // Add column index as a data attribute
+
+                // Check if this user is already assigned to this route
+                if (assignments[user.id] && assignments[user.id].includes(route.id)) {
+                    checkbox.checked = true;
+                }
+
+                // Add event listener to enforce one checkbox per column
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        const allCheckboxes = document.querySelectorAll(
+                            `input[type="checkbox"][data-column-index="${columnIndex}"]`
+                        );
+
+                        // Uncheck all checkboxes in the same column except the current one
+                        allCheckboxes.forEach(cb => {
+                            if (cb !== e.target) {
+                                cb.checked = false;
+                            }
+                        });
+                    }
+                });
+
+                checkboxCell.appendChild(checkbox);
+                tr.appendChild(checkboxCell);
+            });
+
+            userList.appendChild(tr);
+        });
+    }
 </script>
-
 
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+#loadingIndicator {
+        display: flex;
+        justify-content: center;
+        /* Horizontally center */
+        align-items: center;
+        /* Vertically center */
+        text-align: center;
+        /* Align the text in the center */
+        flex-direction: column;
+        /* Stack the image and text vertically */
+        padding-top: 6%;
+    }
 
 .alert {
     padding: 15px;
@@ -1549,7 +1608,7 @@ button:active {
         margin: 2rem 0 0 0.8rem;
     }
 
-        .container1 {
+    .container1 {
         width: 100%;
         grid-template-columns: 1fr;
         padding: 0 var(--padding-1);
@@ -1620,8 +1679,6 @@ button:active {
         margin: 0;
     }
 }
-
-
 </style>
 
 

@@ -17,6 +17,7 @@
                 <i class="fas fa-info-circle me-2"></i> Add
             </button>
         </div>
+        
         <div class="search-container">
             <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterLabs()" />
 
@@ -41,7 +42,6 @@
     @endif
 
     <br><br>
-
 
     @if($centers->isEmpty())
     <div class="col-12 mt-5 center-align-container">
@@ -605,6 +605,44 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+    /* Style the textarea */
+textarea#editDescription,
+#description {
+    width: 100%;
+    min-height: 90px;
+    padding: 10px;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc; /* Light gray */
+    border-radius: 20px;
+    background-color: var(--color-white); /* Light background */
+    resize: vertical; /* Allow vertical resizing only */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Smooth interaction effects */
+    color:var(--color-dark);
+}
+
+/* Focus state for the textarea */
+textarea#editDescription:focus {
+    /* border-color: #4caf50; Green border */
+    /* box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); Green glow */
+    border-color: #628ECB;
+    outline: none;
+}
+
+/* Focus state for the textarea */
+textarea#description:focus {
+    /* border-color: #4caf50; Green border */
+    /* box-shadow: 0 0 8px rgba(76, 175, 80, 0.5); Green glow */
+    border-color: #628ECB;
+    outline: none;
+}
+
+#editUserDropdown,
+#userDropdown{
+    background-color: var(--color-white);
+    color:var(--color-dark);
+}
 
     .center-align-container {
         display: flex;
@@ -1058,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', function() {
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.2);
-        max-width: 500px;
+        max-width: 800px;
         width: 100%;
         position: relative;
         animation: fadeIn 0.4s ease-in-out;
@@ -1094,6 +1132,19 @@ document.addEventListener('DOMContentLoaded', function() {
     input[type="text"],
     input[type="password"],
     input[type="email"] {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 100%;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+        color: var(--color-dark);
+    }
+
+    #routeDropdown,
+    #editrouteDropdown{
         border: 1px solid #ddd;
         border-radius: 50px;
         padding: 12px 20px;
