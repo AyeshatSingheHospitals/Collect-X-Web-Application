@@ -1,27 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 use App\Models\LabAssign;
+use App\Models\RouteAssign;
+
 use App\Models\Systemuser;
 use App\Models\Lab;
 use App\Models\LabAssignLog;
 use DB;
 
-use Illuminate\Support\Facades\Log;
-
 class LabAssignController extends Controller
 {
 
+//---------------------------------------------admin's function---------------------------------------------------
+
     public function indexLabassign()
-{
-    try {
+    {
         // Fetch lab assignments with related systemuser and lab data
         $labassigns = LabAssign::with(['systemuser', 'lab'])->get();
 
-        // Check for empty lab assignments
-        if ($labassigns->isEmpty()) {
+          //------------ Check for empty lab assignments
+          if ($labassigns->isEmpty()) {
             return view('Admin.labassign', compact('labassigns'))
                 ->with('warning', 'No lab assignments available at the moment.');
         }
@@ -35,14 +38,11 @@ class LabAssignController extends Controller
                 Log::warning("Lab not found for LabAssign ID: {$labassign->id}");
             }
         }
+            // ---------------------
 
         // Passing $labassigns to the view
         return view('Admin.labassign', compact('labassigns'));
-    } catch (\Exception $e) {
-        Log::error("Error fetching lab assignments: " . $e->getMessage());
-        return redirect()->back()->with('error', 'An error occurred while fetching lab assignments.');
     }
-}
 
     public function storeLabassign(Request $request)
     {
@@ -126,31 +126,49 @@ class LabAssignController extends Controller
     }
 
 
-      //-----------------------------------------Supervisor's Functions------------------------------------------------------------
 
+    //-----------------------------------------Supervisor's Functions------------------------------------------------------------
 
-      public function getAssignedLabs(Request $request)
-      {
-          $uid = session('uid'); // Get the logged-in user's UID
-          if (!$uid) {
-              return response()->json(['error' => 'User not logged in'], 401);
-          }
-  
-          // Fetch lab assignments for the logged-in user
-          $assignedLabs = LabAssign::where('uid_assign', $uid)
-              ->with('lab') // Eager load the related lab
-              ->get();
-  
-          // Return the labs in a suitable format for the dropdown
-          $labs = $assignedLabs->map(function ($assignment) {
-              return [
-                  'lid' => $assignment->lab->lid,
-                  'name' => $assignment->lab->name,
-              ];
-          });
-  
-          return response()->json($labs);
-      }
-  
-    
+    public function getAssignedLabs(Request $request)
+    {
+        $uid = session('uid'); // Get the logged-in user's UID
+        if (!$uid) {
+            return response()->json(['error' => 'User not logged in'], 401);
+        }
+
+        // Fetch lab assignments for the logged-in user
+        $assignedLabs = LabAssign::where('uid_assign', $uid)
+            ->with('lab') // Eager load the related lab
+            ->get();
+
+        // Return the labs in a suitable format for the dropdown
+        $labs = $assignedLabs->map(function ($assignment) {
+            return [
+                'lid' => $assignment->lab->lid,
+                'name' => $assignment->lab->name,
+            ];
+        });
+
+        return response()->json($labs);
+    }
+
+    public function getLabAssignments(Request $request)
+    {
+
+        // $labassigns = LabAssign::all();
+
+        $labId = $request->input('lid'); // Get the selected lab ID from the request
+
+        // Retrieve assigned officers for the selected lab
+        $assignments = LabAssign::where('lid', $labId)
+            ->with('systemuser') // Eager load the related systemuser
+            ->whereHas('systemuser', function($query){
+                $query->where('role','RO');
+            })
+            ->get();
+
+        // Return the assignments as a JSON response
+        return response()->json($assignments);
+    }
+
 }

@@ -2,23 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Transaction extends Model
+class TransactionLog extends Model
 {
     use HasFactory;
 
-    protected $table = 'transaction';
-
-    protected $primaryKey = 'tid';
+    protected $table = 'transactionlogs';
 
     protected $fillable = [
+        'tid',
         'uid',
         'rid',
         'cid',
         'amount',
         'remark',
+        'action',
     ];
 
     // Relationship to Systemuser

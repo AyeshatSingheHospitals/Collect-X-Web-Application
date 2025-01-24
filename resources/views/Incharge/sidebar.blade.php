@@ -37,23 +37,23 @@
             </div>
 
             <div class="sidebar">
-                <a href="/Incharge/dashboard" class="{{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                <a href="/Incharge/dashboard" class="{{ request()->is('incharge/dashboard') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">grid_view</span>
                     <h3>Dashboard</h3>
                 </a>
-                <a href="/Incharge/labassign" class="{{ request()->is('labassign') ? 'active' : '' }}">
+                <a href="/incharge/assignedlabs" class="{{ request()->is('incharge/assignedlabs') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">medical_services</span>
-                    <h3>Lab Assign</h3>
+                    <h3>Assigned Labs</h3>
                 </a>
-                <a href="/Incharge/rassign" class="{{ request()->is('rassign') ? 'active' : '' }}">
+                <a href="/incharge/rassign" class="{{ request()->is('incharge/rassign') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">add_road</span>
                     <h3>Route Assign</h3>
                 </a>
-                <a href="/Incharge/transaction" class="{{ request()->is('transaction') ? 'active' : '' }}">
+                <a href="/Incharge/transaction" class="{{ request()->is('incharge/transaction') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>
-                <a href="#">
+                <a href="/">
                     <span class="material-symbols-sharp">logout</span>
                     <h3>Logout</h3>
                 </a>

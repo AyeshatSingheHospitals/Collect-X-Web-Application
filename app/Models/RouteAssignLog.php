@@ -17,6 +17,7 @@ class RouteAssignLog extends Model
         'uid',
         'rid',
         'uid_ro',
+        'action',
     ];
 
   

@@ -2,9 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use Illuminate\Database\Eloquent\Model;
 
 class SMS extends Model
 {
@@ -15,20 +14,18 @@ class SMS extends Model
     protected $primaryKey = 'sid';
 
     protected $fillable = [
-      
         'tid',
         'description',
         'phonenumber1',
         'phonenumber2',
-        
-       
+        'phonenumber3',
+        'phonenumber4',
+        'phonenumber5',
     ];
 
-    //relationship to systemuser
-
-  public function transaction(){
-    return $this->belongsTo(Transaction::class, 'tid');
-  }
-
-
+    // Relationship to Transaction
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class, 'tid', 'tid');
+    }
 }

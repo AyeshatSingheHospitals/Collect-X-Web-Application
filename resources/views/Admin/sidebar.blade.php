@@ -72,7 +72,7 @@
                     <span class="material-symbols-sharp">check_circle</span>
                     <h3>Route Assign</h3>
                 </a>
-                <a href="/transaction" class="{{ request()->is('transaction') ? 'active' : '' }}">
+                <a href="/admin/transactions" class="{{ request()->is('/admin/transactions') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>

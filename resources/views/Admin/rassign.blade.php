@@ -1,7 +1,6 @@
 @extends('admin.sidebar')
 
 @section('content')
-
 <main>
     <div class="container1">
         <div class="top-bar">
@@ -91,7 +90,7 @@
         loadingIndicator.style.display = 'block'; // Show loading indicator
 
         try {
-            const response = await fetch(`/route-assign/search?name=${searchQuery}`);
+            const response = await fetch(`/admin/route-assign/search?name=${searchQuery}`);
             const data = await response.json();
 
             if (response.ok) {
@@ -225,6 +224,7 @@
         });
     }
 </script>
+
 
 
 <style>

@@ -1,4 +1,4 @@
-@extends('supervisor.navbar')
+@extends('supervisor.sidebar')
 
 @section('content')
 
@@ -9,52 +9,106 @@
     </div>
     <br>
 
+
+    <!-- Assigned Labs Dropdown -->
+    <div class="form-group">
+        <input type="hidden" name="uid" value="{{ session('uid') }}">
+        <label for="labDropdown" style="color:#7f7f7f">Select your Lab:</label>
+        <select name="lid" id="labDropdown" class="form-control" required>
+            <option value="" disabled selected>Loading...</option>
+        </select>
+    </div>
+
+
     <div class="table-container">
-    <!-- <h2>Transaction Records</h2> -->
-    <table class="transactions-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>2024-10-01</td>
-                <td>Payment for Surgery</td>
-                <td>$1500</td>
-                <td class="success">Completed</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>2024-10-02</td>
-                <td>Payment for Consultation</td>
-                <td>$200</td>
-                <td class="danger">Failed</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>2024-10-03</td>
-                <td>Payment for Medication</td>
-                <td>$300</td>
-                <td class="success">Completed</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>2024-10-04</td>
-                <td>Payment for Therapy</td>
-                <td>$500</td>
-                <td class="warning">Pending</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <!-- <h2>Transaction Records</h2> -->
+        <table class="transactions-table">
+            <thead>
+                <tr>
+                    <th>TID</th>
+                    <th>Date</th>
+                    <th>Full Name</th>
+                    <th>Center Name</th>
+                    <th>Amount</th>
+                    <th>Remark</th>
+                    <th>SMS Description</th>
+                    <th>Actions</th> <!-- New column for actions -->
+                </tr>
+            </thead>
+            <tbody id="transactionTableBody">
+                <tr>
+                    <td colspan="7" class="text-center">No data available</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uid = document.querySelector('input[name="uid"]').value;
+    const labDropdown = document.getElementById('labDropdown');
+    const transactionTableBody = document.getElementById('transactionTableBody');
+
+    // Fetch assigned labs
+    fetch(`/incharge/assigned-labs`)
+        .then(response => response.json())
+        .then(data => {
+            labDropdown.innerHTML = ''; // Clear existing options
+
+            if (data.length === 0) {
+                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
+            } else {
+                labDropdown.innerHTML = `<option value="" disabled selected>Select a Lab</option>`;
+                data.forEach(lab => {
+                    labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching labs:', error);
+            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
+        });
+
+    // Fetch transactions on lab selection
+    labDropdown.addEventListener('change', function() {
+        const lid = labDropdown.value;
+
+        // Fetch transactions for the selected lab
+        fetch(`/supervisor/transactions?lid=${lid}`)
+            .then(response => response.json())
+            .then(data => {
+                transactionTableBody.innerHTML = ''; // Clear the table
+
+                if (data.length === 0) {
+                    transactionTableBody.innerHTML = `<tr>
+                            <td colspan="7" class="text-center">No transactions found</td>
+                        </tr>`;
+                } else {
+                    data.forEach(transaction => {
+                        transactionTableBody.innerHTML += `
+                                <tr>
+                                    <td>${transaction.tid}</td>
+                                    <td>${transaction.date}</td>
+                                    <td>${transaction.full_name}</td>
+                                    <td>${transaction.center_name}</td>
+                                    <td>${transaction.amount}</td>
+                                    <td>${transaction.remark}</td>
+                                    <td>${transaction.sms_description || 'N/A'}</td>
+                                </tr>`;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching transactions:', error);
+                transactionTableBody.innerHTML = `<tr>
+                        <td colspan="7" class="text-center">Error loading transactions</td>
+                    </tr>`;
+            });
+    });
+});
+</script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -841,13 +895,10 @@ button:active {
 .warning {
     color: var(--color-warning);
 }
-
-
 </style>
 
 <!-- JavaScript -->
 <script>
-
 document.addEventListener('DOMContentLoaded', function() {
     const darkModeToggle = document.querySelector('.dark-mode');
     const body = document.body;
@@ -859,48 +910,48 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-    const sideMenu = document.querySelector('aside');
-    const menuBtn = document.getElementById('menu-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const darkMode = document.querySelector('.dark-mode');
+const sideMenu = document.querySelector('aside');
+const menuBtn = document.getElementById('menu-btn');
+const closeBtn = document.getElementById('close-btn');
+const darkMode = document.querySelector('.dark-mode');
 
-    // Toggle dark mode and save preference to local storage
-    darkMode.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode-variables');
-        const isDarkMode = document.body.classList.contains('dark-mode-variables');
-        
-        // Save the current mode in local storage
-        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        
-        // Toggle active states on the dark mode icons
-        darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-        darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-    });
+// Toggle dark mode and save preference to local storage
+darkMode.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode-variables');
+    const isDarkMode = document.body.classList.contains('dark-mode-variables');
 
-    // Function to apply dark mode based on saved preference
-    function applyDarkModePreference() {
-        const darkModePreference = localStorage.getItem('darkMode');
-        if (darkModePreference === 'enabled') {
-            document.body.classList.add('dark-mode-variables');
-            darkMode.querySelector('span:nth-child(1)').classList.remove('active');
-            darkMode.querySelector('span:nth-child(2)').classList.add('active');
-        } else {
-            document.body.classList.remove('dark-mode-variables');
-            darkMode.querySelector('span:nth-child(1)').classList.add('active');
-            darkMode.querySelector('span:nth-child(2)').classList.remove('active');
-        }
+    // Save the current mode in local storage
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+
+    // Toggle active states on the dark mode icons
+    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
+    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
+});
+
+// Function to apply dark mode based on saved preference
+function applyDarkModePreference() {
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'enabled') {
+        document.body.classList.add('dark-mode-variables');
+        darkMode.querySelector('span:nth-child(1)').classList.remove('active');
+        darkMode.querySelector('span:nth-child(2)').classList.add('active');
+    } else {
+        document.body.classList.remove('dark-mode-variables');
+        darkMode.querySelector('span:nth-child(1)').classList.add('active');
+        darkMode.querySelector('span:nth-child(2)').classList.remove('active');
     }
+}
 
-    // Apply dark mode preference on page load
-    window.addEventListener('load', applyDarkModePreference);
+// Apply dark mode preference on page load
+window.addEventListener('load', applyDarkModePreference);
 
-    menuBtn.addEventListener('click', () => {
-        sideMenu.style.display = 'block';
-    });
+menuBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'block';
+});
 
-    closeBtn.addEventListener('click', () => {
-        sideMenu.style.display = 'none';
-    });
+closeBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'none';
+});
 </script>
 
 

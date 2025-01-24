@@ -1,4 +1,4 @@
-@extends('incharge.navbar')
+@extends('incharge.sidebar')
 
 @section('content')
 
@@ -8,6 +8,18 @@
         <h1>Transaction Records</h1>
     </div>
     <br>
+  
+
+        <!-- Assigned Labs Dropdown -->
+        <div class="form-group">
+        <input type="hidden" name="uid" value="{{ session('uid') }}">
+
+                <label for="labDropdown" style="color:#7f7f7f">Select your Lab :</label>
+                <select name="lid" id="labDropdown"  class="form-control" required>
+                    <option value="" disabled selected>Loading...</option>
+                </select>
+            </div>
+
 
     <div class="table-container">
     <!-- <h2>Transaction Records</h2> -->
@@ -56,6 +68,32 @@
 
 </main>
 
+<script>  
+   document.addEventListener('DOMContentLoaded', function() {
+    const uid = document.querySelector('input[name="uid"]').value;
+    const labDropdown = document.getElementById('labDropdown');
+
+    // Fetch assigned labs
+    fetch(`/incharge/assigned-labs`)
+        .then(response => response.json())
+        .then(data => {
+            labDropdown.innerHTML = ''; // Clear existing options
+
+            if (data.length === 0) {
+                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
+            } else {
+                labDropdown.innerHTML = `<option value="" disabled selected>Lab Names</option>`;
+                data.forEach(lab => {
+                    labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching labs:', error);
+            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
+        });
+});
+   </script>  
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 

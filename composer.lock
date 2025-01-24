@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "589cc0f65c3aaa7d4e9024d545bc1974",
+    "content-hash": "1c78ddc494395312c8bd8be3f35dade6",
     "packages": [
         {
             "name": "brick/math",
@@ -2399,6 +2399,52 @@
                 }
             ],
             "time": "2024-07-20T21:41:07+00:00"
+        },
+        {
+            "name": "playsms/webservices",
+            "version": "1.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/playsms/playsms-webservices.git",
+                "reference": "bcb985eb87a52ece6a4b23a9ca7c8eb7cc4901bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/playsms/playsms-webservices/zipball/bcb985eb87a52ece6a4b23a9ca7c8eb7cc4901bc",
+                "reference": "bcb985eb87a52ece6a4b23a9ca7c8eb7cc4901bc",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Playsms\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anton Raharja",
+                    "email": "araharja@protonmail.com",
+                    "homepage": "http://antonraharja.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "playSMS Webservices Class. playSMS is a free and open source SMS portal software.",
+            "homepage": "http://github.com/antonraharja/playsms-webservices",
+            "keywords": [
+                "bulk",
+                "playsms",
+                "sms",
+                "webservices"
+            ],
+            "support": {
+                "issues": "https://github.com/playsms/playsms-webservices/issues",
+                "source": "https://github.com/playsms/playsms-webservices/tree/master"
+            },
+            "time": "2020-04-08T18:37:59+00:00"
         },
         {
             "name": "psr/clock",
