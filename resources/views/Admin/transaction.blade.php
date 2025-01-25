@@ -57,6 +57,7 @@
                 <input type="hidden" name="tid" id="edit-tid">
                 <label for="amount">New Amount:</label>
                 <input type="number" name="amount" id="edit-amount" step="0.01" required>
+                
                 <button type="submit">Update</button>
                 <button type="button" id="cancel-btn">Cancel</button>
             </form>

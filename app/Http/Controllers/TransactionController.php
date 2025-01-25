@@ -17,7 +17,7 @@ class TransactionController extends Controller
 {
     
 
-public function index()
+    public function index()
     {
    
         $transactions = Transaction::with(['systemuser', 'center', 'sms'])
@@ -44,6 +44,7 @@ public function index()
 
         $data = [
             'tid' => $transaction->tid,
+            'date' => $transaction->created_at,
             'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
             'center_name' => $transaction->center->centername,
             'amount' => $transaction->amount,
@@ -97,7 +98,7 @@ public function index()
             ->map(function ($transaction) {
                 return [
                     'tid' => $transaction->tid,
-                    'date' => $transaction->created_at,
+                    'date' => $transaction->created_at->format('d-m-Y H:i A'),
                     'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
                     'center_name' => $transaction->center->centername,
                     'amount' => $transaction->amount,
