@@ -30,46 +30,47 @@
         <div>
             <input type="hidden" name="uid" value="{{ session('uid') }}">
 
-            <!-- Dropdown for selecting a lab -->
-            <label for="labDropdown">Select Lab:</label>
-            <select id="labDropdown" class="form-control">
-                <option value="" disabled selected>Select a lab</option>
-                @foreach ($labs as $lab)
-                <option value="{{ $lab->lid }}">{{ $lab->name }}</option>
-                @endforeach
-            </select>
+            <div class="form-group">
+                <!-- Dropdown for selecting a lab -->
+                <label for="labDropdown">Select Lab:</label>
+                <select id="labDropdown" class="form-control">
+                    <option value="" disabled selected>Select a lab</option>
+                    @foreach ($labs as $lab)
+                    <option value="{{ $lab->lid }}">{{ $lab->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <form action="{{ route('route-assign.store') }}" method="POST">
+                @csrf
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
+
+                <div class="table-container">
+                    <table class="route-assign-table">
+                        <thead>
+                            <tr id="routeHeaders">
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList" class="userList">
+                            <tr>
+                                <td colspan="100%">Select a lab to see the data</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Submit Button Section -->
+                <div class="submit-button-container" id="submitButtonContainer" hidden>
+                    <p>Hey {{ session('fname', 'Guest') }}! You can update now</p>
+                    <button type="submit" id="submitAssignments">Submit</button>
+                </div>
+            </form>
         </div>
-
-        <form action="{{ route('route-assign.store') }}" method="POST">
-            @csrf
-            <input type="hidden" name="uid" value="{{ session('uid') }}">
-
-            <div class="table-container">
-                <table class="route-assign-table">
-                    <thead>
-                        <tr id="routeHeaders">
-                            <th>User</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userList" class="userList">
-                        <tr>
-                            <td colspan="100%">Select a lab to see the data</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Submit Button Section -->
-            <div class="submit-button-container" id="submitButtonContainer" hidden>
-                <p>Hey {{ session('fname', 'Guest') }}! You can update now</p>
-                <button type="submit" id="submitAssignments">Submit</button>
-            </div>
-        </form>
-    </div>
 </main>
 
 <script>
-document.getElementById('labDropdown').addEventListener('change', async function () {
+document.getElementById('labDropdown').addEventListener('change', async function() {
     const labId = this.value;
 
     if (!labId) return;
@@ -198,7 +199,6 @@ function renderTable(users, routes, assignments = {}) {
         userList.appendChild(tr);
     });
 }
-
 </script>
 
 
@@ -208,6 +208,18 @@ function renderTable(users, routes, assignments = {}) {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
 
 .alert {
     padding: 15px;

@@ -76,10 +76,11 @@
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>
-                <a href="/">
+                <a href="{{ route('logout') }}">
                     <span class="material-symbols-sharp">logout</span>
                     <h3>Logout</h3>
                 </a>
+
             </div>
         </aside>
 
@@ -105,7 +106,7 @@
                             </span>
                         </div>
 
-                        <div class="profile">
+                        <div class="profile" id="profileDropdown">
                             <div class="info">
                                 <p>Hey, <b>{{ session('fname', 'Guest') }}</b></p>
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
@@ -114,7 +115,27 @@
                                 <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
                                     onerror="this.style.display='none'; this.parentNode.innerHTML += '<i class=\'bx bxs-user-circle\' style=\'font-size: 40px; color: rgb(156,161,221);\'></i>';">
                             </div>
+
+                            <!-- Dropdown Menu -->
+                            <div class="dropdown-menu">
+                                <h4><strong>{{ session('role', 'Unknown Role') }}</strong></h4>
+                                <div>{{ session('username', 'Guest') }}</div>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item">
+                                    <i class='bx bx-cog'></i> Settings
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="changepassword" class="dropdown-item">
+                                    <i class='bx bxs-lock-alt'></i> Change Password
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item text-danger">
+                                    <i class='bx bx-log-out'></i> Logout
+                                </a>
+                            </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>
@@ -123,64 +144,91 @@
 
     </div>
 
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const profileDropdown = document.getElementById("profileDropdown");
+        const dropdownMenu = profileDropdown.querySelector(".dropdown-menu");
 
-    <!-- <script>
-            const sideMenu = document.querySelector('aside');
-            const menuBtn = document.getElementById('menu-btn');
-            const closeBtn = document.getElementById('close-btn');
+        profileDropdown.addEventListener("click", function(event) {
+            event.stopPropagation();
+            profileDropdown.classList.toggle("active");
+        });
 
-            const darkMode = document.querySelector('.dark-mode');
+        document.addEventListener("click", function(event) {
+            if (!profileDropdown.contains(event.target)) {
+                profileDropdown.classList.remove("active");
+            }
+        });
+    });
+    </script>
 
-            menuBtn.addEventListener('click', () => {
-                sideMenu.style.display = 'block';
-            });
+    <style>
+    /* Dropdown container */
+    .profile {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+    }
 
-            closeBtn.addEventListener('click', () => {
-                sideMenu.style.display = 'none';
-            });
+    /* Dropdown menu */
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 50px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 220px;
+        z-index: 100;
+        padding: 10px;
+    }
 
-            darkMode.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode-variables');
-                darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-                darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-            })
+    /* Show dropdown */
+    .profile.active .dropdown-menu {
+        display: block;
+    }
 
+    /* Dropdown items */
+    .dropdown-menu h4 {
+        margin-bottom: 5px;
+        font-size: 18px;
+    }
 
-            Orders.forEach(order => {
-                const tr = document.createElement('tr');
-                const trContent = `
-                    <td>${order.productName}</td>
-                    <td>${order.productNumber}</td>
-                    <td>${order.paymentStatus}</td>
-                    <td class="${order.status === 'Declined' ? 'danger' : order.status === 'Pending' ? 'warning' : 'primary'}">${order.status}</td>
-                    <td class="primary">Details</td>
-                `;
-                tr.innerHTML = trContent;
-                document.querySelector('table tbody').appendChild(tr);
-            });
+    .dropdown-menu div {
+        font-size: 14px;
+        color: gray;
+        margin-bottom: 10px;
+    }
 
+    .dropdown-divider {
+        border-bottom: 1px solid #ddd;
+        margin: 5px 0;
+    }
 
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 10px;
+        text-decoration: none;
+        color: #333;
+        font-size: 14px;
+        transition: background 0.2s;
+    }
 
-            const Orders = [{
-                    productName: 'JavaScript Tutorial',
-                    productNumber: '85743',
-                    paymentStatus: 'Due',
-                    status: 'Pending'
-                },
-                {
-                    productName: 'CSS Full Course',
-                    productNumber: '97245',
-                    paymentStatus: 'Refunded',
-                    status: 'Declined'
-                },
-                {
-                    productName: 'Flex-Box Tutorial',
-                    productNumber: '36452',
-                    paymentStatus: 'Paid',
-                    status: 'Active'
-                },
-            ]
-    </script> -->
+    .dropdown-item:hover {
+        background: #f5f5f5;
+    }
+
+    .dropdown-item i {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .text-danger {
+        color: red;
+    }
+    </style>
 
     <script>
     const sideMenu = document.querySelector('aside');

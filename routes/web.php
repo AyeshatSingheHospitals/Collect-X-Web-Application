@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SystemuserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\CenterController;
 use App\Http\Controllers\LabController;
@@ -23,6 +24,8 @@ Route::get('/', function () {
 
 // Login routes
 Route::post('/', [AuthController::class, 'login'])->name('login.form');
+
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Logout route
 // Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -209,6 +212,13 @@ Route::get('Incharge/transaction', function () {
     return view('incharge.transaction');
 });
 
+// transaction
+
+Route::get('/incharge/transactions', [TransactionController::class, 'indexincharge'])->name('incharge.transactions.index');
+Route::get('/incharge/transactions/{tid}', [TransactionController::class, 'showincharge'])->name('incharge.transactions.show');
+Route::put('/incharge/transaction/{tid}', [TransactionController::class, 'updateAmountincharge'])->name('incharge.transaction.updateAmount');
+
+
 // Route::get('/incharge/assigned-labs', [TransactionController::class, 'getAssignedLabs'])->name('incharge.assigned-labs');
 
 // ----------------------supervisor-----------------------
@@ -237,4 +247,27 @@ Route::get('Supervisor/transaction', function () {
     return view('supervisor.transaction');
 });
 
+// transaction
+
+Route::get('/supervisor/transactions', [TransactionController::class, 'indexsupervisor'])->name('supervisor.transactions.index');
+Route::get('/supervisor/transactions/{tid}', [TransactionController::class, 'showinsupervisor'])->name('supervisor.transactions.show');
+Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountsupervisor'])->name('supervisor.transaction.updateAmount');
+
+
+// common route for transaction dropdown select and view record regarding to selected lab by supervisor and incharge
 Route::get('/supervisor/transactions', [TransactionController::class, 'fetchTransactionsByLab'])->name('transactions.byLab');
+// -------------------------
+
+Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountsupervisor']);
+// Route::get('/supervisor/transactions/search', [TransactionController::class, 'filter'])->name('transactions.search');
+
+//change password
+Route::get('admin/changepassword', function () {
+    return view('admin.changepassword');
+});
+
+
+Route::get('admin/changepassword', [AdminController::class, 'showChangePasswordForm'])->name('admin.changepassword');
+Route::post('admin/changepassword/update', [AdminController::class, 'changePassword'])->name('admin.changepassword.update');
+
+Route::get('admin/logout', [AuthController::class, 'logout'])->name('admin.logout');

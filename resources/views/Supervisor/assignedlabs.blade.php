@@ -5,8 +5,11 @@
 <!-- Registration Form -->
 <main>
     <div class="container1">
+    <div class="top-bar">
+        <h1>Assigned Labs</h1>
+    </div>
+    <br><br>
         <!-- Left Section (Cards) -->
-        <br><br><br>
         <div class="row">
             <input type="hidden" name="uid" value="{{ session('uid') }}">
 

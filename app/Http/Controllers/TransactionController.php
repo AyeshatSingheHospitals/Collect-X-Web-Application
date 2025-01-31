@@ -7,16 +7,17 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Center;
 use App\Models\Systemuser;
 use App\Models\Transaction;
+use App\Models\TransactionLog;
 use App\Models\SMS;
-
-
-
 use Illuminate\Http\Request;
+use App\Models\HasFactory;
+
+use Playsms\Webservices;
 
 class TransactionController extends Controller
 {
+    // For admin 
     
-
     public function index()
     {
    
@@ -55,35 +56,98 @@ class TransactionController extends Controller
         return response()->json($data);
     }
 
+
     public function updateAmount(Request $request, $tid)
     {
-        $request->validate([
-            'amount' => 'required|numeric|min:0',
-        ]);
+        // Find the transaction
+        $transaction = Transaction::find($tid);
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Transaction not found.');
+        }
 
-        $transaction = Transaction::findOrFail($tid);
+        // Get the logged-in user
+        $user = Systemuser::find(session('uid'));
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        // Get the center related to the transaction
+        $center = Center::find($transaction->cid);
+        if (!$center) {
+            return redirect()->back()->with('error', 'Center not found.');
+        }
+
+        // Save the original amount for logging purposes
+        $originalAmount = $transaction->amount;
+
+        // Update the transaction amount
         $transaction->amount = $request->amount;
         $transaction->save();
 
-        return response()->json(['success' => true, 'message' => 'Amount updated successfully!']);
+        // Insert a new record into the transactionlogs table
+        TransactionLog::create([
+            'tid' => $transaction->tid,
+            'uid' => $user->uid, // Logged-in user ID
+            'rid' => $transaction->rid,
+            'cid' => $transaction->cid,
+            'amount' => $request->amount,
+            'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
+            'action' => 'updated',
+        ]);
+
+        // Construct SMS message
+        $message = $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount from LKR ' . 
+                   number_format($originalAmount, 2) . ' to LKR ' . number_format($request->amount, 2) .
+                   ' for center: ' . $center->centername;
+
+        // Insert a new SMS record into the `sms` table
+        Sms::create([
+            'tid' => $transaction->tid,
+            'description' => $message,
+            'phonenumber1' => $center->authorizedcontact,
+            'phonenumber2' => $center->selectedcontact,
+            'phonenumber3' => $center->thirdpartycontact,
+            'phonenumber4' => '', // Include additional phone numbers as needed
+            'phonenumber5' => '',
+        ]);
+
+        // Send SMS to authorized, selected, and third-party contacts
+        $this->sendSms($center->authorizedcontact, $message);
+        $this->sendSms($center->selectedcontact, $message);
+        $this->sendSms($center->thirdpartycontact, $message);
+
+        return redirect()->route('transactions.index')->with('success', 'Amount updated and SMS sent successfully.');
     }
 
-// public function updateAmount(Request $request, $tid)
-// {
-//     $request->validate([
-//         'amount' => 'required|numeric|min:0',
-//         'uid' => 'required|exists:systemuser,uid', // Ensure the UID is valid
-//     ]);
+    private function sendSms($phoneNumber, $message)
+    {
+        if (!empty($phoneNumber)) {
+            $ws = new Webservices();
 
-//     $transaction = Transaction::findOrFail($tid);
+            // Configure your SMS API credentials
+            $ws->url = 'https://sms.scnev.es/index.php?app=ws'; // Your SMS service URL
+            $ws->username = 'rajith'; // Your SMS service username
+            $ws->token = '188a51f2390e8a8d26fa090ab3215da8'; // Your SMS service token
 
-//     // Update the amount and the user ID
-//     $transaction->amount = $request->amount;
-//     $transaction->uid = $request->uid;
-//     $transaction->save();
+            // Set SMS details
+            $ws->from = 'Sandeshaya'; // Sender ID / Mask
+            $ws->to = $phoneNumber; // Recipient’s phone number
+            $ws->msg = $message; // SMS content
+            $ws->nofooter = 1; // Disable footer (1) or enable (0)
 
-//     return response()->json(['success' => true, 'message' => 'Transaction updated successfully!']);
-// }
+            // Send SMS
+            $ws->sendSms();
+
+            // Log response for debugging
+            if ($ws->getStatus()) {
+                \Log::info("SMS sent successfully to $phoneNumber. Response: " . json_encode($ws->getData()));
+            } else {
+                \Log::error("Failed to send SMS to $phoneNumber. Error: " . $ws->getErrorString());
+            }
+        }
+    }
+
+    // --------------------------------Supervisor and Incharge ---------------------------------------------------
 
     public function fetchTransactionsByLab(Request $request)
     {
@@ -108,6 +172,186 @@ class TransactionController extends Controller
             });
 
         return response()->json($transactions);
+    } 
+
+    // --------------------------supervisor transaction-------------------------
+
+    public function indexsupervisor()
+    {
+   
+        $transactions = Transaction::with(['systemuser', 'center', 'sms'])
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'tid' => $transaction->tid,
+                    'date' => $transaction->created_at,
+                    'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
+                    'center_name' => $transaction->center->centername,
+                    'amount' => $transaction->amount,
+                    'remark' => $transaction->remark,
+                    'sms_description' => $transaction->sms ? $transaction->sms->description : null,
+                ];
+            });
+
+        return view('Admin.transaction', compact('transactions'));
+    }
+
+    public function showsupervisor($tid)
+    {
+       
+        $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
+
+        $data = [
+            'tid' => $transaction->tid,
+            'date' => $transaction->created_at,
+            'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
+            'center_name' => $transaction->center->centername,
+            'amount' => $transaction->amount,
+            'remark' => $transaction->remark,
+            'sms_description' => $transaction->sms ? $transaction->sms->description : null,
+        ];
+
+        return response()->json($data);
+    }
+
+    public function updateAmountsupervisor(Request $request, $tid)
+    {
+        // Find the transaction
+        $transaction = Transaction::find($tid);
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Transaction not found.');
+        }
+
+        // Get the center related to the transaction
+        $center = Center::find($transaction->cid);
+        if (!$center) {
+            return redirect()->back()->with('error', 'Center not found.');
+        }
+
+        // Save the original values for logging purposes
+        $originalAmount = $transaction->amount;
+
+        // Update the amount of the transaction
+        $transaction->amount = $request->amount;
+        $transaction->save();
+
+        // Insert a new record into the transactionlogs table
+        TransactionLog::create([
+            'tid' => $transaction->tid,
+            'uid' => session('uid'), // Logged in user ID
+            'rid' => $transaction->rid,
+            'cid' => $transaction->cid,
+            'amount' => $request->amount,
+            'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
+            'action' => 'updated',
+        ]);
+
+        // Get the logged-in user's details
+        $user = Systemuser::find(session('uid'));
+
+        // Insert a new SMS record with the updated amount and logged-in user's details
+        Sms::create([
+            'tid' => $transaction->tid,
+            'description' => $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount to LKR ' . number_format($request->amount, 2) .
+            ' for center: ' . $center->centername,
+            'phonenumber1' => $transaction->center->authorizedcontact, 
+            'phonenumber2' => $transaction->center->selectedcontact,
+            'phonenumber3' => $transaction->center->thirdpartycontact,
+            'phonenumber4' => '', // Make sure you include all phone numbers
+            'phonenumber5' => '',
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Amount updated successfully!']);
+    }
+
+    // --------------------------Incharge transaction-------------------------
+
+    public function indexincharge()
+    {
+
+        $transactions = Transaction::with(['systemuser', 'center', 'sms'])
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'tid' => $transaction->tid,
+                    'date' => $transaction->created_at,
+                    'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
+                    'center_name' => $transaction->center->centername,
+                    'amount' => $transaction->amount,
+                    'remark' => $transaction->remark,
+                    'sms_description' => $transaction->sms ? $transaction->sms->description : null,
+                ];
+            });
+
+        return view('Admin.transaction', compact('transactions'));
+    }
+
+    public function showincharge($tid)
+    {
+    
+        $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
+
+        $data = [
+            'tid' => $transaction->tid,
+            'date' => $transaction->created_at,
+            'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
+            'center_name' => $transaction->center->centername,
+            'amount' => $transaction->amount,
+            'remark' => $transaction->remark,
+            'sms_description' => $transaction->sms ? $transaction->sms->description : null,
+        ];
+
+        return response()->json($data);
+    }
+
+    public function updateAmountincharge(Request $request, $tid)
+    {
+    // Find the transaction
+    $transaction = Transaction::find($tid);
+    if (!$transaction) {
+        return redirect()->back()->with('error', 'Transaction not found.');
+    }
+
+    // Get the center related to the transaction
+    $center = Center::find($transaction->cid);
+    if (!$center) {
+        return redirect()->back()->with('error', 'Center not found.');
+    }
+
+    // Save the original values for logging purposes
+    $originalAmount = $transaction->amount;
+
+    // Update the amount of the transaction
+    $transaction->amount = $request->amount;
+    $transaction->save();
+
+    // Insert a new record into the transactionlogs table
+    TransactionLog::create([
+        'tid' => $transaction->tid,
+        'uid' => session('uid'), // Logged in user ID
+        'rid' => $transaction->rid,
+        'cid' => $transaction->cid,
+        'amount' => $request->amount,
+        'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
+        'action' => 'updated',
+    ]);
+
+    // Get the logged-in user's details
+    $user = Systemuser::find(session('uid'));
+
+    // Insert a new SMS record with the updated amount and logged-in user's details
+    Sms::create([
+        'tid' => $transaction->tid,
+        'description' => $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount to LKR ' . number_format($request->amount, 2) .
+        ' for center: ' . $center->centername,
+        'phonenumber1' => $transaction->center->authorizedcontact, 
+        'phonenumber2' => $transaction->center->selectedcontact,
+        'phonenumber3' => $transaction->center->thirdpartycontact,
+        'phonenumber4' => '', // Make sure you include all phone numbers
+        'phonenumber5' => '',
+    ]);
+
+    return redirect()->route('transactions.index')->with('success', 'Amount updated and new records added successfully.');
     }
 
 }

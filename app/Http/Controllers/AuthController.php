@@ -82,10 +82,19 @@ class AuthController extends Controller
     /**
      * Logout the user
      */
+    // public function logout()
+    // {
+    //     Auth::logout();
+    //     Session::flush();
+    //     return redirect('/')->with('success', 'Logged out successfully.');
+    // }
+
     public function logout()
-    {
-        Auth::logout();
-        Session::flush();
-        return redirect('/')->with('success', 'Logged out successfully.');
-    }
+{
+    Session::flush(); // Clear all session data
+    Auth::logout(); // Log out the user
+
+    return redirect('/')->with('success', 'Logged out successfully.');
+}
+
 }
