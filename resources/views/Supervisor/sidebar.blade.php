@@ -19,6 +19,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
     </style>
 
+    <script type="text/javascript" src="../js/sidebar.js"></script>
 
 </head>
 
@@ -37,19 +38,20 @@
             </div>
 
             <div class="sidebar">
-                <a href="/Supervisor/dashboard" class="{{ request()->is('supervisor/dashboard') ? 'active' : '' }}">
+                <a href="/supervisor/dashboard" class="{{ request()->is('supervisor/dashboard') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">grid_view</span>
                     <h3>Dashboard</h3>
                 </a>
-                <a href="/Supervisor/assignedlabs" class="{{ request()->is('supervisor/assignedlabs') ? 'active' : '' }}">
+                <a href="/supervisor/assignedlabs"
+                    class="{{ request()->is('supervisor/assignedlabs') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">medical_services</span>
                     <h3>Assigned Labs</h3>
                 </a>
-                <a href="/Supervisor/rassign" class="{{ request()->is('supervisor/rassign') ? 'active' : '' }}">
+                <a href="/supervisor/rassign" class="{{ request()->is('supervisor/rassign') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">add_road</span>
                     <h3>Route Assign</h3>
                 </a>
-                <a href="/Supervisor/transaction" class="{{ request()->is('supervisor/transaction') ? 'active' : '' }}">
+                <a href="/supervisor/transaction" class="{{ request()->is('supervisor/transaction') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>
@@ -82,13 +84,32 @@
                             </span>
                         </div>
 
-                        <div class="profile">
-                        <div class="info">
+                        <div class="profile" id="profileDropdown">
+                            <div class="info">
                                 <p>Hey, <b>{{ session('fname', 'Guest') }}</b></p>
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
                             <div class="profile-photo">
-                            <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
+                                    onerror="this.style.display='none'; this.parentNode.innerHTML += '<i class=\'bx bxs-user-circle\' style=\'font-size: 40px; color: rgb(156,161,221);\'></i>';">
+                            </div>
+
+                            <!-- Dropdown Menu -->
+                            <div class="dropdown-menu">
+                                <h4><strong>{{ session('role', 'Unknown Role') }}</strong></h4>
+                                <div>{{ session('username', 'Guest') }}</div>
+                                <!-- <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item">
+                                    <i class='bx bx-cog'></i> Settings
+                                </a> -->
+                                <div class="dropdown-divider"></div>
+                                <a href="/supervisor/changepassword" class="dropdown-item">
+                                    <i class='bx bxs-lock-alt'></i> Change Password
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item text-danger">
+                                    <i class='bx bx-log-out'></i> Logout
+                                </a>
                             </div>
                         </div>
                     </div>

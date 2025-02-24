@@ -7,7 +7,11 @@
         <h1>Transaction Records</h1>
     </div>
     <br><br>
-    <input type="text" id="search-input" placeholder="Search Transactions..." class="search-input">
+    <div class="form-group">
+        <label for="searchInput" style="color:#7f7f7f">Search Records:</label>
+        <input type="text" id="searchInput" class="form-control"
+            placeholder="Search by TID, Name, Center Name, or Date">
+    </div>
     <div class="table-container">
         <div class="scrollable-wrapper">
             <table class="transactions-table">
@@ -23,29 +27,38 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @if (isset($transactions))
-                    @foreach ($transactions as $transaction)
-                    <tr data-id="{{ $transaction['tid'] }}">
-                        <td>{{ $transaction['tid'] }}</td>
-                        <td>{{ $transaction['date'] }}</td>
-                        <td>{{ $transaction['full_name'] }}</td>
-                        <td>{{ $transaction['center_name'] }}</td>
-                        <td class="amount-cell">LRK {{ number_format($transaction['amount'], 2) }}</td>
-                        <td>{{ $transaction['remark'] }}</td>
-                        <td>{{ $transaction['sms_description'] ?? 'N/A' }}</td>
-                        <td>
-                            <button class="edit-btn" data-id="{{ $transaction['tid'] }}"
-                                data-amount="{{ $transaction['amount'] }}">
-                                <i class='bx bxs-pen'></i>
-                            </button>
-                        </td>
-                    </tr>
-                    @endforeach
+                <tbody id="transactionTableBody">
+                    @if (isset($transactions) && $transactions->isNotEmpty())
+                        @foreach ($transactions as $transaction)
+                            <tr data-id="{{ $transaction->tid }}">
+                                <td>{{ $transaction->tid }}</td>
+                                <td>{{ $transaction->created_at }}</td>
+                                <td>{{ $transaction->systemuser->full_name }}</td>
+                                <td>{{ $transaction->center->centername }}</td>
+                                <td class="amount-cell">LRK {{ number_format($transaction->amount, 2) }}</td>
+                                <td>{{ $transaction->remark }}</td>
+                                <td>
+                                    @if ($transaction->sms->isNotEmpty())
+                                        <ul>
+                                            @foreach ($transaction->sms as $sms)
+                                                <li>{{ $sms->description ?? 'No Description' }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td>
+                                    <button class="edit-btn" data-id="{{ $transaction->tid }}" data-amount="{{ $transaction->amount }}">
+                                        <i class='bx bxs-pen'></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
                     @else
-                    <tr>
-                        <td colspan="8">No transactions available</td>
-                    </tr>
+                        <tr>
+                            <td colspan="8" class="text-center">No transactions available</td>
+                        </tr>
                     @endif
                 </tbody>
             </table>
@@ -63,7 +76,6 @@
                 <input type="hidden" name="tid" id="edit-tid">
                 <label for="amount">New Amount:</label>
                 <input type="number" name="amount" id="edit-amount" step="0.01" required>
-
                 <button type="submit">Update</button>
                 <button type="button" id="cancel-btn">Cancel</button>
             </form>
@@ -71,8 +83,8 @@
     </div>
 </main>
 
-<script>
 
+<script>
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('edit-modal');
     const cancelBtn = document.getElementById('cancel-btn');
@@ -99,15 +111,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Dark mode toggle functionality (as already provided)
-    const darkModeToggle = document.querySelector('.dark-mode');
-    const body = document.body;
+// document.addEventListener('DOMContentLoaded', function() {
+//     // Dark mode toggle functionality (as already provided)
+//     const darkModeToggle = document.querySelector('.dark-mode');
+//     const body = document.body;
 
-    darkModeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode-active');
-    });
-});
+//     darkModeToggle.addEventListener('click', function() {
+//         body.classList.toggle('dark-mode-active');
+//     });
+// });
 
 // Search Functionality
 const searchInput = document.getElementById('search-input');
@@ -132,23 +144,6 @@ searchInput.addEventListener('input', function() {
     });
 });
 
-const sideMenu = document.querySelector('aside');
-const menuBtn = document.getElementById('menu-btn');
-const closeBtn = document.getElementById('close-btn');
-const darkMode = document.querySelector('.dark-mode');
-
-// Toggle dark mode and save preference to local storage
-darkMode.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode-variables');
-    const isDarkMode = document.body.classList.contains('dark-mode-variables');
-
-    // Save the current mode in local storage
-    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-
-    // Toggle active states on the dark mode icons
-    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-});
 
 // Function to apply dark mode based on saved preference
 function applyDarkModePreference() {
@@ -174,6 +169,100 @@ menuBtn.addEventListener('click', () => {
 closeBtn.addEventListener('click', () => {
     sideMenu.style.display = 'none';
 });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.getElementById("transactionTableBody");
+
+    searchInput.addEventListener("input", function() {
+        const query = searchInput.value.toLowerCase();
+        const rows = tableBody.getElementsByTagName("tr");
+
+        let found = false;
+
+        // Function to clean amount by removing non-numeric characters
+        function cleanAmount(amount) {
+            return amount.replace(/[^0-9.]/g, ''); // Remove anything that is not a number or dot
+        }
+
+        // Loop through each table row
+        for (let row of rows) {
+            const columns = row.getElementsByTagName("td");
+            if (columns.length > 0) {
+                // Extract text content of relevant columns
+                const tid = columns[0].textContent.toLowerCase();
+                const fullName = columns[2].textContent.toLowerCase();
+                const centerName = columns[3].textContent.toLowerCase();
+                const date = columns[1].textContent.toLowerCase();
+                const amount = columns[4].textContent.toLowerCase();
+                const cleanedAmount = cleanAmount(amount); // Clean the amount
+
+                // Check if any column matches the search query
+                if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) || date.includes(query) || cleanedAmount.includes(query)) {
+                    row.style.display = "";  // Show row if match
+                    found = true;
+                } else {
+                    row.style.display = "none";  // Hide row if no match
+                }
+            }
+        }
+
+        // If no records are found, display "No data found"
+        if (!found) {
+            const noDataRow = document.createElement("tr");
+            noDataRow.innerHTML = `<td colspan="8" class="text-center">No data found</td>`;
+            tableBody.innerHTML = "";  // Clear table
+            tableBody.appendChild(noDataRow);  // Add "No data found" row
+        }
+    });
+});
+</script>
+
+<script>
+    const sideMenu = document.querySelector('aside');
+    const menuBtn = document.getElementById('menu-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const darkMode = document.querySelector('.dark-mode');
+
+    // Toggle dark mode and save preference to local storage
+    darkMode.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode-variables');
+        const isDarkMode = document.body.classList.contains('dark-mode-variables');
+
+        // Save the current mode in local storage
+        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+
+        // Toggle active states on the dark mode icons
+        darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
+        darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
+    });
+
+    // Function to apply dark mode based on saved preference
+    function applyDarkModePreference() {
+        const darkModePreference = localStorage.getItem('darkMode');
+        if (darkModePreference === 'enabled') {
+            document.body.classList.add('dark-mode-variables');
+            darkMode.querySelector('span:nth-child(1)').classList.remove('active');
+            darkMode.querySelector('span:nth-child(2)').classList.add('active');
+        } else {
+            document.body.classList.remove('dark-mode-variables');
+            darkMode.querySelector('span:nth-child(1)').classList.add('active');
+            darkMode.querySelector('span:nth-child(2)').classList.remove('active');
+        }
+    }
+
+    // Apply dark mode preference on page load
+    window.addEventListener('load', applyDarkModePreference);
+
+    menuBtn.addEventListener('click', () => {
+        sideMenu.style.display = 'block';
+    });
+
+    closeBtn.addEventListener('click', () => {
+        sideMenu.style.display = 'none';
+    });
 </script>
 
 <!-- CSS -->
@@ -1043,6 +1132,12 @@ button:active {
 
 .warning {
     color: var(--color-warning);
+}
+
+#searchInput{
+ /* background-color:var(--color-white: #202528); */
+ background-color: var(--color-white);
+ color: var(--color-dark);
 }
 </style>
 

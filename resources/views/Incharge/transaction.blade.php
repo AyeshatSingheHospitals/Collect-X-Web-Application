@@ -7,95 +7,453 @@
     <div class="top-bar">
         <h1>Transaction Records</h1>
     </div>
-    <br>
-  
+    <br><br>
 
-        <!-- Assigned Labs Dropdown -->
-        <div class="form-group">
-        <input type="hidden" name="uid" value="{{ session('uid') }}">
+    <!-- Assigned Labs Dropdown -->
 
-                <label for="labDropdown" style="color:#7f7f7f">Select your Lab :</label>
-                <select name="lid" id="labDropdown"  class="form-control" required>
-                    <option value="" disabled selected>Loading...</option>
-                </select>
-            </div>
+    <div class="row">
+        <div class="dropdown">
+            <input type="hidden" name="uid" value="{{ session('uid') }}">
+            <label for="labDropdown" style="color:#7f7f7f">Select your Lab:</label>
+            <select name="lid" id="labDropdown" class="form-control" required>
+                <option value="" disabled selected>Loading...</option>
+            </select>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="form-control"
+                placeholder="Search by TID, Date, Name, or Center Name">
+        </div>
+    </div>
+
+    <!-- Search Input for Universal Search -->
+    <!-- <div class="form-group">
+        <label for="searchInput" style="color:#7f7f7f">Search Records:</label> -->
 
 
     <div class="table-container">
-    <!-- <h2>Transaction Records</h2> -->
-    <table class="transactions-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>2024-10-01</td>
-                <td>Payment for Surgery</td>
-                <td>$1500</td>
-                <td class="success">Completed</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>2024-10-02</td>
-                <td>Payment for Consultation</td>
-                <td>$200</td>
-                <td class="danger">Failed</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>2024-10-03</td>
-                <td>Payment for Medication</td>
-                <td>$300</td>
-                <td class="success">Completed</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>2024-10-04</td>
-                <td>Payment for Therapy</td>
-                <td>$500</td>
-                <td class="warning">Pending</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+        <table class="transactions-table">
+            <thead>
+                <tr>
+                    <th>TID</th>
+                    <th>Date</th>
+                    <th>Full Name</th>
+                    <th>Center Name</th>
+                    <th>Amount</th>
+                    <th>Remark</th>
+                    <th>SMS Description</th>
+                    <th>Actions</th> <!-- New column for actions -->
+                </tr>
+            </thead>
+            <tbody id="transactionTableBody">
+                <tr>
+                    <td colspan="8" class="text-center">No data available</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
+    <!-- Edit Amount Modal -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Edit Amount</h2>
+            <form method="POST" id="edit-form">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
+                <input type="hidden" name="tid" id="edit-tid">
+                <label for="edit-amount">New Amount:</label>
+                <input type="number" name="amount" id="edit-amount" step="0.01" required>
+
+                <button type="submit">Update</button>
+                <button type="button" id="cancel-btn">Cancel</button>
+            </form>
+        </div>
+    </div>
 </main>
 
-<script>  
-   document.addEventListener('DOMContentLoaded', function() {
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
     const uid = document.querySelector('input[name="uid"]').value;
     const labDropdown = document.getElementById('labDropdown');
+    const transactionTableBody = document.getElementById('transactionTableBody');
+    const modal = document.getElementById('edit-modal');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const editForm = document.getElementById('edit-form');
 
     // Fetch assigned labs
-    fetch(`/incharge/assigned-labs`)
-        .then(response => response.json())
-        .then(data => {
+    fetch(`/lab/assigned-labs`)
+        .then((response) => response.json())
+        .then((data) => {
             labDropdown.innerHTML = ''; // Clear existing options
 
             if (data.length === 0) {
                 labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
             } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Lab Names</option>`;
-                data.forEach(lab => {
+                labDropdown.innerHTML = `<option value="" disabled selected>Select a Lab</option>`;
+                data.forEach((lab) => {
                     labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
                 });
             }
         })
-        .catch(error => {
+        .catch((error) => {
             console.error('Error fetching labs:', error);
             labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
         });
+
+    // Fetch transactions on lab selection
+    labDropdown.addEventListener('change', function() {
+        const lid = labDropdown.value;
+
+        // Fetch transactions for the selected lab
+        fetch(`/lab/transactions?lid=${lid}`)
+            .then((response) => response.json())
+            .then((data) => {
+                transactionTableBody.innerHTML = ''; // Clear the table
+
+                if (data.length === 0) {
+                    transactionTableBody.innerHTML = `<tr>
+                                <td colspan="8" class="text-center">No transactions found</td>
+                            </tr>`;
+                } else {
+                    data.forEach((transaction) => {
+                        transactionTableBody.innerHTML += `
+                                    <tr>
+                                        <td>${transaction.tid}</td>
+                                        <td>${transaction.date}</td>
+                                        <td>${transaction.full_name}</td>
+                                        <td>${transaction.center_name}</td>
+                                        <td>LRK ${transaction.amount}</td>
+                                        <td>${transaction.remark}</td>
+                                        <td>${transaction.sms_description || 'N/A'}</td>
+                                        <td>
+                                            <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
+                                                <i class='bx bxs-pen'></i>
+                                            </button>
+                                        </td>
+                                    </tr>`;
+                    });
+
+                    // Attach event listeners to edit buttons
+                    attachEditButtonListeners();
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching transactions:', error);
+                transactionTableBody.innerHTML = `<tr>
+                            <td colspan="8" class="text-center">Error loading transactions</td>
+                        </tr>`;
+            });
+    });
+
+    // Attach event listeners to edit buttons
+    function attachEditButtonListeners() {
+        document.querySelectorAll('.edit-btn').forEach((button) => {
+            button.addEventListener('click', function() {
+                const tid = this.getAttribute('data-id');
+                const amount = this.getAttribute('data-amount');
+                openEditModal(tid, amount);
+            });
+        });
+    }
+
+    // Open edit modal and populate fields
+    function openEditModal(tid, amount) {
+        document.getElementById('edit-tid').value = tid;
+        document.getElementById('edit-amount').value = amount;
+
+        // Set the form's action URL dynamically
+        editForm.action = `/incharge/transaction/${tid}`;
+        modal.style.display = 'block';
+    }
+
+    // Close the edit modal
+    function closeEditModal() {
+        modal.style.display = 'none';
+    }
+
+    // Close modal on cancel button click
+    cancelBtn.addEventListener('click', function() {
+        closeEditModal();
+    });
+
+    // Submit updated amount
+    editForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const tid = document.getElementById('edit-tid').value;
+        const amount = document.getElementById('edit-amount').value;
+
+        fetch(`/incharge/transaction/${tid}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                },
+                body: JSON.stringify({
+                    amount
+                }),
+            })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert(data.message);
+
+                    // Update the amount directly in the table
+                    const row = document.querySelector(`button[data-id="${tid}"]`).closest('tr');
+                    row.querySelector('td:nth-child(5)').textContent = `LRK ${amount}`;
+
+                    // Close the modal
+                    closeEditModal();
+                } else {
+                    alert('Failed to update amount.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error updating amount:', error);
+                alert('An unexpected error occurred.');
+            });
+
+    });
 });
-   </script>  
+</script>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const darkModeToggle = document.querySelector('.dark-mode');
+    const body = document.body;
+
+    darkModeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode-active');
+    });
+});
+</script>
+
+<script>
+const sideMenu = document.querySelector('aside');
+const menuBtn = document.getElementById('menu-btn');
+const closeBtn = document.getElementById('close-btn');
+const darkMode = document.querySelector('.dark-mode');
+
+// Toggle dark mode and save preference to local storage
+darkMode.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode-variables');
+    const isDarkMode = document.body.classList.contains('dark-mode-variables');
+
+    // Save the current mode in local storage
+    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+
+    // Toggle active states on the dark mode icons
+    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
+    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
+});
+
+// Function to apply dark mode based on saved preference
+function applyDarkModePreference() {
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'enabled') {
+        document.body.classList.add('dark-mode-variables');
+        darkMode.querySelector('span:nth-child(1)').classList.remove('active');
+        darkMode.querySelector('span:nth-child(2)').classList.add('active');
+    } else {
+        document.body.classList.remove('dark-mode-variables');
+        darkMode.querySelector('span:nth-child(1)').classList.add('active');
+        darkMode.querySelector('span:nth-child(2)').classList.remove('active');
+    }
+}
+
+// Apply dark mode preference on page load
+window.addEventListener('load', applyDarkModePreference);
+
+menuBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'block';
+});
+
+closeBtn.addEventListener('click', () => {
+    sideMenu.style.display = 'none';
+});
+</script>
+
+
+<script>
+// Wait for the document to be ready
+document.addEventListener("DOMContentLoaded", function() {
+    // Get the search input field and table rows
+    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.getElementById("transactionTableBody");
+
+    // Listen for input event on the search field
+    searchInput.addEventListener("input", function() {
+        const query = searchInput.value.toLowerCase(); // Get search query in lowercase
+        const rows = tableBody.getElementsByTagName("tr");
+
+        let found = false;
+
+        // Loop through each table row
+        for (let row of rows) {
+            const columns = row.getElementsByTagName("td");
+            if (columns.length > 0) {
+                // Extract the text content of relevant columns (TID, Full Name, Center Name, Date)
+                const tid = columns[0].textContent.toLowerCase();
+                const fullName = columns[2].textContent.toLowerCase();
+                const centerName = columns[3].textContent.toLowerCase();
+                const date = columns[1].textContent.toLowerCase(); // Date column
+
+                // Check if any column matches the search query
+                if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) ||
+                    date.includes(query)) {
+                    row.style.display = ""; // Show row if there's a match
+                    found = true;
+                } else {
+                    row.style.display = "none"; // Hide row if there's no match
+                }
+            }
+        }
+
+        // If no records are found, display "No data found" message
+        if (!found) {
+            const noDataRow = document.createElement("tr");
+            noDataRow.innerHTML = `<td colspan="8" class="text-center">No data found</td>`;
+            tableBody.innerHTML = "";
+            tableBody.appendChild(noDataRow);
+        }
+
+
+    });
+});
+</script>
+
+
+<!-- CSS -->
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}    
+
+.row {
+    display: flex;
+    flex-wrap: nowrap;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 340px;
+}
+
+.dropdown {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.search-container {
+    width: 35%;
+}
+
+.table-container {
+    /* padding: 20px; */
+}
+
+.scrollable-wrapper {
+    max-height: 600px;
+    /* Adjust this height as needed */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    /* For Firefox */
+    scrollbar-color: transparent transparent;
+    /* For Firefox */
+}
+
+.scrollable-wrapper::-webkit-scrollbar {
+    width: 8px;
+    /* Adjust width of the scrollbar */
+}
+
+.scrollable-wrapper::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    /* Invisible scrollbar thumb */
+}
+
+.scrollable-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+    /* Invisible track */
+}
+
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+    padding: 8px;
+    text-align: left;
+    /* border: 1px solid #ddd; */
+}
+
+.transactions-table th {
+    background-color: #f4f4f4;
+    position: sticky;
+    top: 0;
+    /* This keeps the header at the top of the table */
+    z-index: 1;
+    /* Ensures the header stays on top of the table body */
+}
+
+/* Show scrollbar when scrolling */
+.scrollable-wrapper:hover::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Visible scrollbar thumb */
+}
+
+.scrollable-wrapper:hover::-webkit-scrollbar {
+    opacity: 1;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 60px;
+    border-radius: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content button {
+    margin-top: 10px;
+    font-size: 14px;
+}
 
 .content {
     margin-left: 90px;
@@ -363,8 +721,6 @@ main .analyse .progresss {
     border-radius: 50%;
 }
 
-
-
 @media screen and (max-width: 1200px) {
     .container {
         width: 95%;
@@ -418,7 +774,6 @@ main .analyse .progresss {
     main table tbody tr td:first-child {
         display: none;
     }
-
 }
 
 @media screen and (max-width: 768px) {
@@ -747,35 +1102,36 @@ input[type="email"] {
     border: 1px solid #ddd;
     border-radius: 50px;
     padding: 12px 20px;
-    font-size: 1rem;
+    /* font-size: 14px; */
     margin-bottom: 15px;
     width: 100%;
+    font-family: 'Poppins', sans-serif;
     transition: border 0.3s ease;
 }
 
 input:focus {
-    border-color: #1B9C85;
+    border-color: rgb(65, 143, 207);
     outline: none;
 }
 
 /* Button Styling */
 button {
-    padding: 12px 25px;
+    padding: 6px 10px;
     border: none;
-    border-radius: 50px;
-    background-color: #1B9C85;
+    border-radius: 80px;
+    background-color: rgb(100, 150, 226);
     color: white;
-    font-size: 1rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #0f775e;
+    background-color: rgb(64, 147, 241);
 }
 
 button:active {
-    background-color: #0c5e48;
+    background-color: rgb(87, 152, 250);
 }
 
 /* Radio Button and Label */
@@ -881,68 +1237,103 @@ button:active {
 }
 
 
+/* @media (min-width: 1814px) { */
+@media (min-width: 1100px) and (max-width: 1350px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.dropdown {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 45%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+    font-size: 0.8rem;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 80px;
+
+}}
+
+@media (min-width: 1338px) and (max-width: 1590px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.dropdown {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 50%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 150px;
+
+}}
+
 </style>
-
-<!-- JavaScript -->
-<script>
-
-document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.querySelector('.dark-mode');
-    const body = document.body;
-
-    darkModeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode-active');
-    });
-});
-</script>
-
-<script>
-    const sideMenu = document.querySelector('aside');
-    const menuBtn = document.getElementById('menu-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const darkMode = document.querySelector('.dark-mode');
-
-    // Toggle dark mode and save preference to local storage
-    darkMode.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode-variables');
-        const isDarkMode = document.body.classList.contains('dark-mode-variables');
-        
-        // Save the current mode in local storage
-        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-        
-        // Toggle active states on the dark mode icons
-        darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-        darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-    });
-
-    // Function to apply dark mode based on saved preference
-    function applyDarkModePreference() {
-        const darkModePreference = localStorage.getItem('darkMode');
-        if (darkModePreference === 'enabled') {
-            document.body.classList.add('dark-mode-variables');
-            darkMode.querySelector('span:nth-child(1)').classList.remove('active');
-            darkMode.querySelector('span:nth-child(2)').classList.add('active');
-        } else {
-            document.body.classList.remove('dark-mode-variables');
-            darkMode.querySelector('span:nth-child(1)').classList.add('active');
-            darkMode.querySelector('span:nth-child(2)').classList.remove('active');
-        }
-    }
-
-    // Apply dark mode preference on page load
-    window.addEventListener('load', applyDarkModePreference);
-
-    menuBtn.addEventListener('click', () => {
-        sideMenu.style.display = 'block';
-    });
-
-    closeBtn.addEventListener('click', () => {
-        sideMenu.style.display = 'none';
-    });
-</script>
-
-
-<!-- FontAwesome for icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 @endsection

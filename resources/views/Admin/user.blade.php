@@ -36,8 +36,16 @@
                     <p><strong>Status:</strong> {{ ucfirst($user->status) }}</p>
                     <p><strong>EPF:</strong> {{ $user->epf }}</p>
                 </div>
-                <div class="edit-icon" title="Edit" onclick="editUser(this)" data-id="{{ $user->uid }}">
-                    <i class="bx bx-edit"></i>
+                <div class="icon">
+
+                    <div class="edit-icon" title="Edit" onclick="editUser(this)" data-id="{{ $user->uid }}">
+                        <i class="bx bx-edit"></i>
+                    </div>
+
+                    <div class="reset-icon" title="reset" onclick="" data-id="">
+                        <i class='bx bx-reset' style="color: #FF0060;"></i>
+                    </div>
+                    
                 </div>
             </div>
             @endforeach
@@ -127,7 +135,7 @@
                 <!-- Password -->
                 <div class="form-group form-group-full-width">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control" required>
+                    <input type="password" id="password" name="password" class="form-control">
                 </div>
 
                 <br>
@@ -429,11 +437,12 @@ button:active {
 }
 
 .left-section {
-    max-height: 667px;
+    max-height: 750px;
     /* Set a fixed height for the left section */
     overflow-y: auto;
     /* Enable vertical scrolling */
-    padding-right: 10px;
+    padding-right: 5px;
+    padding-left: 5px;
     /* Add some padding to avoid hiding content behind the scrollbar */
 }
 
@@ -474,7 +483,7 @@ i {
 }
 
 /* Styling for the edit icon */
-.edit-icon {
+.icon {
     /* position: relative; */
     position: absolute;
     top: 10px;
@@ -487,14 +496,14 @@ i {
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.card:hover .edit-icon {
+.card:hover .icon {
     display: block;
     /* Show when hovering over the card */
     transform: scale(1.2);
     opacity: 1;
 }
 
-.edit-icon:hover {
+.icon:hover {
     color: #0056b3;
 }
 
@@ -605,7 +614,7 @@ i {
         grid-template-columns: 1fr 2fr;
         /* 1fr for cards, 2fr for form */
         /* gap: 2rem;
-        padding: 1.8rem; */ 
+        padding: 1.8rem; */
     }
 
 
@@ -643,43 +652,6 @@ i {
         font-size: 17px;
         color: #628ECB;
     }
-
-    /* Styling for the edit icon */
-    .edit-icon {
-        /* position: relative; */
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        display: none;
-        /* Hidden by default */
-        font-size: 18px;
-        color: #007bff;
-        cursor: pointer;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    .card:hover .edit-icon {
-        display: block;
-        /* Show when hovering over the card */
-        transform: scale(1.2);
-        opacity: 1;
-    }
-
-    .edit-icon:hover {
-        color: #0056b3;
-    }
-
-    /* aside {
-        position: fixed;
-        background-color: var(--color-white);
-        width: 15rem;
-        z-index: 3;
-        box-shadow: 1rem 3rem 4rem var(--color-light);
-        height: 100vh;
-        left: -100%;
-        display: none;
-        animation: showMenu 0.4s ease forwards;
-    } */
 
     @keyframes showMenu {
         to {
@@ -1034,6 +1006,30 @@ i {
         flex-wrap: wrap;
     }
 
+    /* card view Hide scrollbar for Webkit browsers (Chrome, Safari) */
+
+    /*-----------------------------------------------------------------------------
+
+/* .raw {
+    max-height: 650px; 
+    overflow-y: auto; 
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent; 
+    padding-left:7px;
+
+}
+.raw::-webkit-scrollbar {
+    width: 6px;
+}
+
+.raw::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.raw:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2); 
+} */
+
 }
 </style>
 
@@ -1045,7 +1041,8 @@ function filterCards() {
 
     cards.forEach(card => {
         let name = card.querySelector('h3').innerText.toLowerCase();
-        let role = card.querySelector('p').innerText.toLowerCase();
+        let roleElement = card.querySelector('p strong'); // Selects <strong> inside <p>
+        let role = roleElement ? roleElement.nextSibling.nodeValue.trim().toLowerCase() : '';
 
         if (name.includes(input) || role.includes(input)) {
             card.style.display = 'block';
@@ -1091,7 +1088,7 @@ function editUser(element) {
             document.getElementById('contact').value = user.contact;
             document.getElementById('epf').value = user.epf;
             document.getElementById('username').value = user.username;
-            document.getElementById('password').value = user.password;
+            document.getElementById('password').value = '';
             // Set the image input field
             const imageInput = document.getElementById('image');
             if (user.image) {

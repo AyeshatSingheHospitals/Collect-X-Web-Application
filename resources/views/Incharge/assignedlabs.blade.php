@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const labDropdown = document.getElementById('labDropdown');
 
     // Fetch assigned labs
-    fetch(`/incharge/assigned-labs`)
+    fetch(`/lab/assigned-labs`)
         .then(response => response.json())
         .then(data => {
             labDropdown.innerHTML = ''; // Clear existing options
@@ -440,6 +440,103 @@ input:focus {
 /* ======================================== */
 
 /* Right Section (Form) */
+
+/* @media (min-width: 1814px) { */
+@media (min-width: 1100px) and (max-width: 1350px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-group1 {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 65%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 100px;
+
+}}
+
+@media (min-width: 1338px) and (max-width: 1590px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-group1 {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 150px;
+
+}}
+
 </style>
 
 @endsection

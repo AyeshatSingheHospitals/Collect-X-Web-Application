@@ -185,82 +185,6 @@ Route::get('/admin/transactions', [TransactionController::class, 'index'])->name
 Route::get('/admin/transactions/{tid}', [TransactionController::class, 'show'])->name('transactions.show');
 Route::put('/admin/transaction/{tid}', [TransactionController::class, 'updateAmount'])->name('transaction.updateAmount');
 
-// ----------------------Incharge-----------------------
-
-Route::get('Incharge/dashboard', function () {
-    return view('incharge.dashboard');
-});
-
-//Lab View
-Route::get('incharge/assignedlabs', function () {
-    return view('incharge.assignedlabs');
-});
-
-Route::get('/incharge/assigned-labs', [LabAssignController::class, 'getAssignedLabs'])->name('incharge.assigned-labs');
-Route::get('/lab/assignments', [LabAssignController::class, 'getLabAssignments'])->name('lab.assignments');
-
-//Route Assign
-Route::get('incharge/rassign', function () {
-    return view('incharge.rassign');
-});
-Route::get('incharge/rassign', [RouteAssignByInchargeController::class, 'showAssignedRoutes'])->name('incharge.rassign');
-Route::get('incharge/route-assign/search', [RouteAssignByInchargeController::class, 'searchLab'])->name('incharge.route.assign.search');
-Route::post('incharge/route-assign/store', [RouteAssignByInchargeController::class, 'storeAssignments'])->name('incharge.route-assign.store');
-
-//transaction
-Route::get('Incharge/transaction', function () {
-    return view('incharge.transaction');
-});
-
-// transaction
-
-Route::get('/incharge/transactions', [TransactionController::class, 'indexincharge'])->name('incharge.transactions.index');
-Route::get('/incharge/transactions/{tid}', [TransactionController::class, 'showincharge'])->name('incharge.transactions.show');
-Route::put('/incharge/transaction/{tid}', [TransactionController::class, 'updateAmountincharge'])->name('incharge.transaction.updateAmount');
-
-
-// Route::get('/incharge/assigned-labs', [TransactionController::class, 'getAssignedLabs'])->name('incharge.assigned-labs');
-
-// ----------------------supervisor-----------------------
-Route::get('supervisor/dashboard', function () {
-    return view('supervisor.dashboard');
-});
-
-//Lab View
-Route::get('Supervisor/assignedlabs', function () {
-    return view('supervisor.assignedlabs');
-});
-
-Route::get('/supervisor/assigned-labs', [LabAssignController::class, 'getAssignedLabs'])->name('supervisor.assigned-labs');
-Route::get('/lab/assignments', [LabAssignController::class, 'getLabAssignments'])->name('lab.assignments');
-
-//Route Assign
-Route::get('Supervisor/rassign', function () {
-    return view('supervisor.rassign');
-});
-Route::get('Supervisor/rassign', [RouteAssignBySupervisorController::class, 'showAssignedRoutes'])->name('supervisor.rassign');
-Route::get('/route-assign/search', [RouteAssignBySupervisorController::class, 'searchLab'])->name('route.assign.search');
-Route::post('/route-assign/store', [RouteAssignBySupervisorController::class, 'storeAssignments'])->name('route-assign.store');
-
-//transaction
-Route::get('Supervisor/transaction', function () {
-    return view('supervisor.transaction');
-});
-
-// transaction
-
-Route::get('/supervisor/transactions', [TransactionController::class, 'indexsupervisor'])->name('supervisor.transactions.index');
-Route::get('/supervisor/transactions/{tid}', [TransactionController::class, 'showinsupervisor'])->name('supervisor.transactions.show');
-Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountsupervisor'])->name('supervisor.transaction.updateAmount');
-
-
-// common route for transaction dropdown select and view record regarding to selected lab by supervisor and incharge
-Route::get('/supervisor/transactions', [TransactionController::class, 'fetchTransactionsByLab'])->name('transactions.byLab');
-// -------------------------
-
-Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountsupervisor']);
-// Route::get('/supervisor/transactions/search', [TransactionController::class, 'filter'])->name('transactions.search');
-
 //change password
 Route::get('admin/changepassword', function () {
     return view('admin.changepassword');
@@ -271,3 +195,101 @@ Route::get('admin/changepassword', [AdminController::class, 'showChangePasswordF
 Route::post('admin/changepassword/update', [AdminController::class, 'changePassword'])->name('admin.changepassword.update');
 
 Route::get('admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+
+// ----------------------Incharge-----------------------
+
+Route::get('incharge/dashboard', function () {
+    return view('incharge.dashboard');
+});
+
+//Lab View
+Route::get('incharge/assignedlabs', function () {
+    return view('incharge.assignedlabs');
+});
+
+//Route Assign
+Route::get('incharge/rassign', function () {
+    return view('incharge.rassign');
+});
+Route::get('incharge/rassign', [RouteAssignByInchargeController::class, 'showAssignedRoutes'])->name('incharge.rassign');
+Route::get('incharge/route-assign/search', [RouteAssignByInchargeController::class, 'searchLab'])->name('incharge.route.assign.search');
+Route::post('incharge/route-assign/store', [RouteAssignByInchargeController::class, 'storeAssignments'])->name('incharge.route-assign.store');
+
+//transaction
+Route::get('incharge/transaction', function () {
+    return view('incharge.transaction');
+});
+
+// transaction
+
+Route::get('/incharge/transactions', [TransactionController::class, 'indexIncharge'])->name('incharge.transactions.index');
+Route::get('/incharge/transactions/{tid}', [TransactionController::class, 'showIncharge'])->name('incharge.transactions.show');
+Route::put('/incharge/transaction/{tid}', [TransactionController::class, 'updateAmountIncharge'])->name('incharge.transaction.updateAmount');
+
+//change password 
+Route::get('incharge/changepassword', function () {
+    return view('incharge.changepassword');
+});
+
+
+Route::get('incharge/changepassword', [AdminController::class, 'showChangePasswordFormbyIncharge'])->name('incharge.changepassword');
+Route::post('incharge/changepassword/update', [AdminController::class, 'changePasswordbyIncharge'])->name('incharge.changepassword.update');
+
+Route::get('incharge/logout', [AuthController::class, 'logout'])->name('incharge.logout');
+
+// ----------------------supervisor-----------------------
+Route::get('supervisor/dashboard', function () {
+    return view('supervisor.dashboard');
+});
+
+//Lab View
+Route::get('supervisor/assignedlabs', function () {
+    return view('supervisor.assignedlabs');
+});
+
+//Route Assign
+Route::get('supervisor/rassign', function () {
+    return view('supervisor.rassign');
+});
+Route::get('supervisor/rassign', [RouteAssignBySupervisorController::class, 'showAssignedRoutes'])->name('supervisor.rassign');
+Route::get('/route-assign/search', [RouteAssignBySupervisorController::class, 'searchLab'])->name('route.assign.search');
+Route::post('/route-assign/store', [RouteAssignBySupervisorController::class, 'storeAssignments'])->name('route-assign.store');
+
+//transaction
+Route::get('supervisor/transaction', function () {
+    return view('supervisor.transaction');
+});
+
+// transaction
+
+Route::get('/supervisor/transactions', [TransactionController::class, 'indexSupervisor'])->name('supervisor.transactions.index');
+Route::get('/supervisor/transactions/{tid}', [TransactionController::class, 'showSupervisor'])->name('supervisor.transactions.show');
+Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountSupervisor'])->name('supervisor.transaction.updateAmount');
+
+
+// Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountsupervisor']);
+// Route::get('/supervisor/transactions/search', [TransactionController::class, 'filter'])->name('transactions.search');
+
+//change password 
+Route::get('supervisor/changepassword', function () {
+    return view('supervisor.changepassword');
+});
+
+
+Route::get('supervisor/changepassword', [AdminController::class, 'showChangePasswordFormbySupervisor'])->name('supervisor.changepassword');
+Route::post('supervisor/changepassword/update', [AdminController::class, 'changePasswordbySupervisor'])->name('supervisor.changepassword.update');
+
+Route::get('supervisor/logout', [AuthController::class, 'logout'])->name('supervisor.logout');
+
+
+
+// -----------------------------------------------Common Routes--------------------------------
+
+
+//assigned lab dropdown (supervisor/incharge)
+Route::get('/lab/assigned-labs', [LabAssignController::class, 'getAssignedLabs'])->name('lab.assigned-labs');
+Route::get('/lab/assignments', [LabAssignController::class, 'getLabAssignments'])->name('lab.assignments');
+
+// common route for transaction dropdown select and view record regarding to selected lab by supervisor and incharge
+Route::get('/lab/transactions', [TransactionController::class, 'fetchTransactionsByLab'])->name('transactions.byLab');

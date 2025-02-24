@@ -1,4 +1,4 @@
-@extends('admin.sidebar')
+@extends('incharge.sidebar')
 
 @section('content')
 <main>
@@ -69,7 +69,7 @@
 
             <div class="button-container">
                 <button type="submit" class="btn btn-primary">Update</button>
-                <a href="/admin/dashboard" class="btn1">Cancel</a>
+                <a href="/incharge/dashboard" class="btn1">Cancel</a>
             </div>
         </form>
     </div>

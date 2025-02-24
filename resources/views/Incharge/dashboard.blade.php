@@ -957,7 +957,7 @@ h1 {
     <!-- End of New Users Section -->
     <br>
     <!-- Recent Orders Table -->
-    <div class="recent-orders">
+    <!-- <div class="recent-orders">
         <h2>Today Route Assigns</h2>
         <table>
             <thead>
@@ -972,7 +972,7 @@ h1 {
             <tbody></tbody>
         </table>
         <a href="#">Show All</a>
-    </div>
+    </div> -->
     <!-- End of Recent Orders -->
 
 </main>

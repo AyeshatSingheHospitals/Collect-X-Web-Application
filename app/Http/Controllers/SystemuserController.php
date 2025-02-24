@@ -86,7 +86,6 @@ class SystemuserController extends Controller
             'contact' => $request->contact,
             'epf' => $request->epf,
             'username' => $request->username,
-            'password' => $request->password ? $request->password : $user->password,
             'status' => $request->status,
             'image' => $request->image ? $request->image->store('images', 'public') : $user->image,
         ]);

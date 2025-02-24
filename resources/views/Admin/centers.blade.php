@@ -605,6 +605,18 @@ document.addEventListener('DOMContentLoaded', function() {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+#labList li {
+    padding: 5px;
+    background-color: #628ECB;
+    color: #fff;
+}
+
+#labList li:hover {
+    background-color: #628ECB;
+    color: #202528;
+    /* font-weight:bold; */
+}
+
 /* Style the textarea */
 textarea#editDescription,
 #description {
@@ -1176,6 +1188,27 @@ input:focus {
 .form-check-label {
     font-size: 0.9rem;
     color: #555;
+}
+
+    /* card view Hide scrollbar for Webkit browsers (Chrome, Safari) */
+    .raw {
+    max-height: 650px; 
+    overflow-y: auto; 
+    scrollbar-width: thin; 
+    scrollbar-color: transparent transparent; 
+    padding-left:7px;
+
+}
+.raw::-webkit-scrollbar {
+    width: 6px;
+}
+
+.raw::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+.raw:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2); 
 }
 
 /* Responsive Styling */

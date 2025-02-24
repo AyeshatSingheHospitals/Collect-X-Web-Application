@@ -45,36 +45,62 @@ class LabAssignController extends Controller
     }
 
     public function storeLabassign(Request $request)
-    {
+{
+    try {
         // Validate the necessary fields
         $validated = $request->validate([
             'uid' => 'required|exists:systemuser,uid', // Validate user ID exists in `systemuser` table
             'uid_assign' => 'required|exists:systemuser,uid', // Assigned user ID exists in `systemuser` table
             'lid' => 'required|exists:lab,lid', // Validate lab ID exists in `lab` table
         ]);
-
-        try {
-            // Create the new lab assignment
-            $labassign = LabAssign::create([
-                'uid' => $validated['uid'],
-                'uid_assign' => $validated['uid_assign'],
-                'lid' => $validated['lid'],
-            ]);
-
-            // Create the log for this action
-            LabAssignLog::create([
-                'laid' => $labassign->laid, // Using the newly created `laid`
-                'uid' => $labassign->uid,
-                'uid_assign' => $labassign->uid_assign,
-                'lid' => $labassign->lid,
-                'action' => 'inserted',
-            ]);
-
-            return redirect()->back()->with('success', 'Lab assignment saved successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Failed to save lab assignment.']);
-        }
+    } catch (ValidationException $e) {
+        return redirect()->back()->withErrors($e->validator->errors())->withInput();
     }
+
+    try {
+        // Ensure the assigned user exists
+        $user = Systemuser::find($validated['uid_assign']);
+        if (!$user) {
+            return redirect()->back()->withErrors(['error' => 'Assigned user not found.'])->withInput();
+        }
+
+        // Check if the user being assigned has the role 'RO'
+        if ($user->role == 'RO') {
+            $existingLabAssign = LabAssign::where('uid_assign', $validated['uid_assign'])->first();
+            if ($existingLabAssign) {
+                return redirect()->back()->withErrors(['error' => 'RO user cannot be assigned more than one lab.'])->withInput();
+            }
+        }
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => 'Error checking user role: ' . $e->getMessage()])->withInput();
+    }
+
+    try {
+        // Create the new lab assignment
+        $labassign = LabAssign::create([
+            'uid' => $validated['uid'],
+            'uid_assign' => $validated['uid_assign'],
+            'lid' => $validated['lid'],
+        ]);
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => 'Database error while creating lab assignment: ' . $e->getMessage()])->withInput();
+    }
+
+    try {
+        // Create the log for this action
+        LabAssignLog::create([
+            'laid' => $labassign->laid, // Using the newly created `laid`
+            'uid' => $labassign->uid,
+            'uid_assign' => $labassign->uid_assign,
+            'lid' => $labassign->lid,
+            'action' => 'inserted',
+        ]);
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => 'Failed to create log entry: ' . $e->getMessage()])->withInput();
+    }
+
+    return redirect()->back()->with('success', 'Lab assignment saved successfully!');
+}
 
     public function updateLabassign(Request $request)
     {

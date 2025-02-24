@@ -35,6 +35,11 @@ class TransactionController extends Controller
                 ];
             });
 
+            $transactions = Transaction::all();
+foreach ($transactions as $transaction) {
+    $transaction->sms = SMS::where('tid', $transaction->tid)->get(); // Manually load the related SMS
+}
+
         return view('Admin.transaction', compact('transactions'));
     }
 
@@ -176,7 +181,7 @@ class TransactionController extends Controller
 
     // --------------------------supervisor transaction-------------------------
 
-    public function indexsupervisor()
+    public function indexSupervisor()
     {
    
         $transactions = Transaction::with(['systemuser', 'center', 'sms'])
@@ -192,11 +197,12 @@ class TransactionController extends Controller
                     'sms_description' => $transaction->sms ? $transaction->sms->description : null,
                 ];
             });
+            
 
-        return view('Admin.transaction', compact('transactions'));
+        return view('Supervisor.transaction', compact('transactions'));
     }
 
-    public function showsupervisor($tid)
+    public function showSupervisor($tid)
     {
        
         $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
@@ -214,59 +220,71 @@ class TransactionController extends Controller
         return response()->json($data);
     }
 
-    public function updateAmountsupervisor(Request $request, $tid)
+    public function updateAmountSupervisor(Request $request, $tid)
     {
-        // Find the transaction
-        $transaction = Transaction::find($tid);
-        if (!$transaction) {
-            return redirect()->back()->with('error', 'Transaction not found.');
-        }
+     // Find the transaction
+     $transaction = Transaction::find($tid);
+     if (!$transaction) {
+         return redirect()->back()->with('error', 'Transaction not found.');
+     }
 
-        // Get the center related to the transaction
-        $center = Center::find($transaction->cid);
-        if (!$center) {
-            return redirect()->back()->with('error', 'Center not found.');
-        }
+     // Get the logged-in user
+     $user = Systemuser::find(session('uid'));
+     if (!$user) {
+         return redirect()->back()->with('error', 'User not found.');
+     }
 
-        // Save the original values for logging purposes
-        $originalAmount = $transaction->amount;
+     // Get the center related to the transaction
+     $center = Center::find($transaction->cid);
+     if (!$center) {
+         return redirect()->back()->with('error', 'Center not found.');
+     }
 
-        // Update the amount of the transaction
-        $transaction->amount = $request->amount;
-        $transaction->save();
+     // Save the original amount for logging purposes
+     $originalAmount = $transaction->amount;
 
-        // Insert a new record into the transactionlogs table
-        TransactionLog::create([
-            'tid' => $transaction->tid,
-            'uid' => session('uid'), // Logged in user ID
-            'rid' => $transaction->rid,
-            'cid' => $transaction->cid,
-            'amount' => $request->amount,
-            'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
-            'action' => 'updated',
-        ]);
+     // Update the transaction amount
+     $transaction->amount = $request->amount;
+     $transaction->save();
 
-        // Get the logged-in user's details
-        $user = Systemuser::find(session('uid'));
+     // Insert a new record into the transactionlogs table
+     TransactionLog::create([
+         'tid' => $transaction->tid,
+         'uid' => $user->uid, // Logged-in user ID
+         'rid' => $transaction->rid,
+         'cid' => $transaction->cid,
+         'amount' => $request->amount,
+         'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
+         'action' => 'updated',
+     ]);
 
-        // Insert a new SMS record with the updated amount and logged-in user's details
-        Sms::create([
-            'tid' => $transaction->tid,
-            'description' => $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount to LKR ' . number_format($request->amount, 2) .
-            ' for center: ' . $center->centername,
-            'phonenumber1' => $transaction->center->authorizedcontact, 
-            'phonenumber2' => $transaction->center->selectedcontact,
-            'phonenumber3' => $transaction->center->thirdpartycontact,
-            'phonenumber4' => '', // Make sure you include all phone numbers
-            'phonenumber5' => '',
-        ]);
+     // Construct SMS message
+     $message = $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount from LKR ' . 
+                number_format($originalAmount, 2) . ' to LKR ' . number_format($request->amount, 2) .
+                ' for center: ' . $center->centername;
 
-        return response()->json(['success' => true, 'message' => 'Amount updated successfully!']);
+     // Insert a new SMS record into the `sms` table
+     Sms::create([
+         'tid' => $transaction->tid,
+         'description' => $message,
+         'phonenumber1' => $center->authorizedcontact,
+         'phonenumber2' => $center->selectedcontact,
+         'phonenumber3' => $center->thirdpartycontact,
+         'phonenumber4' => '', // Include additional phone numbers as needed
+         'phonenumber5' => '',
+     ]);
+
+     // Send SMS to authorized, selected, and third-party contacts
+     $this->sendSms($center->authorizedcontact, $message);
+     $this->sendSms($center->selectedcontact, $message);
+     $this->sendSms($center->thirdpartycontact, $message);
+
+     return redirect()->route('supervisor.transactions.index')->with('success', 'Amount updated and SMS sent successfully.');
     }
 
     // --------------------------Incharge transaction-------------------------
 
-    public function indexincharge()
+    public function indexIncharge()
     {
 
         $transactions = Transaction::with(['systemuser', 'center', 'sms'])
@@ -283,10 +301,10 @@ class TransactionController extends Controller
                 ];
             });
 
-        return view('Admin.transaction', compact('transactions'));
+        return view('Incharge.transaction', compact('transactions'));
     }
 
-    public function showincharge($tid)
+    public function showIncharge($tid)
     {
     
         $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
@@ -304,54 +322,66 @@ class TransactionController extends Controller
         return response()->json($data);
     }
 
-    public function updateAmountincharge(Request $request, $tid)
+    public function updateAmountIncharge(Request $request, $tid)
     {
-    // Find the transaction
-    $transaction = Transaction::find($tid);
-    if (!$transaction) {
-        return redirect()->back()->with('error', 'Transaction not found.');
-    }
+        // Find the transaction
+        $transaction = Transaction::find($tid);
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Transaction not found.');
+        }
 
-    // Get the center related to the transaction
-    $center = Center::find($transaction->cid);
-    if (!$center) {
-        return redirect()->back()->with('error', 'Center not found.');
-    }
+        // Get the logged-in user
+        $user = Systemuser::find(session('uid'));
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
 
-    // Save the original values for logging purposes
-    $originalAmount = $transaction->amount;
+        // Get the center related to the transaction
+        $center = Center::find($transaction->cid);
+        if (!$center) {
+            return redirect()->back()->with('error', 'Center not found.');
+        }
 
-    // Update the amount of the transaction
-    $transaction->amount = $request->amount;
-    $transaction->save();
+        // Save the original amount for logging purposes
+        $originalAmount = $transaction->amount;
 
-    // Insert a new record into the transactionlogs table
-    TransactionLog::create([
-        'tid' => $transaction->tid,
-        'uid' => session('uid'), // Logged in user ID
-        'rid' => $transaction->rid,
-        'cid' => $transaction->cid,
-        'amount' => $request->amount,
-        'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
-        'action' => 'updated',
-    ]);
+        // Update the transaction amount
+        $transaction->amount = $request->amount;
+        $transaction->save();
 
-    // Get the logged-in user's details
-    $user = Systemuser::find(session('uid'));
+        // Insert a new record into the transactionlogs table
+        TransactionLog::create([
+            'tid' => $transaction->tid,
+            'uid' => $user->uid, // Logged-in user ID
+            'rid' => $transaction->rid,
+            'cid' => $transaction->cid,
+            'amount' => $request->amount,
+            'remark' => 'Amount updated from ' . number_format($originalAmount, 2) . ' to ' . number_format($request->amount, 2),
+            'action' => 'updated',
+        ]);
 
-    // Insert a new SMS record with the updated amount and logged-in user's details
-    Sms::create([
-        'tid' => $transaction->tid,
-        'description' => $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount to LKR ' . number_format($request->amount, 2) .
-        ' for center: ' . $center->centername,
-        'phonenumber1' => $transaction->center->authorizedcontact, 
-        'phonenumber2' => $transaction->center->selectedcontact,
-        'phonenumber3' => $transaction->center->thirdpartycontact,
-        'phonenumber4' => '', // Make sure you include all phone numbers
-        'phonenumber5' => '',
-    ]);
+        // Construct SMS message
+        $message = $user->fname . ' ' . $user->lname . ' (' . $user->role . ') updated the amount from LKR ' . 
+                   number_format($originalAmount, 2) . ' to LKR ' . number_format($request->amount, 2) .
+                   ' for center: ' . $center->centername;
 
-    return redirect()->route('transactions.index')->with('success', 'Amount updated and new records added successfully.');
+        // Insert a new SMS record into the `sms` table
+        Sms::create([
+            'tid' => $transaction->tid,
+            'description' => $message,
+            'phonenumber1' => $center->authorizedcontact,
+            'phonenumber2' => $center->selectedcontact,
+            'phonenumber3' => $center->thirdpartycontact,
+            'phonenumber4' => '', // Include additional phone numbers as needed
+            'phonenumber5' => '',
+        ]);
+
+        // Send SMS to authorized, selected, and third-party contacts
+        $this->sendSms($center->authorizedcontact, $message);
+        $this->sendSms($center->selectedcontact, $message);
+        $this->sendSms($center->thirdpartycontact, $message);
+
+        return redirect()->route('incharge.transactions.index')->with('success', 'Amount updated and SMS sent successfully.');
     }
 
 }

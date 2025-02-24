@@ -183,7 +183,8 @@
 
             // User name column
             const nameCell = document.createElement('td');
-            nameCell.textContent = user.name;
+            nameCell.innerHTML = `<strong>${user.name}</strong> <br> <span style="font-size: 0.9em; color: gray;">(${user.status})</span>`;
+
             tr.appendChild(nameCell);
 
             // Checkbox columns for each route

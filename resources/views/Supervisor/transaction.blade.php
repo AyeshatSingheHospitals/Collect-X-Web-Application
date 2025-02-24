@@ -10,18 +10,19 @@
     <br><br>
 
     <!-- Assigned Labs Dropdown -->
-   
+
     <div class="row">
         <div class="dropdown">
             <input type="hidden" name="uid" value="{{ session('uid') }}">
             <label for="labDropdown" style="color:#7f7f7f">Select your Lab:</label>
-            <select name="lid" id="labDropdown" class="form-control" required>
+            <select name="lid" id="labDropdown" class="form-controler" required>
                 <option value="" disabled selected>Loading...</option>
             </select>
         </div>
 
         <div class="search-container">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search by TID, Date, Name, or Center Name">
+            <input type="text" id="searchInput" class="form-control"
+                placeholder="Search by TID, Date, Name, or Center Name">
         </div>
     </div>
 
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const editForm = document.getElementById('edit-form');
 
     // Fetch assigned labs
-    fetch(`/incharge/assigned-labs`)
+    fetch(`/lab/assigned-labs`)
         .then((response) => response.json())
         .then((data) => {
             labDropdown.innerHTML = ''; // Clear existing options
@@ -107,32 +108,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const lid = labDropdown.value;
 
         // Fetch transactions for the selected lab
-        fetch(`/supervisor/transactions?lid=${lid}`)
+        fetch(`/lab/transactions?lid=${lid}`)
             .then((response) => response.json())
             .then((data) => {
                 transactionTableBody.innerHTML = ''; // Clear the table
 
                 if (data.length === 0) {
                     transactionTableBody.innerHTML = `<tr>
-                                <td colspan="8" class="text-center">No transactions found</td>
-                            </tr>`;
+                                    <td colspan="8" class="text-center">No transactions found</td>
+                                </tr>`;
                 } else {
                     data.forEach((transaction) => {
                         transactionTableBody.innerHTML += `
-                                    <tr>
-                                        <td>${transaction.tid}</td>
-                                        <td>${transaction.date}</td>
-                                        <td>${transaction.full_name}</td>
-                                        <td>${transaction.center_name}</td>
-                                        <td>LRK ${transaction.amount}</td>
-                                        <td>${transaction.remark}</td>
-                                        <td>${transaction.sms_description || 'N/A'}</td>
-                                        <td>
-                                            <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
-                                                <i class='bx bxs-pen'></i>
-                                            </button>
-                                        </td>
-                                    </tr>`;
+                                        <tr>
+                                            <td>${transaction.tid}</td>
+                                            <td>${transaction.date}</td>
+                                            <td>${transaction.full_name}</td>
+                                            <td>${transaction.center_name}</td>
+                                            <td>LRK ${transaction.amount}</td>
+                                            <td>${transaction.remark}</td>
+                                            <td>${transaction.sms_description || 'N/A'}</td>
+                                            <td>
+                                                <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
+                                                    <i class='bx bxs-pen'></i>
+                                                </button>
+                                            </td>
+                                        </tr>`;
                     });
 
                     // Attach event listeners to edit buttons
@@ -142,8 +143,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch((error) => {
                 console.error('Error fetching transactions:', error);
                 transactionTableBody.innerHTML = `<tr>
-                            <td colspan="8" class="text-center">Error loading transactions</td>
-                        </tr>`;
+                                <td colspan="8" class="text-center">Error loading transactions</td>
+                            </tr>`;
             });
     });
 
@@ -319,8 +320,8 @@ document.addEventListener("DOMContentLoaded", function() {
             tableBody.innerHTML = "";
             tableBody.appendChild(noDataRow);
         }
-        
-        
+
+
     });
 });
 </script>
@@ -328,6 +329,24 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <!-- CSS -->
 <style>
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
 .row {
     display: flex;
     flex-wrap: nowrap;
@@ -348,7 +367,7 @@ document.addEventListener("DOMContentLoaded", function() {
     background-color: var(--color-white);
 }
 
-.search-container{
+.search-container {
     width: 35%;
 }
 
@@ -1214,6 +1233,105 @@ button:active {
 
 .warning {
     color: var(--color-warning);
+}
+
+/* @media (min-width: 1814px) { */
+@media (min-width: 1100px) and (max-width: 1350px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
+
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .dropdown {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 45%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+        font-size: 0.8rem;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 80px;
+
+    }
+}
+
+@media (min-width: 1338px) and (max-width: 1590px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .dropdown {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 50%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 150px;
+
+    }
 }
 </style>
 

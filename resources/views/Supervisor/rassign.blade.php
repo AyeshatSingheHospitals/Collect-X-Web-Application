@@ -201,12 +201,50 @@ function renderTable(users, routes, assignments = {}) {
 }
 </script>
 
-
-
-
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+
+/* Style for the checkbox */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-background);
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+/* When checkbox is checked */
+input[type="checkbox"]:checked {
+    background-color:rgb(113, 142, 235); /* Green background */
+    border-color:rgb(109, 111, 207); /* Green border */
+}
+
+/* Custom checkmark inside the checkbox */
+input[type="checkbox"]:checked::before {
+    content: '\2714'; /* Unicode checkmark symbol (✓) */
+    position: absolute;
+    top: 0.1px;
+    left: 2px;
+    font-size: 14px;
+    color: white; /* White checkmark */
+}
+
+/* Hover effect for unselected checkboxes */
+input[type="checkbox"]:not(:checked):hover {
+    border-color:rgb(81, 112, 199); /* Border turns green on hover */
+}
+
+/* Hover effect for checked checkboxes */
+input[type="checkbox"]:checked:hover {
+    background-color:rgb(88, 98, 197); /* Darker green on hover */
+}
+
 
 .form-group {
     border: 1px solid #ddd;
@@ -219,6 +257,12 @@ function renderTable(users, routes, assignments = {}) {
 
     transition: border 0.3s ease;
     background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
 }
 
 .alert {
@@ -1504,7 +1548,7 @@ button:active {
     }
 
     main .new-users .user-list .user {
-        flex-basis: 35%;
+        /* flex-basis: 35%; */
     }
 
     main .recent-orders {
@@ -1656,6 +1700,8 @@ button:active {
         width: 100%;
         margin: 0;
     }
+
+    
 }
 </style>
 
@@ -1694,4 +1740,102 @@ button:active {
 </style> -->
 
 <!-- JavaScript -->
+<style>
+/* @media (min-width: 1814px) { */
+@media (min-width: 1100px) and (max-width: 1350px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 60%;
+    height: 43px;
+
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-group1 {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 65%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 100px;
+
+}}
+
+@media (min-width: 1338px) and (max-width: 1590px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-group1 {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 150px;
+
+}}
+
+</style>
 @endsection

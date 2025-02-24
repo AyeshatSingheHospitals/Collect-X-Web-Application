@@ -24,7 +24,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
     </style>
 
-
+<script type="text/javascript" src="../js/sidebar.js"></script>
 </head>
 
 <body>
@@ -120,12 +120,12 @@
                             <div class="dropdown-menu">
                                 <h4><strong>{{ session('role', 'Unknown Role') }}</strong></h4>
                                 <div>{{ session('username', 'Guest') }}</div>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">
+                                <!-- <div class="dropdown-divider"></div> -->
+                                <!-- <a href="#" class="dropdown-item">
                                     <i class='bx bx-cog'></i> Settings
-                                </a>
+                                </a> -->
                                 <div class="dropdown-divider"></div>
-                                <a href="changepassword" class="dropdown-item">
+                                <a href="/admin/changepassword" class="dropdown-item">
                                     <i class='bx bxs-lock-alt'></i> Change Password
                                 </a>
                                 <div class="dropdown-divider"></div>
@@ -144,91 +144,6 @@
 
     </div>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const profileDropdown = document.getElementById("profileDropdown");
-        const dropdownMenu = profileDropdown.querySelector(".dropdown-menu");
-
-        profileDropdown.addEventListener("click", function(event) {
-            event.stopPropagation();
-            profileDropdown.classList.toggle("active");
-        });
-
-        document.addEventListener("click", function(event) {
-            if (!profileDropdown.contains(event.target)) {
-                profileDropdown.classList.remove("active");
-            }
-        });
-    });
-    </script>
-
-    <style>
-    /* Dropdown container */
-    .profile {
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-    }
-
-    /* Dropdown menu */
-    .dropdown-menu {
-        display: none;
-        position: absolute;
-        right: 0;
-        top: 50px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 220px;
-        z-index: 100;
-        padding: 10px;
-    }
-
-    /* Show dropdown */
-    .profile.active .dropdown-menu {
-        display: block;
-    }
-
-    /* Dropdown items */
-    .dropdown-menu h4 {
-        margin-bottom: 5px;
-        font-size: 18px;
-    }
-
-    .dropdown-menu div {
-        font-size: 14px;
-        color: gray;
-        margin-bottom: 10px;
-    }
-
-    .dropdown-divider {
-        border-bottom: 1px solid #ddd;
-        margin: 5px 0;
-    }
-
-    .dropdown-item {
-        display: flex;
-        align-items: center;
-        padding: 8px 10px;
-        text-decoration: none;
-        color: #333;
-        font-size: 14px;
-        transition: background 0.2s;
-    }
-
-    .dropdown-item:hover {
-        background: #f5f5f5;
-    }
-
-    .dropdown-item i {
-        margin-right: 8px;
-        font-size: 16px;
-    }
-
-    .text-danger {
-        color: red;
-    }
-    </style>
 
     <script>
     const sideMenu = document.querySelector('aside');

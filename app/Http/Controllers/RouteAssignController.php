@@ -52,6 +52,8 @@ public function searchLab(Request $request)
             return [
                 'id' => $assignment->systemuser->uid,
                 'name' => $assignment->systemuser->full_name,
+                'status' => $assignment->systemuser->status, // Include status
+
             ];
         }),
         'routes' => $routes->map(function ($route) {

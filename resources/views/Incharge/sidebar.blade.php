@@ -19,6 +19,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
     </style>
 
+<script type="text/javascript" src="../js/sidebar.js"></script>
+
 
 </head>
 
@@ -37,7 +39,7 @@
             </div>
 
             <div class="sidebar">
-                <a href="/Incharge/dashboard" class="{{ request()->is('incharge/dashboard') ? 'active' : '' }}">
+                <a href="/incharge/dashboard" class="{{ request()->is('incharge/dashboard') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">grid_view</span>
                     <h3>Dashboard</h3>
                 </a>
@@ -49,7 +51,7 @@
                     <span class="material-symbols-sharp">add_road</span>
                     <h3>Route Assign</h3>
                 </a>
-                <a href="/Incharge/transaction" class="{{ request()->is('incharge/transaction') ? 'active' : '' }}">
+                <a href="/incharge/transaction" class="{{ request()->is('incharge/transaction') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
                 </a>
@@ -82,13 +84,32 @@
                             </span>
                         </div>
 
-                        <div class="profile">
-                        <div class="info">
+                        <div class="profile" id="profileDropdown">
+                            <div class="info">
                                 <p>Hey, <b>{{ session('fname', 'Guest') }}</b></p>
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
                             <div class="profile-photo">
-                            <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile">
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
+                                    onerror="this.style.display='none'; this.parentNode.innerHTML += '<i class=\'bx bxs-user-circle\' style=\'font-size: 40px; color: rgb(156,161,221);\'></i>';">
+                            </div>
+
+                            <!-- Dropdown Menu -->
+                            <div class="dropdown-menu">
+                                <h4><strong>{{ session('role', 'Unknown Role') }}</strong></h4>
+                                <div>{{ session('username', 'Guest') }}</div>
+                                <!-- <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item">
+                                    <i class='bx bx-cog'></i> Settings
+                                </a> -->
+                                <div class="dropdown-divider"></div>
+                                <a href="/incharge/changepassword" class="dropdown-item">
+                                    <i class='bx bxs-lock-alt'></i> Change Password
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="#" class="dropdown-item text-danger">
+                                    <i class='bx bx-log-out'></i> Logout
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -96,6 +117,7 @@
             </div>
             @yield('content')
         </div>
+
 
     </div>
 
@@ -119,6 +141,19 @@
     });
 
     // Function to apply dark mode based on saved preference
+    function applyDarkModePreference() {
+        const darkModePreference = localStorage.getItem('darkMode');
+        if (darkModePreference === 'enabled') {
+            document.body.classList.add('dark-mode-variables');
+            darkMode.querySelector('span:nth-child(1)').classList.remove('active');
+            darkMode.querySelector('span:nth-child(2)').classList.add('active');
+        } else {
+            document.body.classList.remove('dark-mode-variables');
+            darkMode.querySelector('span:nth-child(1)').classList.add('active');
+            darkMode.querySelector('span:nth-child(2)').classList.remove('active');
+        }
+    }
+
     function applyDarkModePreference() {
         const darkModePreference = localStorage.getItem('darkMode');
         if (darkModePreference === 'enabled') {
