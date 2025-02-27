@@ -10,7 +10,7 @@
     <div class="form-group">
         <label for="searchInput" style="color:#7f7f7f">Search Records:</label>
         <input type="text" id="searchInput" class="form-control"
-            placeholder="Search by TID, Name, Center Name, or Date">
+            placeholder="Search by Transaction ID, Name, Center Name, or Date">
     </div>
     <div class="table-container">
         <div class="scrollable-wrapper">

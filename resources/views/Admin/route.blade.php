@@ -106,7 +106,7 @@
                 <!-- <input type="hidden" name="uid" id="editUid" class="form-control rounded-pill" required> -->
 
                 <div class="mb-3">
-                    <label class="form-label" for="editUid" class="form-label"> UID:</label>
+                    <label class="form-label" for="editUid" class="form-label"> Username:</label>
                     <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('username') }}"
                         readonly required />
                 </div>
@@ -118,10 +118,15 @@
                         <i class="fas fa-flask me-2"></i> Search Lab Name:
                     </label>
                     <input type="text" id="editlabSearch" class="form-control rounded-pill"
-                        placeholder="Type to search labs...">
+                        placeholder="Type to search labs..." required>
 
                     <!-- Hidden input to store the selected lab ID -->
                     <input type="hidden" id="editLid" name="lid">
+
+                              
+                    @error('editlabSearch')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
 
                     <!-- Dropdown list to display labs -->
                     <ul id="editlabList" class="list-group mt-2"
@@ -133,6 +138,8 @@
                 <div class="mb-3">
                     <label for="editRoutename" class="form-label">Routename:</label>
                     <input type="text" name="routename" id="editRoutename" class="form-control rounded-pill" required>
+                    
+           
                 </div>
 
                 <div class="mb-3">
@@ -161,7 +168,7 @@
 
                 <div class="mb-3">
                     <label class="form-label" for="uid">
-                        <i class="fas fa-user me-2"></i> UID:
+                        <i class="fas fa-user me-2"></i> Username:
                     </label>
                     <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('username') }}"
                         readonly required />

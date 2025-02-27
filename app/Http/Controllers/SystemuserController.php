@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 use App\Models\Systemuser;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+
+
 class SystemuserController extends Controller
 {
     // Show the form to create a new user
@@ -111,5 +115,25 @@ class SystemuserController extends Controller
     return response()->json($userDetails);
 }
 
+
+public function updatePassword(Request $request)
+{
+    // Validate the request
+    $request->validate([
+        'resetUserId' => 'required|exists:systemuser,uid', // Ensure the user exists
+        'newPassword' => 'required|string|min:8',
+        'confirmPassword' => 'required|same:newPassword', // Ensure passwords match
+    ]);
+
+    // Find the user
+    $user = Systemuser::findOrFail($request->resetUserId);
+
+    // Update the password
+    $user->password = $request->newPassword;
+    $user->save();
+
+    // Redirect with success message
+    return redirect()->route('admin.user.index')->with('success', 'Password updated successfully');
+}
 
 }

@@ -163,8 +163,6 @@ Route::delete('/admin/centers/{cid}', [CenterController::class, 'destroycenter']
 //lab assign
 Route::get('/admin/labassigns', [LabAssignController::class, 'indexLabassign'])->name('admin.labassign.index');
 Route::post('/admin/labassigns/store', [LabAssignController::class, 'storeLabassign'])->name('admin.labassigns.store');
-// Route::get('/admin/labassigns/{id}/edit', [LabAssignController::class, 'editLabassign'])->name('admin.labassigns.edit');
-// Route::put('/admin/labassigns/{id}/update', [LabAssignController::class, 'updateLabassign'])->name('admin.labassigns.update');
 Route::put('/admin/labassigns/{laid}', [LabAssignController::class, 'updateLabassign'])->name('admin.labassigns.update');
 Route::delete('/admin/labassigns/{id}', [LabAssignController::class, 'destroyLabassign'])->name('admin.labassigns.destroy');
 
@@ -180,19 +178,17 @@ Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->na
 Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');
 
 // transaction
-
 Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('transactions.index');
 Route::get('/admin/transactions/{tid}', [TransactionController::class, 'show'])->name('transactions.show');
 Route::put('/admin/transaction/{tid}', [TransactionController::class, 'updateAmount'])->name('transaction.updateAmount');
 
 //change password
-Route::get('admin/changepassword', function () {
-    return view('admin.changepassword');
-});
-
-
+Route::get('admin/changepassword', function () {return view('admin.changepassword');});
 Route::get('admin/changepassword', [AdminController::class, 'showChangePasswordForm'])->name('admin.changepassword');
 Route::post('admin/changepassword/update', [AdminController::class, 'changePassword'])->name('admin.changepassword.update');
+
+// reset password
+Route::post('/update-password', [SystemuserController::class, 'updatePassword'])->name('update-password');
 
 Route::get('admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
@@ -268,9 +264,6 @@ Route::get('/supervisor/transactions/{tid}', [TransactionController::class, 'sho
 Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountSupervisor'])->name('supervisor.transaction.updateAmount');
 
 
-// Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountsupervisor']);
-// Route::get('/supervisor/transactions/search', [TransactionController::class, 'filter'])->name('transactions.search');
-
 //change password 
 Route::get('supervisor/changepassword', function () {
     return view('supervisor.changepassword');
@@ -293,3 +286,7 @@ Route::get('/lab/assignments', [LabAssignController::class, 'getLabAssignments']
 
 // common route for transaction dropdown select and view record regarding to selected lab by supervisor and incharge
 Route::get('/lab/transactions', [TransactionController::class, 'fetchTransactionsByLab'])->name('transactions.byLab');
+
+
+
+

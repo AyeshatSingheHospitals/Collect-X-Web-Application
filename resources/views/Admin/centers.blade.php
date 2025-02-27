@@ -19,7 +19,8 @@
         </div>
 
         <div class="search-container">
-            <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterLabs()" />
+        <input type="text" id="searchInput" class="form-control" placeholder="Search..." onkeyup="filterCards()" />
+
 
         </div>
     </div>
@@ -111,7 +112,7 @@
                             <i class="fas fa-flask me-2"></i> Search Lab Name:
                         </label>
                         <input type="text" id="labSearch" class="form-control rounded-pill"
-                            placeholder="Type to search labs...">
+                            placeholder="Type to search labs..." required>
 
                         <input type="hidden" id="selectedLabId" name="selectedLabId" name="lid">
 
@@ -125,7 +126,7 @@
                         <label class="form-label">
                             <i class="fas fa-route me-2"></i> Select Route:
                         </label>
-                        <select id="routeDropdown" class="form-control rounded-pill" name="rid" class="select">
+                        <select id="routeDropdown" class="form-control rounded-pill" name="rid" class="select" required>
                             <option value="" class="fonts">Select a route</option>
                         </select>
                     </div>
@@ -148,22 +149,23 @@
                     <div class="form-group">
                         <label for="authorizedcontact">Authorized Contact</label>
                         <input type="text" name="authorizedcontact" id="authorizedcontact" class="form-control"
-                            required>
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10)" title="Enter exactly 10 digits"  maxlength="10" required>
                     </div>
 
                     <div class="form-group">
                         <label for="thirdpartycontact">ThirdParty Contact</label>
                         <input type="text" name="thirdpartycontact" id="thirdpartycontact" class="form-control"
-                            required>
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,10)"  required>
                     </div>
                 </div>
 
                 <!-- Searchable User Dropdown -->
                 <div class="form-group">
                     <label for="userDropdown">Select User Name</label>
-                    <select id="userDropdown" name="user_id" class="form-control select2">
+                    <select id="userDropdown" name="user_id" class="form-control select2" required>
                         <option value="">Select username</option>
-                        @foreach($users as $user)
+                        @foreach($users->filter(fn($user) => in_array($user->role, ['Supervisor', 'Incharge', 'Admin']))
+                        as $user)
                         <option value="{{ $user->uid }}" data-contact="{{ $user->contact }}">
                             {{ $user->fname }} {{ $user->lname }} - {{ $user->role }}
                         </option>
@@ -174,7 +176,9 @@
                 </div>
                 <div class="form-group">
                     <label for="description">Description</label>
-                    <textarea name="description" id="description" class="form-control"></textarea>
+                   
+                    <textarea name="description" id="description" class="form-control" >N/A</textarea>
+
                 </div>
 
                 <div class="raw">
@@ -274,7 +278,8 @@
                     <label for="editUserDropdown">Select User Name</label>
                     <select id="editUserDropdown" name="user_id" class="form-control select2">
                         <option value="" id="newuser">Select username</option>
-                        @foreach($users as $user)
+                        @foreach($users->filter(fn($user) => in_array($user->role, ['Supervisor', 'Incharge', 'Admin']))
+                        as $user)
                         <option value="{{ $user->uid }}" data-contact="{{ $user->contact }}">
                             {{ $user->fname }} {{ $user->lname }} - {{ $user->role }}
                         </option>
@@ -306,6 +311,7 @@
     </div>
 
 </main>
+
 
 <!-- JavaScript -->
 <script>
@@ -593,6 +599,35 @@ document.addEventListener('DOMContentLoaded', function() {
     window.closeEditModal = closeEditModal;
 });
 </script>
+<script>
+
+function filterCards() {
+    // Get the search input value
+    const query = document.getElementById('searchInput').value.toLowerCase();
+
+    // Get all the cards
+    const cards = document.querySelectorAll('.card');
+
+    // Loop through each card and hide or show based on search query
+    cards.forEach(card => {
+        // Check if the card contains the search query
+        const centerName = card.querySelector('.card-title').textContent.toLowerCase();
+        const authorizedPerson = card.querySelector('.card-text').textContent.toLowerCase();
+        const lab = card.querySelector('.card-text:nth-of-type(2)').textContent.toLowerCase();
+        const route = card.querySelector('.card-text:nth-of-type(3)').textContent.toLowerCase();
+
+        // If any field contains the search query, show the card
+        if (centerName.includes(query) || authorizedPerson.includes(query) || lab.includes(query) || route.includes(query)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+
+
+
 
 <!-- me tika awe selected contact search ek create krnkota  -->
 <!-- Include jQuery (if not already included) -->

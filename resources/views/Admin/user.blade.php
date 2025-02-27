@@ -42,10 +42,15 @@
                         <i class="bx bx-edit"></i>
                     </div>
 
-                    <div class="reset-icon" title="reset" onclick="" data-id="">
+                    <!-- <div class="reset-icon" title="reset" onclick="" data-id="">
+                        <i class='bx bx-reset' style="color: #FF0060;"></i>
+                    </div> -->
+
+                    <div class="reset-icon" title="Reset" onclick="showResetForm(this)" data-id="{{ $user->uid }}">
                         <i class='bx bx-reset' style="color: #FF0060;"></i>
                     </div>
-                    
+
+
                 </div>
             </div>
             @endforeach
@@ -61,20 +66,18 @@
                 <div class="mb-3">
                     <div class="form-check">
                         <div class="row">
-                            <div class="radio">
-                                <input class="radio__input" type="radio" name="role" id="roleAdmin" value="Admin"
-                                    required>
+                            <div class="radio" required>
+                                <input class="radio__input" type="radio" name="role" id="roleAdmin" value="Admin">
                                 <label class="radio__label" for="roleAdmin"> Admin </label>
 
                                 <input class="radio__input" type="radio" name="role" id="roleSupervisor"
-                                    value="Supervisor" required>
+                                    value="Supervisor">
                                 <label class="radio__label" for="roleSupervisor"> Supervisor </label>
 
-                                <input class="radio__input" type="radio" name="role" id="roleIncharge" value="Incharge"
-                                    required>
+                                <input class="radio__input" type="radio" name="role" id="roleIncharge" value="Incharge">
                                 <label class="radio__label" for="roleIncharge"> Incharge </label>
 
-                                <input class="radio__input" type="radio" name="role" id="roleRO" value="RO" required>
+                                <input class="radio__input" type="radio" name="role" id="roleRO" value="RO">
                                 <label class="radio__label" for="roleRO"> RO </label>
                             </div>
 
@@ -96,6 +99,10 @@
                     </div>
                 </div>
 
+                <div id="roleError" style="color: #FF0060; font-size: 12px; display: none;">
+                    Please select a role.
+                </div>
+
                 <br><br>
 
                 <input type="hidden" id="userId" name="userId">
@@ -114,16 +121,26 @@
                 </div>
 
                 <!-- Contact -->
-                <div class="form-group form-group-full-width">
+                <!-- <div class="form-group form-group-full-width">
                     <label for="contact">Contact</label>
-                    <input type="text" id="contact" name="contact" class="form-control" required>
+                    <input type="text" id="contact" name="contact" class="form-control" required
+                        oninput="validateEPF(this)">
+                </div> -->
+
+                <div class="form-group form-group-full-width">
+                    <label for="contact">Contact Number</label>
+                    <input type="text" id="contact" name="contact" class="form-control" required
+                        oninput="validateContact()">
+                    <small id="contactError" style="color: #6C9BCF; display: none;" class="message">Contact number must
+                        be exactly 10
+                        digits.</small>
                 </div>
 
                 <!-- EPF -->
                 <div class="form-group form-group-full-width">
                     <label for="epf">EPF</label>
-                    <input type="text" id="epf" name="epf" class="form-control" required required
-                        oninput="generateUsername()">
+                    <input type="text" id="epf" name="epf" class="form-control" required
+                        oninput="validateEPF(this); generateUsername()">
                 </div>
 
                 <!-- Username -->
@@ -134,8 +151,9 @@
 
                 <!-- Password -->
                 <div class="form-group form-group-full-width">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" class="form-control">
+                    <label for="password" id="passwordLabel">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                    <p id="password-strength1" style="font-size: 10px;" class="message"></p>
                 </div>
 
                 <br>
@@ -143,7 +161,7 @@
                 <!-- Image -->
                 <div class="form-group form-group-full-width">
                     <label for="image">Profile Image</label>
-                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
                     <small id="imageLabel" style="display: none; color: gray;"></small>
                 </div>
                 <br><br>
@@ -151,12 +169,372 @@
                 <!-- Submit Button -->
                 <button type="submit" class="btn btn-primary" class="new" class="form-group">Register</button>
             </form>
+
+            <!-- Password Reset Form (Initially Hidden) -->
+            <div class="right-section1" id="passwordResetForm" style="display: none;">
+                <form id="resetPasswordForm" action="{{ route('update-password') }}" method="POST">
+                    @csrf
+
+                    <!-- Display user name (dynamically populated) -->
+                    <div class="form-group form-group-full-width">
+                        <!-- <label for="userNameDisplay">User Name</label> -->
+                        <!-- <span id="userNameDisplay" class="form-control" readonly></span> -->
+                        <!-- <h3 id="userNameDisplay" class="form-control" readonly></h3> -->
+                    </div>
+
+                    <h3 class="text"><i class="bx bxs-user-circle"></i> <span id="userNameDisplay" class="form-control"
+                            readonly></span></h3>
+
+                    <br>
+
+                    <input type="hidden" id="resetUserId" name="resetUserId">
+
+                    <!-- New Password Field -->
+                    <div class="form-group form-group-full-width">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+                        <p id="password-strength" style="font-size: 10px;" class="message"></p>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-group form-group-full-width">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control"
+                            required>
+                        <p id="password-match" style="font-size: 10px; " class="message"></p>
+                    </div>
+                    <br>
+                    <!-- Submit Button -->
+                    <div class="row">
+                        <button type="submit" class="btn btn-primary">Reset Password</button><br>
+                        <button type="button" class="btn btn-primary" onclick="showUserForm()">Back</button>
+                        <div>
+                </form>
+            </div>
+
         </div>
     </div>
 </main>
 
+<script>
+function validateEPF(input) {
+    input.value = input.value.replace(/[^0-9]/g, ''); // This removes anything that's not a number
+}
+</script>
+
+<script>
+function validateContact() {
+    let input = document.getElementById('contact');
+    let contactError = document.getElementById('contactError');
+
+    // Remove any non-numeric characters
+    input.value = input.value.replace(/[^0-9]/g, '');
+
+    // Check if the length is exactly 10
+    if (input.value.length === 10) {
+        contactError.style.display = "none"; // Hide error message if valid
+    } else {
+        contactError.style.display = "block"; // Show error message if invalid
+    }
+}
+</script>
+
+<script>
+// Get the role radios and error message element
+const roleRadios = document.querySelectorAll('input[name="role"]');
+const roleError = document.getElementById('roleError');
+
+// Check if any role is selected and hide error if true
+roleRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+        if (roleError.style.display === 'block') {
+            roleError.style.display = 'none'; // Hide the error message
+        }
+    });
+});
+
+// Validate form on submit
+document.querySelector('form').addEventListener('submit', function(event) {
+    const selectedRole = document.querySelector('input[name="role"]:checked');
+    if (!selectedRole) {
+        roleError.style.display = 'block'; // Show error if no role is selected
+        event.preventDefault(); // Prevent form submission
+    }
+});
+</script>
+
+<script>
+// document.getElementById('userForm').addEventListener('submit', function(event) {
+//     // Check if any role is selected
+//     let roleSelected = document.querySelector('input[name="role"]:checked');
+
+//     // If no role is selected, prevent form submission and show error message
+//     if (!roleSelected) {
+//         event.preventDefault();  // Prevent form submission
+//         document.getElementById('roleError').style.display = 'block';  // Show error message
+//     } else {
+//         document.getElementById('roleError').style.display = 'none';  // Hide error message if a role is selected
+//     }
+// });
+
+// JavaScript function to filter cards based on the search input
+function filterCards() {
+    let input = document.getElementById('searchInput').value.toLowerCase();
+    let cards = document.querySelectorAll('.left-section .card');
+
+    cards.forEach(card => {
+        let name = card.querySelector('h3').innerText.toLowerCase();
+        let roleElement = card.querySelector('p strong'); // Selects <strong> inside <p>
+        let role = roleElement ? roleElement.nextSibling.nodeValue.trim().toLowerCase() : '';
+
+        if (name.includes(input) || role.includes(input)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+//create username automatically
+function generateUsername() {
+    const fname = document.getElementById('fname').value.trim().toLowerCase();
+    const epf = document.getElementById('epf').value.trim();
+    const usernameField = document.getElementById('username');
+
+    if (fname && epf) {
+        usernameField.value = fname + "-" + epf;
+    } else {
+        usernameField.value = ''; // Clear username if one of the fields is empty
+    }
+}
+
+function editUser(element) {
+    const userId = element.getAttribute('data-id');
+
+    if (!userId) {
+        console.error('Error: userId is missing.');
+        return;
+    }
+
+    fetch(`/admin/users/${userId}/edit`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(user => {
+            // Populate the form fields
+            document.getElementById('userId').value = user.uid;
+            document.getElementById('fname').value = user.fname;
+            document.getElementById('lname').value = user.lname;
+            document.getElementById('contact').value = user.contact;
+            document.getElementById('epf').value = user.epf;
+            document.getElementById('username').value = user.username;
+            document.getElementById('password').value = '';
+
+            // Hide the password field and label
+            const passwordField = document.getElementById('password');
+            const passwordLabel = document.getElementById(
+                'passwordLabel'); // Ensure your password label has this ID
+
+            if (passwordField) {
+                passwordField.style.display = "none";
+            }
+            if (passwordLabel) {
+                passwordLabel.style.display = "none";
+            }
+
+            // Set the image input field
+            const imageInput = document.getElementById('image');
+            if (user.image) {
+                // Display the file name or a message
+                const imageLabel = document.getElementById('imageLabel');
+                imageLabel.textContent = `Current image: ${user.image}`;
+                imageLabel.style.display = 'block';
+            }
+
+            // Set role and status
+            document.querySelector(`input[name="role"][value="${user.role}"]`).checked = true;
+            document.querySelector(`input[name="status"][value="${user.status}"]`).checked = true;
+
+            // Update form action
+            const form = document.getElementById('userForm');
+            form.action = `/admin/users/${user.uid}/update`;
+
+            const submitButton = document.getElementById('submitButton');
+            submitButton.textContent = "Update";
+        })
+        .catch(error => console.error('Error fetching user:', error));
+}
+
+
+document.getElementById('userForm').addEventListener('reset', () => {
+    const form = document.getElementById('userForm');
+    form.action = "{{ route('admin.users.store') }}"; // Reset to store route
+    document.getElementById('submitButton').textContent = "Register";
+});
+</script>
+
+<script>
+function showResetForm(element) {
+    var userId = element.getAttribute("data-id");
+    var userName = element.closest('.card').querySelector('.text').innerText.trim(); // Get the full name from the card
+
+    // Set user ID in the hidden input field of the reset form
+    document.getElementById("resetUserId").value = userId;
+
+    // Set user name in the password reset form
+    document.getElementById("userNameDisplay").innerText = userName;
+
+    // Hide user registration form and show reset form
+    document.getElementById("userForm").style.display = "none";
+    document.getElementById("passwordResetForm").style.display = "block";
+}
+
+function showUserForm() {
+    // Show user registration form and hide reset form
+    document.getElementById("userForm").style.display = "block";
+    document.getElementById("passwordResetForm").style.display = "none";
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+            const password = document.getElementById("password");
+            // const confirmPassword = document.getElementById("confirmPassword");
+            const passwordStrength = document.getElementById("password-strength1");
+            // const passwordMatch = document.getElementById("password-match");
+            // const form = document.getElementById("resetPasswordForm");
+
+            // Function to check password strength
+            function checkPasswordStrength(password) {
+                if (password.length < 8) return {
+                    strength: "Too short ❌",
+                    color: "#FF0060"
+                };
+                if (!/[A-Z]/.test(password)) return {
+                    strength: "Must include an uppercase letter ❌",
+                    color: "#FF0060"
+                };
+                if (!/[a-z]/.test(password)) return {
+                    strength: "Must include a lowercase letter ❌",
+                    color: "#FF0060"
+                };
+                if (!/\d/.test(password)) return {
+                    strength: "Must include a number ❌",
+                    color: "#FF0060"
+                };
+                if (!/[\W]/.test(password)) return {
+                    strength: "Must include a special character ❌",
+                    color: "#FF0060"
+                };
+                return {
+                    strength: "Strong ✅",
+                    color: "green"
+                };
+            }
+
+            // Password strength validation
+            password.addEventListener("input", function() {
+                const {
+                    strength,
+                    color
+                } = checkPasswordStrength(password.value);
+                passwordStrength.textContent = strength;
+                passwordStrength.style.color = color;
+            });
+        });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const newPassword = document.getElementById("newPassword");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const passwordStrength = document.getElementById("password-strength");
+    const passwordMatch = document.getElementById("password-match");
+    const form = document.getElementById("resetPasswordForm");
+
+    // Function to check password strength
+    function checkPasswordStrength(password) {
+        if (password.length < 8) return {
+            strength: "Too short ❌",
+            color: "#FF0060"
+        };
+        if (!/[A-Z]/.test(password)) return {
+            strength: "Must include an uppercase letter ❌",
+            color: "#FF0060"
+        };
+        if (!/[a-z]/.test(password)) return {
+            strength: "Must include a lowercase letter ❌",
+            color: "#FF0060"
+        };
+        if (!/\d/.test(password)) return {
+            strength: "Must include a number ❌",
+            color: "#FF0060"
+        };
+        if (!/[\W]/.test(password)) return {
+            strength: "Must include a special character ❌",
+            color: "#FF0060"
+        };
+        return {
+            strength: "Strong ✅",
+            color: "green"
+        };
+    }
+
+    // Password strength validation
+    newPassword.addEventListener("input", function() {
+        const {
+            strength,
+            color
+        } = checkPasswordStrength(newPassword.value);
+        passwordStrength.textContent = strength;
+        passwordStrength.style.color = color;
+    });
+
+    // Confirm password validation
+    confirmPassword.addEventListener("input", function() {
+        if (confirmPassword.value === newPassword.value) {
+            passwordMatch.textContent = "Passwords match ✅";
+            passwordMatch.style.color = "green";
+        } else {
+            passwordMatch.textContent = "Passwords do not match ❌";
+            passwordMatch.style.color = "red";
+        }
+    });
+
+    // Prevent form submission if validation fails
+    form.addEventListener("submit", function(event) {
+        const passwordValidation = checkPasswordStrength(newPassword.value);
+        if (passwordValidation.strength.includes("❌")) {
+            alert("New Password is too weak! Please follow the password rules.");
+            event.preventDefault(); // Stop form submission
+            return;
+        }
+
+        if (newPassword.value !== confirmPassword.value) {
+            alert("Confirm Password does not match New Password.");
+            event.preventDefault(); // Stop form submission
+            return;
+        }
+    });
+});
+</script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+#roleError {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.message {
+    text-align: right;
+    padding-right: 10px;
+}
 
 .content {
     margin-left: 90px;
@@ -1033,88 +1411,5 @@ i {
 }
 </style>
 
-<script>
-// JavaScript function to filter cards based on the search input
-function filterCards() {
-    let input = document.getElementById('searchInput').value.toLowerCase();
-    let cards = document.querySelectorAll('.left-section .card');
-
-    cards.forEach(card => {
-        let name = card.querySelector('h3').innerText.toLowerCase();
-        let roleElement = card.querySelector('p strong'); // Selects <strong> inside <p>
-        let role = roleElement ? roleElement.nextSibling.nodeValue.trim().toLowerCase() : '';
-
-        if (name.includes(input) || role.includes(input)) {
-            card.style.display = 'block';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-//create username automatically
-function generateUsername() {
-    const fname = document.getElementById('fname').value.trim().toLowerCase();
-    const epf = document.getElementById('epf').value.trim();
-    const usernameField = document.getElementById('username');
-
-    if (fname && epf) {
-        usernameField.value = fname + "-" + epf;
-    } else {
-        usernameField.value = ''; // Clear username if one of the fields is empty
-    }
-}
-
-function editUser(element) {
-    const userId = element.getAttribute('data-id');
-
-    if (!userId) {
-        console.error('Error: userId is missing.');
-        return;
-    }
-
-    fetch(`/admin/users/${userId}/edit`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(user => {
-            // Populate the form fields
-            document.getElementById('userId').value = user.uid;
-            document.getElementById('fname').value = user.fname;
-            document.getElementById('lname').value = user.lname;
-            document.getElementById('contact').value = user.contact;
-            document.getElementById('epf').value = user.epf;
-            document.getElementById('username').value = user.username;
-            document.getElementById('password').value = '';
-            // Set the image input field
-            const imageInput = document.getElementById('image');
-            if (user.image) {
-                // Display the file name or a message
-                const imageLabel = document.getElementById('imageLabel');
-                imageLabel.textContent = `Current image: ${user.image}`;
-                imageLabel.style.display = 'block';
-            }
-            document.querySelector(`input[name="role"][value="${user.role}"]`).checked = true;
-            document.querySelector(`input[name="status"][value="${user.status}"]`).checked = true;
-
-            // Update form action
-            const form = document.getElementById('userForm');
-            form.action = `/admin/users/${user.uid}/update`;
-
-            const submitButton = document.getElementById('submitButton');
-            submitButton.textContent = "Update";
-        })
-        .catch(error => console.error('Error fetching user:', error));
-}
-
-document.getElementById('userForm').addEventListener('reset', () => {
-    const form = document.getElementById('userForm');
-    form.action = "{{ route('admin.users.store') }}"; // Reset to store route
-    document.getElementById('submitButton').textContent = "Register";
-});
-</script>
 
 @endsection

@@ -46,6 +46,10 @@
                     <span class="material-symbols-sharp">grid_view</span>
                     <h3>Dashboard</h3>
                 </a>
+                <a href="/admin/users" class="{{ request()->is('admin/users') ? 'active' : '' }}">
+                    <span class="material-symbols-sharp">person_add</span>
+                    <h3>User Creation</h3>
+                </a>
                 <a href="/admin/labs" class="{{ request()->is('admin/labs') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">science</span>
                     <h3>Lab Creation</h3>
@@ -54,11 +58,6 @@
                     <span class="material-symbols-sharp">add_road</span>
                     <h3>Route Creation</h3>
                 </a>
-                <a href="/admin/users" class="{{ request()->is('admin/users') ? 'active' : '' }}">
-                    <span class="material-symbols-sharp">person_add</span>
-                    <h3>User Creation</h3>
-                </a>
-
                 <a href="/admin/centers" class="{{ request()->is('admin/centers') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">location_city</span>
                     <h3>Center Creation</h3>

@@ -109,7 +109,7 @@
                 <input type="hidden" name="uid" value="{{ session('uid') }}"> -->
 
                 <div class="form-group">
-                    <label class="form-label" for="editUid" class="form-label"> UID:</label>
+                    <label class="form-label" for="editUid" class="form-label"> Username:</label>
                     <input type="text" name="uid" class="form-control rounded-pill" value="{{ session('username') }}"
                         readonly required>
                 </div>
@@ -143,7 +143,7 @@
                 @csrf
 
                 <div class="form-group">
-                    <label for="uid">UID: </label>
+                    <label for="uid">Username: </label>
                     <input type="text" name="uid" id="uid" class="form-control" value="{{ session('username') }}"
                         required>
                 </div>
