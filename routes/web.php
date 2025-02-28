@@ -285,7 +285,7 @@ Route::get('/lab/assigned-labs', [LabAssignController::class, 'getAssignedLabs']
 Route::get('/lab/assignments', [LabAssignController::class, 'getLabAssignments'])->name('lab.assignments');
 
 // common route for transaction dropdown select and view record regarding to selected lab by supervisor and incharge
-Route::get('/lab/transactions', [TransactionController::class, 'fetchTransactionsByLab'])->name('transactions.byLab');
+Route::get('/lab/transactions', [TransactionController::class, 'getTransactions'])->name('transactions.byLab');
 
 
 

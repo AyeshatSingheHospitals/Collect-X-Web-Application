@@ -36,31 +36,11 @@ class TransactionController extends Controller
             });
 
             $transactions = Transaction::all();
-foreach ($transactions as $transaction) {
-    $transaction->sms = SMS::where('tid', $transaction->tid)->get(); // Manually load the related SMS
-}
-
+            foreach ($transactions as $transaction) {
+                $transaction->sms = SMS::where('tid', $transaction->tid)->get(); // Manually load the related SMS
+            }
         return view('Admin.transaction', compact('transactions'));
     }
-
-    public function show($tid)
-    {
-       
-        $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
-
-        $data = [
-            'tid' => $transaction->tid,
-            'date' => $transaction->created_at,
-            'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
-            'center_name' => $transaction->center->centername,
-            'amount' => $transaction->amount,
-            'remark' => $transaction->remark,
-            'sms_description' => $transaction->sms ? $transaction->sms->description : null,
-        ];
-
-        return response()->json($data);
-    }
-
 
     public function updateAmount(Request $request, $tid)
     {
@@ -154,71 +134,39 @@ foreach ($transactions as $transaction) {
 
     // --------------------------------Supervisor and Incharge ---------------------------------------------------
 
-    public function fetchTransactionsByLab(Request $request)
-    {
-        $lid = $request->lid;
+    public function getTransactions(Request $request)
+{
+    $lid = $request->query('lid');
 
-        // Get all transactions for the given lab (lid)
-        $transactions = Transaction::with(['systemuser', 'center', 'sms'])
-            ->whereHas('center', function ($query) use ($lid) {
-                $query->where('lid', $lid);
-            })
-            ->get()
-            ->map(function ($transaction) {
-                return [
-                    'tid' => $transaction->tid,
-                    'date' => $transaction->created_at->format('d-m-Y H:i A'),
-                    'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
-                    'center_name' => $transaction->center->centername,
-                    'amount' => $transaction->amount,
-                    'remark' => $transaction->remark,
-                    'sms_description' => $transaction->sms ? $transaction->sms->description : null,
-                ];
-            });
+    // Fetch transactions without eager loading SMS
+    $transactions = Transaction::whereHas('center', function ($query) use ($lid) {
+            $query->where('lid', $lid);
+        })
+        ->get();
 
-        return response()->json($transactions);
-    } 
+    // Manually load SMS records
+    $formattedTransactions = $transactions->map(function ($transaction) {
+        // Fetch SMS records separately
+        $smsRecords = SMS::where('tid', $transaction->tid)->get()->map(function ($sms) {
+            return ['description' => $sms->description];
+        });
+
+        return [
+            'tid' => $transaction->tid,
+            'date' => $transaction->created_at->format('Y-m-d H:i:s'),
+            'full_name' => optional($transaction->systemuser)->fname . ' ' . optional($transaction->systemuser)->lname ?? 'N/A',
+            'center_name' => optional($transaction->center)->centername ?? 'N/A',
+            'amount' => $transaction->amount, // Format amount
+            'remark' => $transaction->remark ?? 'N/A',
+            'sms' => $smsRecords->isNotEmpty() ? $smsRecords : [],
+        ];
+    });
+
+    return response()->json($formattedTransactions);
+}
 
     // --------------------------supervisor transaction-------------------------
 
-    public function indexSupervisor()
-    {
-   
-        $transactions = Transaction::with(['systemuser', 'center', 'sms'])
-            ->get()
-            ->map(function ($transaction) {
-                return [
-                    'tid' => $transaction->tid,
-                    'date' => $transaction->created_at,
-                    'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
-                    'center_name' => $transaction->center->centername,
-                    'amount' => $transaction->amount,
-                    'remark' => $transaction->remark,
-                    'sms_description' => $transaction->sms ? $transaction->sms->description : null,
-                ];
-            });
-            
-
-        return view('Supervisor.transaction', compact('transactions'));
-    }
-
-    public function showSupervisor($tid)
-    {
-       
-        $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
-
-        $data = [
-            'tid' => $transaction->tid,
-            'date' => $transaction->created_at,
-            'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
-            'center_name' => $transaction->center->centername,
-            'amount' => $transaction->amount,
-            'remark' => $transaction->remark,
-            'sms_description' => $transaction->sms ? $transaction->sms->description : null,
-        ];
-
-        return response()->json($data);
-    }
 
     public function updateAmountSupervisor(Request $request, $tid)
     {
@@ -284,43 +232,6 @@ foreach ($transactions as $transaction) {
 
     // --------------------------Incharge transaction-------------------------
 
-    public function indexIncharge()
-    {
-
-        $transactions = Transaction::with(['systemuser', 'center', 'sms'])
-            ->get()
-            ->map(function ($transaction) {
-                return [
-                    'tid' => $transaction->tid,
-                    'date' => $transaction->created_at,
-                    'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
-                    'center_name' => $transaction->center->centername,
-                    'amount' => $transaction->amount,
-                    'remark' => $transaction->remark,
-                    'sms_description' => $transaction->sms ? $transaction->sms->description : null,
-                ];
-            });
-
-        return view('Incharge.transaction', compact('transactions'));
-    }
-
-    public function showIncharge($tid)
-    {
-    
-        $transaction = Transaction::with(['systemuser', 'center', 'sms'])->findOrFail($tid);
-
-        $data = [
-            'tid' => $transaction->tid,
-            'date' => $transaction->created_at,
-            'full_name' => $transaction->systemuser->fname . ' ' . $transaction->systemuser->lname,
-            'center_name' => $transaction->center->centername,
-            'amount' => $transaction->amount,
-            'remark' => $transaction->remark,
-            'sms_description' => $transaction->sms ? $transaction->sms->description : null,
-        ];
-
-        return response()->json($data);
-    }
 
     public function updateAmountIncharge(Request $request, $tid)
     {

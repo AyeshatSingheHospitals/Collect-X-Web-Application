@@ -15,7 +15,7 @@
         <div class="dropdown">
             <input type="hidden" name="uid" value="{{ session('uid') }}">
             <label for="labDropdown" style="color:#7f7f7f">Select your Lab:</label>
-            <select name="lid" id="labDropdown" class="form-controler" required>
+            <select name="lid" id="labDropdown" class="form-control" required>
                 <option value="" disabled selected>Loading...</option>
             </select>
         </div>
@@ -72,8 +72,6 @@
     </div>
 </main>
 
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const uid = document.querySelector('input[name="uid"]').value;
@@ -107,45 +105,49 @@ document.addEventListener('DOMContentLoaded', function() {
     labDropdown.addEventListener('change', function() {
         const lid = labDropdown.value;
 
-        // Fetch transactions for the selected lab
         fetch(`/lab/transactions?lid=${lid}`)
-            .then((response) => response.json())
-            .then((data) => {
-                transactionTableBody.innerHTML = ''; // Clear the table
+    .then((response) => response.json())
+    .then((data) => {
+        transactionTableBody.innerHTML = '';
 
-                if (data.length === 0) {
-                    transactionTableBody.innerHTML = `<tr>
-                                    <td colspan="8" class="text-center">No transactions found</td>
-                                </tr>`;
-                } else {
-                    data.forEach((transaction) => {
-                        transactionTableBody.innerHTML += `
-                                        <tr>
-                                            <td>${transaction.tid}</td>
-                                            <td>${transaction.date}</td>
-                                            <td>${transaction.full_name}</td>
-                                            <td>${transaction.center_name}</td>
-                                            <td>LRK ${transaction.amount}</td>
-                                            <td>${transaction.remark}</td>
-                                            <td>${transaction.sms_description || 'N/A'}</td>
-                                            <td>
-                                                <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
-                                                    <i class='bx bxs-pen'></i>
-                                                </button>
-                                            </td>
-                                        </tr>`;
-                    });
+        if (data.length === 0) {
+            transactionTableBody.innerHTML = `<tr>
+                        <td colspan="8" class="text-center">No transactions found</td>
+                    </tr>`;
+        } else {
+            data.forEach((transaction) => {
+                let smsDescriptions = transaction.sms.length
+                    ? transaction.sms.map((sms) => `<li>${sms.description}</li>`).join('')
+                    : '<li>N/A</li>';
 
-                    // Attach event listeners to edit buttons
-                    attachEditButtonListeners();
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching transactions:', error);
-                transactionTableBody.innerHTML = `<tr>
-                                <td colspan="8" class="text-center">Error loading transactions</td>
-                            </tr>`;
+                transactionTableBody.innerHTML += `
+                    <tr>
+                        <td>${transaction.tid}</td>
+                        <td>${transaction.date}</td>
+                        <td>${transaction.full_name}</td>
+                        <td>${transaction.center_name}</td>
+                        <td>LRK ${transaction.amount}</td>
+                        <td>${transaction.remark}</td>
+                        <td>${smsDescriptions}</td> 
+                        <td>
+                            <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
+                                <i class='bx bxs-pen'></i>
+                            </button>
+                        </td>
+                    </tr>`;
             });
+
+            // Attach event listeners to edit buttons
+            attachEditButtonListeners();
+        }
+    })
+    .catch((error) => {
+        console.error('Error fetching transactions:', error);
+        transactionTableBody.innerHTML = `<tr>
+                    <td colspan="8" class="text-center">Error loading transactions</td>
+                </tr>`;
+    });
+
     });
 
     // Attach event listeners to edit buttons
@@ -160,14 +162,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Open edit modal and populate fields
-    function openEditModal(tid, amount) {
-        document.getElementById('edit-tid').value = tid;
-        document.getElementById('edit-amount').value = amount;
+function openEditModal(tid, amount) {
+    const editTidInput = document.getElementById('edit-tid');
+    const editAmountInput = document.getElementById('edit-amount');
+    const editForm = document.getElementById('edit-form');
+    const modal = document.getElementById('edit-modal');
 
-        // Set the form's action URL dynamically
-        editForm.action = `/supervisor/transaction/${tid}`;
-        modal.style.display = 'block';
+    if (!editTidInput || !editAmountInput || !editForm || !modal) {
+        console.error("Edit modal elements not found.");
+        return;
     }
+
+    // Ensure the actual amount value is retrieved
+    let actualAmount = parseFloat(amount);
+    
+    if (isNaN(actualAmount)) {
+        console.warn("Invalid amount value, setting to 0.000");
+        actualAmount = 0.000; // Default fallback value
+    }
+
+    // Set values in the modal
+    editTidInput.value = tid;
+    editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
+
+    // Set the form's action URL dynamically
+    editForm.action = `/supervisor/transaction/${tid}`;
+
+    // Show the modal
+    modal.style.display = 'block';
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('edit-modal');
+    if (modal && event.target === modal) {
+        modal.style.display = 'none';
+    }
+});
 
     // Close the edit modal
     function closeEditModal() {
@@ -277,7 +308,6 @@ closeBtn.addEventListener('click', () => {
 });
 </script>
 
-
 <script>
 // Wait for the document to be ready
 document.addEventListener("DOMContentLoaded", function() {
@@ -320,8 +350,6 @@ document.addEventListener("DOMContentLoaded", function() {
             tableBody.innerHTML = "";
             tableBody.appendChild(noDataRow);
         }
-
-
     });
 });
 </script>
@@ -337,6 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
     margin-bottom: 15px;
     width: 40%;
     height: 43px;
+
     transition: border 0.3s ease;
     background-color: var(--color-white);
 }
@@ -1235,104 +1264,105 @@ button:active {
     color: var(--color-warning);
 }
 
+
+
 /* @media (min-width: 1814px) { */
-@media (min-width: 1100px) and (max-width: 1350px) {
-    .form-group {
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        padding: 12px 20px;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        width: 40%;
-        height: 43px;
+@media (min-width: 1100px) and (max-width: 1350px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
 
-        transition: border 0.3s ease;
-        background-color: var(--color-white);
-    }
-
-    .dropdown {
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        padding: 12px 20px;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        width: 45%;
-        height: 43px;
-        transition: border 0.3s ease;
-        background-color: var(--color-white);
-    }
-
-    .form-control {
-        background-color: var(--color-white);
-        color: var(--color-dark);
-        padding-left: 50px;
-        font-size: 0.8rem;
-    }
-
-    .form-controler {
-        background-color: var(--color-white);
-        color: var(--color-dark);
-        padding-left: 3px;
-    }
-
-
-    /* Container for the cards */
-    .row {
-        display: flex;
-        /* flex-wrap: wrap; */
-        /* justify-content: space-between; */
-        gap: 80px;
-
-    }
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
 }
 
-@media (min-width: 1338px) and (max-width: 1590px) {
-    .form-group {
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        padding: 12px 20px;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        width: 40%;
-        height: 43px;
-        transition: border 0.3s ease;
-        background-color: var(--color-white);
-    }
-
-    .dropdown {
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        padding: 12px 20px;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        width: 50%;
-        height: 43px;
-        transition: border 0.3s ease;
-        background-color: var(--color-white);
-    }
-
-    .form-control {
-        background-color: var(--color-white);
-        color: var(--color-dark);
-        padding-left: 50px;
-    }
-
-    .form-controler {
-        background-color: var(--color-white);
-        color: var(--color-dark);
-        padding-left: 3px;
-    }
-
-
-    /* Container for the cards */
-    .row {
-        display: flex;
-        /* flex-wrap: wrap; */
-        /* justify-content: space-between; */
-        gap: 150px;
-
-    }
+.dropdown {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 45%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
 }
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+    font-size: 0.8rem;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 80px;
+
+}}
+
+@media (min-width: 1338px) and (max-width: 1590px){
+.form-group {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 40%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.dropdown {
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    width: 50%;
+    height: 43px;
+    transition: border 0.3s ease;
+    background-color: var(--color-white);
+}
+
+.form-control {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 50px;
+}
+
+.form-controler {
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    padding-left: 3px;
+}
+
+
+/* Container for the cards */
+.row {
+    display: flex;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    gap: 150px;
+
+}}
+
 </style>
 
 @endsection

@@ -1,4 +1,4 @@
-@extends('incharge.sidebar')
+@extends('supervisor.sidebar')
 
 @section('content')
 
@@ -72,8 +72,6 @@
     </div>
 </main>
 
-
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const uid = document.querySelector('input[name="uid"]').value;
@@ -107,45 +105,49 @@ document.addEventListener('DOMContentLoaded', function() {
     labDropdown.addEventListener('change', function() {
         const lid = labDropdown.value;
 
-        // Fetch transactions for the selected lab
         fetch(`/lab/transactions?lid=${lid}`)
-            .then((response) => response.json())
-            .then((data) => {
-                transactionTableBody.innerHTML = ''; // Clear the table
+    .then((response) => response.json())
+    .then((data) => {
+        transactionTableBody.innerHTML = '';
 
-                if (data.length === 0) {
-                    transactionTableBody.innerHTML = `<tr>
-                                <td colspan="8" class="text-center">No transactions found</td>
-                            </tr>`;
-                } else {
-                    data.forEach((transaction) => {
-                        transactionTableBody.innerHTML += `
-                                    <tr>
-                                        <td>${transaction.tid}</td>
-                                        <td>${transaction.date}</td>
-                                        <td>${transaction.full_name}</td>
-                                        <td>${transaction.center_name}</td>
-                                        <td>LRK ${transaction.amount}</td>
-                                        <td>${transaction.remark}</td>
-                                        <td>${transaction.sms_description || 'N/A'}</td>
-                                        <td>
-                                            <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
-                                                <i class='bx bxs-pen'></i>
-                                            </button>
-                                        </td>
-                                    </tr>`;
-                    });
+        if (data.length === 0) {
+            transactionTableBody.innerHTML = `<tr>
+                        <td colspan="8" class="text-center">No transactions found</td>
+                    </tr>`;
+        } else {
+            data.forEach((transaction) => {
+                let smsDescriptions = transaction.sms.length
+                    ? transaction.sms.map((sms) => `<li>${sms.description}</li>`).join('')
+                    : '<li>N/A</li>';
 
-                    // Attach event listeners to edit buttons
-                    attachEditButtonListeners();
-                }
-            })
-            .catch((error) => {
-                console.error('Error fetching transactions:', error);
-                transactionTableBody.innerHTML = `<tr>
-                            <td colspan="8" class="text-center">Error loading transactions</td>
-                        </tr>`;
+                transactionTableBody.innerHTML += `
+                    <tr>
+                        <td>${transaction.tid}</td>
+                        <td>${transaction.date}</td>
+                        <td>${transaction.full_name}</td>
+                        <td>${transaction.center_name}</td>
+                        <td>LRK ${transaction.amount}</td>
+                        <td>${transaction.remark}</td>
+                        <td>${smsDescriptions}</td> 
+                        <td>
+                            <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
+                                <i class='bx bxs-pen'></i>
+                            </button>
+                        </td>
+                    </tr>`;
             });
+
+            // Attach event listeners to edit buttons
+            attachEditButtonListeners();
+        }
+    })
+    .catch((error) => {
+        console.error('Error fetching transactions:', error);
+        transactionTableBody.innerHTML = `<tr>
+                    <td colspan="8" class="text-center">Error loading transactions</td>
+                </tr>`;
+    });
+
     });
 
     // Attach event listeners to edit buttons
@@ -160,14 +162,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Open edit modal and populate fields
-    function openEditModal(tid, amount) {
-        document.getElementById('edit-tid').value = tid;
-        document.getElementById('edit-amount').value = amount;
+function openEditModal(tid, amount) {
+    const editTidInput = document.getElementById('edit-tid');
+    const editAmountInput = document.getElementById('edit-amount');
+    const editForm = document.getElementById('edit-form');
+    const modal = document.getElementById('edit-modal');
 
-        // Set the form's action URL dynamically
-        editForm.action = `/incharge/transaction/${tid}`;
-        modal.style.display = 'block';
+    if (!editTidInput || !editAmountInput || !editForm || !modal) {
+        console.error("Edit modal elements not found.");
+        return;
     }
+
+    // Ensure the actual amount value is retrieved
+    let actualAmount = parseFloat(amount);
+    
+    if (isNaN(actualAmount)) {
+        console.warn("Invalid amount value, setting to 0.000");
+        actualAmount = 0.000; // Default fallback value
+    }
+
+    // Set values in the modal
+    editTidInput.value = tid;
+    editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
+
+    // Set the form's action URL dynamically
+    editForm.action = `/supervisor/transaction/${tid}`;
+
+    // Show the modal
+    modal.style.display = 'block';
+}
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('edit-modal');
+    if (modal && event.target === modal) {
+        modal.style.display = 'none';
+    }
+});
 
     // Close the edit modal
     function closeEditModal() {
@@ -186,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const tid = document.getElementById('edit-tid').value;
         const amount = document.getElementById('edit-amount').value;
 
-        fetch(`/incharge/transaction/${tid}`, {
+        fetch(`/supervisor/transaction/${tid}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -277,7 +308,6 @@ closeBtn.addEventListener('click', () => {
 });
 </script>
 
-
 <script>
 // Wait for the document to be ready
 document.addEventListener("DOMContentLoaded", function() {
@@ -320,8 +350,6 @@ document.addEventListener("DOMContentLoaded", function() {
             tableBody.innerHTML = "";
             tableBody.appendChild(noDataRow);
         }
-
-
     });
 });
 </script>
@@ -329,8 +357,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <!-- CSS -->
 <style>
-
-
 .form-group {
     border: 1px solid #ddd;
     border-radius: 50px;
@@ -348,7 +374,7 @@ document.addEventListener("DOMContentLoaded", function() {
     background-color: var(--color-white);
     color: var(--color-dark);
     padding-left: 50px;
-}    
+}
 
 .row {
     display: flex;
@@ -454,6 +480,8 @@ document.addEventListener("DOMContentLoaded", function() {
     margin-top: 10px;
     font-size: 14px;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 .content {
     margin-left: 90px;
@@ -1235,6 +1263,7 @@ button:active {
 .warning {
     color: var(--color-warning);
 }
+
 
 
 /* @media (min-width: 1814px) { */
