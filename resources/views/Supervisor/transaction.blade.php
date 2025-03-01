@@ -9,6 +9,19 @@
     </div>
     <br><br>
 
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+
+
     <!-- Assigned Labs Dropdown -->
 
     <div class="row">
@@ -25,11 +38,6 @@
                 placeholder="Search by TID, Date, Name, or Center Name">
         </div>
     </div>
-
-    <!-- Search Input for Universal Search -->
-    <!-- <div class="form-group">
-        <label for="searchInput" style="color:#7f7f7f">Search Records:</label> -->
-
 
     <div class="table-container">
         <table class="transactions-table">
@@ -82,15 +90,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const editForm = document.getElementById('edit-form');
 
     // Fetch assigned labs
-    fetch(`/lab/assigned-labs`)
+    fetch('/lab/assigned-labs')
         .then((response) => response.json())
         .then((data) => {
             labDropdown.innerHTML = ''; // Clear existing options
 
             if (data.length === 0) {
-                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
+                labDropdown.innerHTML = '<option value="" disabled selected>No labs assigned</option>';
             } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Select a Lab</option>`;
+                labDropdown.innerHTML = '<option value="" disabled selected>Select a Lab</option>';
                 data.forEach((lab) => {
                     labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
                 });
@@ -98,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch((error) => {
             console.error('Error fetching labs:', error);
-            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
+            labDropdown.innerHTML = '<option value="" disabled selected>Error loading labs</option>';
         });
 
     // Fetch transactions on lab selection
@@ -106,21 +114,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const lid = labDropdown.value;
 
         fetch(`/lab/transactions?lid=${lid}`)
-    .then((response) => response.json())
-    .then((data) => {
-        transactionTableBody.innerHTML = '';
+            .then((response) => response.json())
+            .then((data) => {
+                transactionTableBody.innerHTML = '';
 
-        if (data.length === 0) {
-            transactionTableBody.innerHTML = `<tr>
+                if (data.length === 0) {
+                    transactionTableBody.innerHTML = `<tr>
                         <td colspan="8" class="text-center">No transactions found</td>
                     </tr>`;
-        } else {
-            data.forEach((transaction) => {
-                let smsDescriptions = transaction.sms.length
-                    ? transaction.sms.map((sms) => `<li>${sms.description}</li>`).join('')
-                    : '<li>N/A</li>';
+                } else {
+                    data.forEach((transaction) => {
+                        let smsDescriptions = transaction.sms.length ?
+                            transaction.sms.map((sms) => `<li>${sms.description}</li>`).join('') :
+                            '<li>N/A</li>';
 
-                transactionTableBody.innerHTML += `
+                        transactionTableBody.innerHTML += `
                     <tr>
                         <td>${transaction.tid}</td>
                         <td>${transaction.date}</td>
@@ -135,19 +143,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             </button>
                         </td>
                     </tr>`;
-            });
+                    });
 
-            // Attach event listeners to edit buttons
-            attachEditButtonListeners();
-        }
-    })
-    .catch((error) => {
-        console.error('Error fetching transactions:', error);
-        transactionTableBody.innerHTML = `<tr>
+                    // Attach event listeners to edit buttons
+                    attachEditButtonListeners();
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching transactions:', error);
+                transactionTableBody.innerHTML = `<tr>
                     <td colspan="8" class="text-center">Error loading transactions</td>
                 </tr>`;
-    });
-
+            });
     });
 
     // Attach event listeners to edit buttons
@@ -162,43 +169,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Open edit modal and populate fields
-function openEditModal(tid, amount) {
-    const editTidInput = document.getElementById('edit-tid');
-    const editAmountInput = document.getElementById('edit-amount');
-    const editForm = document.getElementById('edit-form');
-    const modal = document.getElementById('edit-modal');
+    function openEditModal(tid, amount) {
+        const editTidInput = document.getElementById('edit-tid');
+        const editAmountInput = document.getElementById('edit-amount');
+        const editForm = document.getElementById('edit-form');
+        const modal = document.getElementById('edit-modal');
 
-    if (!editTidInput || !editAmountInput || !editForm || !modal) {
-        console.error("Edit modal elements not found.");
-        return;
+        if (!editTidInput || !editAmountInput || !editForm || !modal) {
+            console.error("Edit modal elements not found.");
+            return;
+        }
+
+        // Ensure the actual amount value is retrieved
+        let actualAmount = parseFloat(amount);
+
+        if (isNaN(actualAmount)) {
+            console.warn("Invalid amount value, setting to 0.000");
+            actualAmount = 0.000; // Default fallback value
+        }
+
+        // Set values in the modal
+        editTidInput.value = tid;
+        editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
+
+        // Set the form's action URL dynamically
+        editForm.action = `/supervisor/transaction/${tid}`;
+
+        // Show the modal
+        modal.style.display = 'block';
     }
 
-    // Ensure the actual amount value is retrieved
-    let actualAmount = parseFloat(amount);
-    
-    if (isNaN(actualAmount)) {
-        console.warn("Invalid amount value, setting to 0.000");
-        actualAmount = 0.000; // Default fallback value
-    }
-
-    // Set values in the modal
-    editTidInput.value = tid;
-    editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
-
-    // Set the form's action URL dynamically
-    editForm.action = `/supervisor/transaction/${tid}`;
-
-    // Show the modal
-    modal.style.display = 'block';
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', (event) => {
-    const modal = document.getElementById('edit-modal');
-    if (modal && event.target === modal) {
-        modal.style.display = 'none';
-    }
-});
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        const modal = document.getElementById('edit-modal');
+        if (modal && event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 
     // Close the edit modal
     function closeEditModal() {
@@ -227,88 +234,24 @@ window.addEventListener('click', (event) => {
                     amount
                 }),
             })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    alert(data.message);
-
-                    // Update the amount directly in the table
-                    const row = document.querySelector(`button[data-id="${tid}"]`).closest('tr');
-                    row.querySelector('td:nth-child(5)').textContent = `LRK ${amount}`;
-
-                    // Close the modal
-                    closeEditModal();
+            .then((response) => {
+                if (response.ok) {
+                    // Redirect to the transactions page after successful update
+                    window.location.href = '/supervisor/transaction';
                 } else {
-                    alert('Failed to update amount.');
+                    // Handle server-side errors
+                    return response.json().then((data) => {
+                        throw new Error(data.message || 'Failed to update amount.');
+                    });
                 }
             })
             .catch((error) => {
                 console.error('Error updating amount:', error);
-                alert('An unexpected error occurred.');
+                alert(error.message || 'An unexpected error occurred.');
             });
-
     });
 });
-</script>
 
-<!-- JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.querySelector('.dark-mode');
-    const body = document.body;
-
-    darkModeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode-active');
-    });
-});
-</script>
-
-<script>
-const sideMenu = document.querySelector('aside');
-const menuBtn = document.getElementById('menu-btn');
-const closeBtn = document.getElementById('close-btn');
-const darkMode = document.querySelector('.dark-mode');
-
-// Toggle dark mode and save preference to local storage
-darkMode.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode-variables');
-    const isDarkMode = document.body.classList.contains('dark-mode-variables');
-
-    // Save the current mode in local storage
-    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-
-    // Toggle active states on the dark mode icons
-    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-});
-
-// Function to apply dark mode based on saved preference
-function applyDarkModePreference() {
-    const darkModePreference = localStorage.getItem('darkMode');
-    if (darkModePreference === 'enabled') {
-        document.body.classList.add('dark-mode-variables');
-        darkMode.querySelector('span:nth-child(1)').classList.remove('active');
-        darkMode.querySelector('span:nth-child(2)').classList.add('active');
-    } else {
-        document.body.classList.remove('dark-mode-variables');
-        darkMode.querySelector('span:nth-child(1)').classList.add('active');
-        darkMode.querySelector('span:nth-child(2)').classList.remove('active');
-    }
-}
-
-// Apply dark mode preference on page load
-window.addEventListener('load', applyDarkModePreference);
-
-menuBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'block';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'none';
-});
-</script>
-
-<script>
 // Wait for the document to be ready
 document.addEventListener("DOMContentLoaded", function() {
     // Get the search input field and table rows
@@ -352,6 +295,8 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
+
+
 </script>
 
 
@@ -480,8 +425,6 @@ document.addEventListener("DOMContentLoaded", function() {
     margin-top: 10px;
     font-size: 14px;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 .content {
     margin-left: 90px;
@@ -1267,102 +1210,103 @@ button:active {
 
 
 /* @media (min-width: 1814px) { */
-@media (min-width: 1100px) and (max-width: 1350px){
-.form-group {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
+@media (min-width: 1100px) and (max-width: 1350px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
 
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .dropdown {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 45%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+        font-size: 0.8rem;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 80px;
+
+    }
 }
 
-.dropdown {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 45%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
+@media (min-width: 1338px) and (max-width: 1590px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .dropdown {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 50%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 150px;
+
+    }
 }
-
-.form-control {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 50px;
-    font-size: 0.8rem;
-}
-
-.form-controler {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 3px;
-}
-
-
-/* Container for the cards */
-.row {
-    display: flex;
-    /* flex-wrap: wrap; */
-    /* justify-content: space-between; */
-    gap: 80px;
-
-}}
-
-@media (min-width: 1338px) and (max-width: 1590px){
-.form-group {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
-}
-
-.dropdown {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 50%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
-}
-
-.form-control {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 50px;
-}
-
-.form-controler {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 3px;
-}
-
-
-/* Container for the cards */
-.row {
-    display: flex;
-    /* flex-wrap: wrap; */
-    /* justify-content: space-between; */
-    gap: 150px;
-
-}}
-
 </style>
 
 @endsection

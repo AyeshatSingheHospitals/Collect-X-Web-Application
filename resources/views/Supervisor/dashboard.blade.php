@@ -1419,13 +1419,26 @@ h1 {
         <h1>Dashboard</h1>
     </div>
     <br>
-    <!-- Analyses -->
-    <div class="analyse">
+
+    <div class="row">
+        <input type="hidden" name="uid" value="{{ session('uid') }}">
+
+        <!-- Assigned Labs as Stylish Radio Buttons -->
+        <div class="form-group1">
+            <label style="color:#7f7f7f; font-size: 18px; font-weight: bold;">Select your Lab :</label>
+            <div id="labOptions" class="radio-container">
+                <p>Loading...</p> <!-- Placeholder while fetching data -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyses Section -->
+    <div class="analyse" id="analyseSection" style="display:none;">
         <div class="sales">
             <div class="status">
                 <div class="info">
                     <h3>Total Sales</h3>
-                    <h1>$65,024</h1>
+                    <h1 id="totalSales"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
@@ -1437,27 +1450,12 @@ h1 {
                 </div>
             </div>
         </div>
-        <div class="searches">
-            <div class="status">
-                <div class="info">
-                    <h3>Total Laboratories</h3>
-                    <h1>14,147</h1>
-                </div>
-                <div class="progresss">
-                    <svg>
-                        <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div class="percentage">
-                    <i class='bx bxs-building-house' ></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         <div class="visits">
             <div class="status">
                 <div class="info">
                     <h3>Total Routes</h3>
-                    <h1>24,981</h1>
+                    <h1 id="totalRoutes"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
@@ -1473,7 +1471,7 @@ h1 {
             <div class="status">
                 <div class="info">
                     <h3>Total Centers</h3>
-                    <h1>14,147</h1>
+                    <h1 id="totalCenters"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
@@ -1485,43 +1483,12 @@ h1 {
                 </div>
             </div>
         </div>
-        <div class="labassigns">
-            <div class="status">
-                <div class="info">
-                    <h3>Total Laboratory Assigns</h3>
-                    <h1>14,147</h1>
-                </div>
-                <div class="progresss">
-                    <svg>
-                        <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div class="percentage">
-                    <i class='bx bx-building-house' ></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="routeassigns">
-            <div class="status">
-                <div class="info">
-                    <h3>Total Route Assigns</h3>
-                    <h1>14,147</h1>
-                </div>
-                <div class="progresss">
-                    <svg>
-                        <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div class="percentage">
-                    <i class='bx bx-location-plus' ></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+       
         <div class="incharges">
             <div class="status">
                 <div class="info">
                     <h3>Total Relationship Officers</h3>
-                    <h1>14,147</h1>
+                    <h1 id="totalIncharges"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
@@ -1534,35 +1501,131 @@ h1 {
             </div>
         </div>
     </div>
-    <!-- End of Analyses -->
 
-    <!-- New Users Section -->
-
-    <!-- End of New Users Section -->
-    <br>
-    <!-- Recent Orders Table -->
-    <!-- <div class="recent-orders">
-        <h2>Today Route Assigns</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Course Number</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <a href="#">Show All</a>
-    </div> -->
-    <!-- End of Recent Orders -->
-
+    <!-- Loading GIF -->
+    <div id="loadingGif" style="text-align:center; display:block;">
+        <img src="path/to/your/loading.gif" alt="Loading..." />
+    </div>
 </main>
-<!-- End of Main Content -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const labOptionsContainer = document.getElementById('labOptions');
+    const analyseSection = document.getElementById('analyseSection');
+    const loadingGif = document.getElementById('loadingGif');
+
+    // Hide analysis section initially and show loading GIF
+    analyseSection.style.display = 'none';
+    loadingGif.style.display = 'block';
+
+    // Fetch assigned labs
+    fetch(`/lab/assigned-labs`)
+        .then(response => response.json())
+        .then(data => {
+            labOptionsContainer.innerHTML = ''; // Clear existing options
+
+            if (data.length === 0) {
+                labOptionsContainer.innerHTML = `<p>No labs assigned</p>`;
+            } else {
+                data.forEach(lab => {
+                    labOptionsContainer.innerHTML += `
+                        <label class="lab-option">
+                            <input type="radio" name="lid" value="${lab.lid}" required>
+                            <span>${lab.name}</span>
+                        </label>
+                    `;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching labs:', error);
+            labOptionsContainer.innerHTML = `<p>Error loading labs</p>`;
+        });
+
+    // Listen for radio button change to fetch the selected lab details
+    labOptionsContainer.addEventListener('change', function(e) {
+        if (e.target.name === 'lid') {
+            const labId = e.target.value;
+
+            // Fetch details for the selected lab
+            fetch(`/dashboard/lab-details`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({ lid: labId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update dashboard with the new data
+                document.getElementById('totalSales').textContent = `Rs.${data.totalSales.toLocaleString()}`;
+                document.getElementById('totalRoutes').textContent = data.totalRoutes.toLocaleString();
+                document.getElementById('totalCenters').textContent = data.totalCenters.toLocaleString();
+                document.getElementById('totalIncharges').textContent = data.totalIncharges.toLocaleString();
+                
+                // Hide the loading GIF and show the analysis section
+                loadingGif.style.display = 'none';
+                analyseSection.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error fetching lab details:', error);
+            });
+        }
+    });
+});
+</script>
 
 
+
+<style>
+/* Flex container for radio buttons (Single Row Layout) */
+.radio-container {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping if too many items */
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px;
+}
+
+/* Beautiful Radio Button Styling */
+.lab-option {
+    display: flex;
+    align-items: center;
+    background: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.lab-option input[type="radio"] {
+    display: none; /* Hide default radio button */
+}
+
+/* Style when radio button is selected */
+.lab-option input[type="radio"]:checked + span {
+    background: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.lab-option:hover {
+    border: 2px solid #28a745;
+    color: #28a745;
+}
+
+/* Ensuring text inside buttons is centered */
+.lab-option span {
+    padding: 5px 10px;
+}
+</style>
 
 </div>
 

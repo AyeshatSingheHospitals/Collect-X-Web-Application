@@ -254,13 +254,12 @@ Route::post('/route-assign/store', [RouteAssignBySupervisorController::class, 's
 
 //transaction
 Route::get('supervisor/transaction', function () {
-    return view('supervisor.transaction');
+    return view('supervisor.transaction.index');
 });
 
 // transaction
 
-Route::get('/supervisor/transactions', [TransactionController::class, 'indexSupervisor'])->name('supervisor.transactions.index');
-Route::get('/supervisor/transactions/{tid}', [TransactionController::class, 'showSupervisor'])->name('supervisor.transactions.show');
+Route::get('/supervisor/transaction', [TransactionController::class, 'indexSupervisor'])->name('supervisor.transaction.index');
 Route::put('/supervisor/transaction/{tid}', [TransactionController::class, 'updateAmountSupervisor'])->name('supervisor.transaction.updateAmount');
 
 
@@ -287,6 +286,9 @@ Route::get('/lab/assignments', [LabAssignController::class, 'getLabAssignments']
 // common route for transaction dropdown select and view record regarding to selected lab by supervisor and incharge
 Route::get('/lab/transactions', [TransactionController::class, 'getTransactions'])->name('transactions.byLab');
 
+
+
+Route::post('/dashboard/lab-details', [DashboardController::class, 'getLabDetails']);
 
 
 

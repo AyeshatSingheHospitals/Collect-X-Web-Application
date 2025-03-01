@@ -37,4 +37,31 @@ class DashboardController extends Controller
             'labassignCount', 'totalSales', 'todaySales'
         ));
     }
+
+    public function getLabDetails(Request $request)
+    {
+        $labId = $request->input('lid');
+
+        if (!$labId) {
+            return response()->json(['error' => 'Lab ID is required'], 400);
+        }
+
+        // Fetch data based on the selected lab ID
+        $totalSales = Transaction::where('cid', $labId)->sum('amount'); // Sum of amounts for the selected center
+        $totalRoutes = Route::where('lid', $labId)->count(); // Count of routes for the selected lab
+        $totalCenters = Center::where('lid', $labId)->count(); // Count of centers for the selected lab
+        // Get count of ROs assigned to the selected lab
+        $totalIncharges = LabAssign::where('lid', $labId)
+            ->join('systemuser', 'labassign.uid_assign', '=', 'systemuser.uid')
+            ->where('systemuser.role', 'RO') // Filter by "RO" role
+            ->count();  // Count of relationship officers for the selected lab
+
+        // Return the data as JSON response
+        return response()->json([
+            'totalSales' => $totalSales,
+            'totalRoutes' => $totalRoutes,
+            'totalCenters' => $totalCenters,
+            'totalIncharges' => $totalIncharges,
+        ]);
+    }
 }
