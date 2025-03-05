@@ -13,20 +13,14 @@
     --color-danger: #FF0060;
     --color-success: #1B9C85;
     --color-warning: #F7D060;
-    --color-pink: #E79796;
-    --color-orange: #FF8357;
-    --color-orange2: #E25B45;
-    --color-purple: #8e94f2;
-    --color-green: #ADC865;
-    --color-blue: #85CBCC;
     --color-white: #fff;
     --color-info-dark: #7d8da1;
     --color-dark: #363949;
     --color-light: rgba(132, 139, 200, 0.18);
     --color-dark-variant: #677483;
     --color-background: #f6f6f9;
-    --color-pop: #fff;
-    --color-pointer:#f0f0f0;
+    --color-chack: #181a1e;
+
 
     --card-border-radius: 2rem;
     --border-radius-1: 0.4rem;
@@ -41,6 +35,7 @@
 .dark-mode-variables {
     --color-background: #181a1e;
     --color-white: #202528;
+    --color-chack: #f6f6f9;
     --color-dark: #edeffd;
     --color-dark-variant: #a3bdcc;
     --color-light: rgba(0, 0, 0, 0.4);
@@ -66,7 +61,6 @@ body {
     height: 100vh;
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
-    user-select: none;
     overflow-x: hidden;
     color: var(--color-dark);
     background-color: var(--color-background);
@@ -302,59 +296,47 @@ main .analyse .visits svg circle {
     stroke-dasharray: 200;
 }
 
-main .analyse .searches svg circle {
-    stroke: var(--color-primary);
+main .analyse .centers svg circle {
+    stroke: var(--color-warning);
     stroke-dashoffset: -30;
     stroke-dasharray: 200;
 }
 
-main .analyse .visits svg circle {
-        stroke: var(--color-primary);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
+main .analyse .searches svg circle {
+    stroke: var(--color-danger);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
 
-    main .analyse .centers svg circle {
-        stroke: var(--color-warning);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
+main .analyse .ros svg circle {
+    stroke: var(--color-pink);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
 
-    main .analyse .searches svg circle {
-        stroke: var(--color-danger);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
+main .analyse .labassigns svg circle {
+    stroke: var(--color-orange);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
 
-    main .analyse .ros svg circle {
-        stroke: var(--color-pink);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
+main .analyse .routeassigns svg circle {
+    stroke: var(--color-purple);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
 
-    main .analyse .labassigns svg circle {
-        stroke: var(--color-orange);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
+main .analyse .supervisors svg circle {
+    stroke: var(--color-green);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
 
-    main .analyse .routeassigns svg circle {
-        stroke: var(--color-purple);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
-
-    main .analyse .supervisors svg circle {
-        stroke: var(--color-green);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
-
-    main .analyse .incharges svg circle {
-        stroke: var(--color-blue);
-        stroke-dashoffset: -30;
-        stroke-dasharray: 200;
-    }
+main .analyse .incharges svg circle {
+    stroke: var(--color-primary);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
 
 main .analyse .progresss .percentage {
     position: absolute;
@@ -601,6 +583,265 @@ main .recent-orders a {
     gap: 0.6rem;
 }
 
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.right-section {
+    display: flex;
+    align-items: center;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    /* Adjust the gap between items */
+}
+
+.dark-mode {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* Space between light and dark mode icons */
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-photo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+#menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.material-icons-sharp {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+
+@media screen and (max-width: 1200px) {
+    .container1 {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section1 {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    .container1 {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section1 {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
+}
+
 @media screen and (max-width: 1200px) {
     .container {
         width: 95%;
@@ -624,9 +865,37 @@ main .recent-orders a {
         margin-top: 1.8rem;
     }
 
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        cursor: pointer;
+    }
+
     main .analyse {
-        grid-template-columns: 1fr;
-        gap: 0;
+        grid-template-columns: 2fr 2fr 2fr;
+        gap: 20px;
     }
 
     main .new-users .user-list .user {
@@ -714,6 +983,11 @@ main .recent-orders a {
         padding: 0 1rem;
     }
 
+    main .analyse {
+        grid-template-columns: 2fr 2fr 2fr;
+        gap: 0;
+    }
+
     main .new-users .user-list .user {
         flex-basis: 35%;
     }
@@ -773,60 +1047,370 @@ main .recent-orders a {
 
 }
 
-.top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+@media screen and (max-width: 548px) {
+    .container {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .analyse {
+        grid-template-columns: 2fr;
+        gap: 0;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
 }
 
-h1 {
-    margin: 0;
-    font-size: 24px;
+@media (min-width: 548px) and (max-width: 719px) {
+    .container {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
+
+    aside .logo {
+        margin-left: 1rem;
+    }
+
+    aside .logo h2 {
+        display: inline;
+    }
+
+    aside .sidebar h3 {
+        display: inline;
+    }
+
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .analyse {
+        grid-template-columns: 2fr;
+        gap: 0;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
 }
 
-.right-section {
-    display: flex;
-    align-items: center;
-}
+/* @media screen and (max-width: 548px) */
+@media (min-width:719px) and (max-width: 1040px) {
+    .container {
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
 
-.nav {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    /* Adjust the gap between items */
-}
+    aside {
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
 
-.dark-mode {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    /* Space between light and dark mode icons */
-}
+    @keyframes showMenu {
+        to {
+            left: 0;
+        }
+    }
 
-.profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+    aside .logo {
+        margin-left: 1rem;
+    }
 
-.profile-photo img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
+    aside .logo h2 {
+        display: inline;
+    }
 
-#menu-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
+    aside .sidebar h3 {
+        display: inline;
+    }
 
-.material-icons-sharp {
-    font-size: 24px;
-    cursor: pointer;
+    aside .sidebar a {
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child {
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    main {
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .analyse {
+        grid-template-columns: 2fr 2fr;
+        gap: 10px;
+    }
+
+    main .new-users .user-list .user {
+        flex-basis: 35%;
+    }
+
+    main .recent-orders {
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table {
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section {
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode {
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info {
+        display: none;
+    }
+
+    .right-section .nav button {
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span {
+        font-size: 2rem;
+    }
+
 }
 </style>
-
 
 <!-- <div class="container"> -->
 <!-- Main Content -->
@@ -835,13 +1419,26 @@ h1 {
         <h1>Dashboard</h1>
     </div>
     <br>
-    <!-- Analyses -->
-    <div class="analyse">
+
+    <div class="row">
+        <input type="hidden" name="uid" value="{{ session('uid') }}">
+
+        <!-- Assigned Labs as Stylish Radio Buttons -->
+        <div class="form-group1">
+            <!-- <label style="color:#7f7f7f; font-size: 18px; font-weight: bold;">Select your Lab :</label> -->
+            <div id="labOptions" class="radio-container">
+                <p>Loading...</p> <!-- Placeholder while fetching data -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Analyses Section -->
+    <div class="analyse" id="analyseSection" style="display:none;">
         <div class="sales">
             <div class="status">
                 <div class="info">
                     <h3>Total Sales</h3>
-                    <h1>$65,024</h1>
+                    <h1 id="totalSales"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
@@ -853,34 +1450,19 @@ h1 {
                 </div>
             </div>
         </div>
-        <div class="searches">
-            <div class="status">
-                <div class="info">
-                    <h3>Total Laboratories</h3>
-                    <h1>14,147</h1>
-                </div>
-                <div class="progresss">
-                    <svg>
-                        <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div class="percentage">
-                    <i class='bx bxs-building-house' ></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+
         <div class="visits">
             <div class="status">
                 <div class="info">
                     <h3>Total Routes</h3>
-                    <h1>24,981</h1>
+                    <h1 id="totalRoutes"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bxs-location-plus'></i>
+                        <i class='bx bxs-location-plus'></i>
                     </div>
                 </div>
             </div>
@@ -889,96 +1471,190 @@ h1 {
             <div class="status">
                 <div class="info">
                     <h3>Total Centers</h3>
-                    <h1>14,147</h1>
+                    <h1 id="totalCenters"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bx-buildings'></i>
+                        <i class='bx bx-buildings'></i>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="labassigns">
-            <div class="status">
-                <div class="info">
-                    <h3>Total Laboratory Assigns</h3>
-                    <h1>14,147</h1>
-                </div>
-                <div class="progresss">
-                    <svg>
-                        <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div class="percentage">
-                    <i class='bx bx-building-house' ></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="routeassigns">
-            <div class="status">
-                <div class="info">
-                    <h3>Total Route Assigns</h3>
-                    <h1>14,147</h1>
-                </div>
-                <div class="progresss">
-                    <svg>
-                        <circle cx="38" cy="38" r="36"></circle>
-                    </svg>
-                    <div class="percentage">
-                    <i class='bx bx-location-plus' ></i>
-                    </div>
-                </div>
-            </div>
-        </div>
+
         <div class="incharges">
             <div class="status">
                 <div class="info">
                     <h3>Total Relationship Officers</h3>
-                    <h1>14,147</h1>
+                    <h1 id="totalIncharges"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bxs-user-voice' ></i>
+                        <i class='bx bxs-user-voice'></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- End of Analyses -->
 
-    <!-- New Users Section -->
-
-    <!-- End of New Users Section -->
-    <br>
-    <!-- Recent Orders Table -->
-    <!-- <div class="recent-orders">
-        <h2>Today Route Assigns</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Course Number</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <a href="#">Show All</a>
-    </div> -->
-    <!-- End of Recent Orders -->
-
+    <!-- Loading GIF -->
+    <!-- <div class="col-12 mt-5 center-align-container"> -->
+    <div id="loadingGif"  >
+        <!-- <img src="path/to/your/loading.gif" alt="Loading..." /> -->
+        <img src="{{ asset('../image/Data Analytics - Animation.gif') }}" alt="Loading..." class="col-12 mt-5 center-align-container"
+            style="max-width: 500px; border-radius:50%; text-align:center; display:block;">
+        <!-- </div> -->
+    </div>
 </main>
-<!-- End of Main Content -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const labOptionsContainer = document.getElementById('labOptions');
+    const analyseSection = document.getElementById('analyseSection');
+    const loadingGif = document.getElementById('loadingGif');
+
+    // Hide analysis section initially and show loading GIF
+    analyseSection.style.display = 'none';
+    loadingGif.style.display = 'block';
+
+    // Fetch assigned labs
+    fetch(`/lab/assigned-labs`)
+        .then(response => response.json())
+        .then(data => {
+            labOptionsContainer.innerHTML = ''; // Clear existing options
+
+            if (data.length === 0) {
+                labOptionsContainer.innerHTML = `<p>No labs assigned</p>`;
+            } else {
+                data.forEach(lab => {
+                    labOptionsContainer.innerHTML += `
+                        <label class="lab-option">
+                            <input type="radio" name="lid" value="${lab.lid}" required>
+                            <span>${lab.name}</span>
+                        </label>
+                    `;
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching labs:', error);
+            labOptionsContainer.innerHTML = `<p>Error loading labs</p>`;
+        });
+
+    // Listen for radio button change to fetch the selected lab details
+    labOptionsContainer.addEventListener('change', function(e) {
+        if (e.target.name === 'lid') {
+            const labId = e.target.value;
+
+            // Fetch details for the selected lab
+            fetch(`/dashboard/lab-details`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content'),
+                    },
+                    body: JSON.stringify({
+                        lid: labId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update dashboard with the new data
+                    document.getElementById('totalSales').textContent =
+                        `Rs.${data.totalSales.toLocaleString()}`;
+                    document.getElementById('totalRoutes').textContent = data.totalRoutes
+                        .toLocaleString();
+                    document.getElementById('totalCenters').textContent = data.totalCenters
+                        .toLocaleString();
+                    document.getElementById('totalIncharges').textContent = data.totalIncharges
+                        .toLocaleString();
+
+                    // Hide the loading GIF and show the analysis section
+                    loadingGif.style.display = 'none';
+                    analyseSection.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching lab details:', error);
+                });
+        }
+    });
+});
+</script>
 
 
+
+<style>
+#loadingGif {
+    display: flex;
+    justify-content: center;
+    /* Horizontally center */
+    align-items: center;
+    /* Vertically center */
+    text-align: center;
+    /* Align the text in the center */
+    flex-direction: column;
+    /* Stack the image and text vertically */
+    padding-top: 9%;
+    padding-left:28%;
+}
+
+
+/* Flex container for radio buttons (Single Row Layout) */
+.radio-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows wrapping if too many items */
+    gap: 10px;
+    /* Space between buttons */
+    margin-top: 10px;
+}
+
+/* Beautiful Radio Button Styling */
+.lab-option {
+    display: flex;
+    align-items: center;
+    background:var(--color-pointer1);
+    padding: 5px 10px;
+    border-radius: 25px;
+    font-size: 12px;
+    font-weight: 600;
+    color:var(--color-pointer2);
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    border: 2px solid transparent;
+}
+
+.lab-option input[type="radio"] {
+    display: none;
+    /* Hide default radio button */
+}
+
+/* Style when radio button is selected */
+.lab-option input[type="radio"]:checked+span {
+    background:  #8e94f2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Hover Effect */
+.lab-option:hover {
+    border: 2px solid  #8e94f2;
+    color:  #8e94f2;
+}
+
+/* Ensuring text inside buttons is centered */
+.lab-option span {
+    padding: 5px 10px;
+}
+</style>
 
 </div>
 

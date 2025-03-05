@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Systemuser;
+use App\Models\SystemuserLog;
+
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Hash;
@@ -50,6 +52,23 @@ class SystemuserController extends Controller
         // Save the user to the database
         $users->save();
 
+        $loggedUid = session('uid',0); 
+            
+        SystemuserLog::create([
+            'logged_uid' => $loggedUid,
+            'uid' => $users->uid,
+            'role' => $users->role,
+            'fname' => $users->fname,
+            'lname' => $users->lname,
+            'contact' => $users->contact,
+            'epf' => $users->epf,
+            'username' => $users->username,
+            'password' => $users->password, // Hash the password
+            'status' => $users->status,
+            'image' => $users->image,// Save image if uploaded
+            'action' => 'inserted',
+        ]);
+
         // Redirect or return with success message
         return redirect()->route('admin.user.index')->with('success', 'User added successfully');
     }
@@ -94,6 +113,25 @@ class SystemuserController extends Controller
             'image' => $request->image ? $request->image->store('images', 'public') : $user->image,
         ]);
 
+        
+        $loggedUid = session('uid',0); 
+
+
+        SystemuserLog::create([
+            'logged_uid' => $loggedUid,
+            'uid' => $user->uid,
+            'role' => $user->role,
+            'fname' => $user->fname,
+            'lname' => $user->lname,
+            'contact' => $user->contact,
+            'epf' => $user->epf,
+            'username' => $user->username,
+            'password' => $user->password, // Hash the password
+            'status' => $user->status,
+            'image' => $user->image,// Save image if uploaded
+            'action' => 'updated',
+        ]);
+
         return redirect()->route('admin.user.index')->with('success', 'User updated successfully');
     }
 
@@ -131,6 +169,25 @@ public function updatePassword(Request $request)
     // Update the password
     $user->password = $request->newPassword;
     $user->save();
+
+
+    $loggedUid = session('uid',0); 
+
+    // $user = Systemuser::findOrFail($id);
+    SystemuserLog::create([
+        'logged_uid' => $loggedUid,
+        'uid' => $user->uid,
+        'role' => $user->role,
+        'fname' => $user->fname,
+        'lname' => $user->lname,
+        'contact' => $user->contact,
+        'epf' => $user->epf,
+        'username' => $user->username,
+        'password' => $user->password, // Hash the password
+        'status' => $user->status,
+        'image' => $user->image,// Save image if uploaded
+        'action' => 'reset password',
+    ]);
 
     // Redirect with success message
     return redirect()->route('admin.user.index')->with('success', 'Password updated successfully');

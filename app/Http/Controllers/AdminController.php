@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Systemuser;
+use App\Models\SystemuserLog;
+
 use Illuminate\Support\Facades\Session;
 
 
@@ -41,6 +43,25 @@ class AdminController extends Controller
         // Update the password
         $user->password = $request->new_password;
         $user->save();
+
+                
+    $loggedUid = session('uid',0); 
+
+    // $user = Systemuser::findOrFail($id);
+    SystemuserLog::create([
+        'logged_uid' => $loggedUid,
+        'uid' => $user->uid,
+        'role' => $user->role,
+        'fname' => $user->fname,
+        'lname' => $user->lname,
+        'contact' => $user->contact,
+        'epf' => $user->epf,
+        'username' => $user->username,
+        'password' => $user->password, // Hash the password
+        'status' => $user->status,
+        'image' => $user->image,// Save image if uploaded
+        'action' => 'changed password',
+    ]);
 
           // Log the user out and clear session data
     Auth::logout();
@@ -85,6 +106,25 @@ return redirect()->route('admin.logout')->with('success', 'Password changed succ
         $user->password = $request->new_password;
         $user->save();
 
+                
+    $loggedUid = session('uid',0); 
+
+    // $user = Systemuser::findOrFail($id);
+    SystemuserLog::create([
+        'logged_uid' => $loggedUid,
+        'uid' => $user->uid,
+        'role' => $user->role,
+        'fname' => $user->fname,
+        'lname' => $user->lname,
+        'contact' => $user->contact,
+        'epf' => $user->epf,
+        'username' => $user->username,
+        'password' => $user->password, // Hash the password
+        'status' => $user->status,
+        'image' => $user->image,// Save image if uploaded
+        'action' => 'changed password',
+    ]);
+
           // Log the user out and clear session data
     Auth::logout();
     Session::flush();
@@ -128,6 +168,25 @@ return redirect()->route('incharge.logout')->with('success', 'Password changed s
         $user->password = $request->new_password;
         $user->save();
 
+
+                
+    $loggedUid = session('uid',0); 
+
+    // $user = Systemuser::findOrFail($id);
+    SystemuserLog::create([
+        'logged_uid' => $loggedUid,
+        'uid' => $user->uid,
+        'role' => $user->role,
+        'fname' => $user->fname,
+        'lname' => $user->lname,
+        'contact' => $user->contact,
+        'epf' => $user->epf,
+        'username' => $user->username,
+        'password' => $user->password, // Hash the password
+        'status' => $user->status,
+        'image' => $user->image,// Save image if uploaded
+        'action' => 'changed password',
+    ]);
           // Log the user out and clear session data
     Auth::logout();
     Session::flush();

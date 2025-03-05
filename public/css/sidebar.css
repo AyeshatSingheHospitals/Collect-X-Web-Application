@@ -20,6 +20,8 @@
     --color-table:#f1f1f1;
     --color-thover:#fafafa;
     --color-input:#ddd;
+    --color-pointer1:#f0f0f0;
+    --color-pointer2:#555;
 
     --card-border-radius: 2rem;
     --border-radius-1: 0.4rem;
@@ -43,6 +45,8 @@
     --color-pointer:#363949;
     --color-table:#15181a;
     --color-thover:#181a1e;
+    --color-pointer1:#000000;
+    --color-pointer2:#dfdada;
 }
 
 .top-bar {

@@ -21,7 +21,6 @@
     @endif
     <div class="container1">
 
-
         <!-- Left Section (Cards) -->
         <div class="left-section">
             <!-- Search Bar -->
@@ -50,12 +49,10 @@
                         <i class='bx bx-reset' style="color: #FF0060;"></i>
                     </div>
 
-
                 </div>
             </div>
             @endforeach
         </div>
-
 
         <!-- Right Section (Form) -->
         <div class="right-section1">
@@ -81,7 +78,6 @@
                                 <label class="radio__label" for="roleRO"> RO </label>
                             </div>
 
-
                             <div class="www">
                                 <div>
                                     <input type="radio" class="checks" name="status" id="active" value="active"
@@ -104,6 +100,8 @@
                 </div>
 
                 <br><br>
+
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
 
                 <input type="hidden" id="userId" name="userId">
 
@@ -161,13 +159,14 @@
                 <!-- Image -->
                 <div class="form-group form-group-full-width">
                     <label for="image">Profile Image</label>
-                    <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+                    <input type="file" id="image" name="image" class="form-control" accept="image/*">
                     <small id="imageLabel" style="display: none; color: gray;"></small>
                 </div>
                 <br><br>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary" class="new" class="form-group">Register</button>
+                <button type="submit" id="submitButton" class="btn btn-primary" class="new"
+                    class="form-group">Register</button>
             </form>
 
             <!-- Password Reset Form (Initially Hidden) -->
@@ -175,16 +174,8 @@
                 <form id="resetPasswordForm" action="{{ route('update-password') }}" method="POST">
                     @csrf
 
-                    <!-- Display user name (dynamically populated) -->
-                    <div class="form-group form-group-full-width">
-                        <!-- <label for="userNameDisplay">User Name</label> -->
-                        <!-- <span id="userNameDisplay" class="form-control" readonly></span> -->
-                        <!-- <h3 id="userNameDisplay" class="form-control" readonly></h3> -->
-                    </div>
-
                     <h3 class="text"><i class="bx bxs-user-circle"></i> <span id="userNameDisplay" class="form-control"
                             readonly></span></h3>
-
                     <br>
 
                     <input type="hidden" id="resetUserId" name="resetUserId">
@@ -340,6 +331,7 @@ function editUser(element) {
 
             if (passwordField) {
                 passwordField.style.display = "none";
+                passwordField.removeAttribute("required");
             }
             if (passwordLabel) {
                 passwordLabel.style.display = "none";
@@ -367,7 +359,6 @@ function editUser(element) {
         })
         .catch(error => console.error('Error fetching user:', error));
 }
-
 
 document.getElementById('userForm').addEventListener('reset', () => {
     const form = document.getElementById('userForm');
@@ -401,50 +392,50 @@ function showUserForm() {
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-            const password = document.getElementById("password");
-            // const confirmPassword = document.getElementById("confirmPassword");
-            const passwordStrength = document.getElementById("password-strength1");
-            // const passwordMatch = document.getElementById("password-match");
-            // const form = document.getElementById("resetPasswordForm");
+    const password = document.getElementById("password");
+    // const confirmPassword = document.getElementById("confirmPassword");
+    const passwordStrength = document.getElementById("password-strength1");
+    // const passwordMatch = document.getElementById("password-match");
+    // const form = document.getElementById("resetPasswordForm");
 
-            // Function to check password strength
-            function checkPasswordStrength(password) {
-                if (password.length < 8) return {
-                    strength: "Too short ❌",
-                    color: "#FF0060"
-                };
-                if (!/[A-Z]/.test(password)) return {
-                    strength: "Must include an uppercase letter ❌",
-                    color: "#FF0060"
-                };
-                if (!/[a-z]/.test(password)) return {
-                    strength: "Must include a lowercase letter ❌",
-                    color: "#FF0060"
-                };
-                if (!/\d/.test(password)) return {
-                    strength: "Must include a number ❌",
-                    color: "#FF0060"
-                };
-                if (!/[\W]/.test(password)) return {
-                    strength: "Must include a special character ❌",
-                    color: "#FF0060"
-                };
-                return {
-                    strength: "Strong ✅",
-                    color: "green"
-                };
-            }
+    // Function to check password strength
+    function checkPasswordStrength(password) {
+        if (password.length < 8) return {
+            strength: "Too short ❌",
+            color: "#FF0060"
+        };
+        if (!/[A-Z]/.test(password)) return {
+            strength: "Must include an uppercase letter ❌",
+            color: "#FF0060"
+        };
+        if (!/[a-z]/.test(password)) return {
+            strength: "Must include a lowercase letter ❌",
+            color: "#FF0060"
+        };
+        if (!/\d/.test(password)) return {
+            strength: "Must include a number ❌",
+            color: "#FF0060"
+        };
+        if (!/[\W]/.test(password)) return {
+            strength: "Must include a special character ❌",
+            color: "#FF0060"
+        };
+        return {
+            strength: "Strong ✅",
+            color: "green"
+        };
+    }
 
-            // Password strength validation
-            password.addEventListener("input", function() {
-                const {
-                    strength,
-                    color
-                } = checkPasswordStrength(password.value);
-                passwordStrength.textContent = strength;
-                passwordStrength.style.color = color;
-            });
-        });
+    // Password strength validation
+    password.addEventListener("input", function() {
+        const {
+            strength,
+            color
+        } = checkPasswordStrength(password.value);
+        passwordStrength.textContent = strength;
+        passwordStrength.style.color = color;
+    });
+});
 </script>
 
 <script>

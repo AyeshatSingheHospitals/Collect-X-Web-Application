@@ -291,7 +291,7 @@ main .analyse .sales svg circle {
 }
 
 main .analyse .visits svg circle {
-    stroke: var(--color-primary);
+    stroke: var(--color-danger);
     stroke-dashoffset: -30;
     stroke-dasharray: 200;
 }
@@ -333,7 +333,7 @@ main .analyse .supervisors svg circle {
 }
 
 main .analyse .incharges svg circle {
-    stroke: var(--color-blue);
+    stroke: var(--color-primary);
     stroke-dashoffset: -30;
     stroke-dasharray: 200;
 }
@@ -1425,7 +1425,7 @@ h1 {
 
         <!-- Assigned Labs as Stylish Radio Buttons -->
         <div class="form-group1">
-            <label style="color:#7f7f7f; font-size: 18px; font-weight: bold;">Select your Lab :</label>
+            <!-- <label style="color:#7f7f7f; font-size: 18px; font-weight: bold;">Select your Lab :</label> -->
             <div id="labOptions" class="radio-container">
                 <p>Loading...</p> <!-- Placeholder while fetching data -->
             </div>
@@ -1450,7 +1450,7 @@ h1 {
                 </div>
             </div>
         </div>
-        
+
         <div class="visits">
             <div class="status">
                 <div class="info">
@@ -1462,7 +1462,7 @@ h1 {
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bxs-location-plus'></i>
+                        <i class='bx bxs-location-plus'></i>
                     </div>
                 </div>
             </div>
@@ -1478,12 +1478,12 @@ h1 {
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bx-buildings'></i>
+                        <i class='bx bx-buildings'></i>
                     </div>
                 </div>
             </div>
         </div>
-       
+
         <div class="incharges">
             <div class="status">
                 <div class="info">
@@ -1495,7 +1495,7 @@ h1 {
                         <circle cx="38" cy="38" r="36"></circle>
                     </svg>
                     <div class="percentage">
-                    <i class='bx bxs-user-voice' ></i>
+                        <i class='bx bxs-user-voice'></i>
                     </div>
                 </div>
             </div>
@@ -1503,8 +1503,12 @@ h1 {
     </div>
 
     <!-- Loading GIF -->
-    <div id="loadingGif" style="text-align:center; display:block;">
-        <img src="path/to/your/loading.gif" alt="Loading..." />
+    <!-- <div class="col-12 mt-5 center-align-container"> -->
+    <div id="loadingGif"  >
+        <!-- <img src="path/to/your/loading.gif" alt="Loading..." /> -->
+        <img src="{{ asset('../image/Data Analytics - Animation.gif') }}" alt="Loading..." class="col-12 mt-5 center-align-container"
+            style="max-width: 500px; border-radius:50%; text-align:center; display:block;">
+        <!-- </div> -->
     </div>
 </main>
 
@@ -1549,28 +1553,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Fetch details for the selected lab
             fetch(`/dashboard/lab-details`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                },
-                body: JSON.stringify({ lid: labId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Update dashboard with the new data
-                document.getElementById('totalSales').textContent = `Rs.${data.totalSales.toLocaleString()}`;
-                document.getElementById('totalRoutes').textContent = data.totalRoutes.toLocaleString();
-                document.getElementById('totalCenters').textContent = data.totalCenters.toLocaleString();
-                document.getElementById('totalIncharges').textContent = data.totalIncharges.toLocaleString();
-                
-                // Hide the loading GIF and show the analysis section
-                loadingGif.style.display = 'none';
-                analyseSection.style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error fetching lab details:', error);
-            });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content'),
+                    },
+                    body: JSON.stringify({
+                        lid: labId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update dashboard with the new data
+                    document.getElementById('totalSales').textContent =
+                        `Rs.${data.totalSales.toLocaleString()}`;
+                    document.getElementById('totalRoutes').textContent = data.totalRoutes
+                        .toLocaleString();
+                    document.getElementById('totalCenters').textContent = data.totalCenters
+                        .toLocaleString();
+                    document.getElementById('totalIncharges').textContent = data.totalIncharges
+                        .toLocaleString();
+
+                    // Hide the loading GIF and show the analysis section
+                    loadingGif.style.display = 'none';
+                    analyseSection.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching lab details:', error);
+                });
         }
     });
 });
@@ -1579,11 +1590,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 <style>
+#loadingGif {
+    display: flex;
+    justify-content: center;
+    /* Horizontally center */
+    align-items: center;
+    /* Vertically center */
+    text-align: center;
+    /* Align the text in the center */
+    flex-direction: column;
+    /* Stack the image and text vertically */
+    padding-top: 9%;
+    padding-left:28%;
+}
+
+
 /* Flex container for radio buttons (Single Row Layout) */
 .radio-container {
     display: flex;
-    flex-wrap: wrap; /* Allows wrapping if too many items */
-    gap: 10px; /* Space between buttons */
+    flex-wrap: wrap;
+    /* Allows wrapping if too many items */
+    gap: 10px;
+    /* Space between buttons */
     margin-top: 10px;
 }
 
@@ -1591,24 +1619,25 @@ document.addEventListener('DOMContentLoaded', function() {
 .lab-option {
     display: flex;
     align-items: center;
-    background: #f0f0f0;
-    padding: 10px 20px;
+    background:var(--color-pointer1);
+    padding: 5px 10px;
     border-radius: 25px;
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 600;
-    color: #555;
+    color:var(--color-pointer2);
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     border: 2px solid transparent;
 }
 
 .lab-option input[type="radio"] {
-    display: none; /* Hide default radio button */
+    display: none;
+    /* Hide default radio button */
 }
 
 /* Style when radio button is selected */
-.lab-option input[type="radio"]:checked + span {
-    background: #28a745;
+.lab-option input[type="radio"]:checked+span {
+    background:  #8e94f2;
     color: white;
     padding: 10px 20px;
     border-radius: 25px;
@@ -1617,8 +1646,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 /* Hover Effect */
 .lab-option:hover {
-    border: 2px solid #28a745;
-    color: #28a745;
+    border: 2px solid  #8e94f2;
+    color:  #8e94f2;
 }
 
 /* Ensuring text inside buttons is centered */

@@ -367,6 +367,11 @@ document.addEventListener("DOMContentLoaded", function() {
     font-size: 14px;
 }
 
+.modal {
+    z-index: 1050 !important; /* Ensure modal is above other elements */
+}
+
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 .content {

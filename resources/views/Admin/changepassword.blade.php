@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!/[a-z]/.test(password)) return { strength: "Must include a lowercase letter ❌", color: " #FF0060" };
         if (!/\d/.test(password)) return { strength: "Must include a number ❌", color: " #FF0060" };
         if (!/[\W]/.test(password)) return { strength: "Must include a special character ❌", color: " #FF0060" };
-        return { strength: "Strong ✅", color: "rgb(187, 255, 0)" };
+        return { strength: "Strong ✅", color: "green" };
     }
 
     // Password strength validation
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
     confirmPassword.addEventListener("input", function () {
         if (confirmPassword.value === newPassword.value) {
             passwordMatch.textContent = "Passwords match ✅";
-            passwordMatch.style.color = "rgb(187, 255, 0)";
+            passwordMatch.style.color = "green";
         } else {
             passwordMatch.textContent = "Passwords do not match ❌";
             passwordMatch.style.color = " #FF0060";

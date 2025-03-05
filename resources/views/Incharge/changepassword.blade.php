@@ -86,11 +86,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to check password strength
     function checkPasswordStrength(password) {
-        if (password.length < 8) return { strength: "Too short ❌", color: "red" };
-        if (!/[A-Z]/.test(password)) return { strength: "Must include an uppercase letter ❌", color: "red" };
-        if (!/[a-z]/.test(password)) return { strength: "Must include a lowercase letter ❌", color: "red" };
-        if (!/\d/.test(password)) return { strength: "Must include a number ❌", color: "red" };
-        if (!/[\W]/.test(password)) return { strength: "Must include a special character ❌", color: "red" };
+        if (password.length < 8) return { strength: "Too short ❌", color: " #FF0060" };
+        if (!/[A-Z]/.test(password)) return { strength: "Must include an uppercase letter ❌", color: " #FF0060" };
+        if (!/[a-z]/.test(password)) return { strength: "Must include a lowercase letter ❌", color: " #FF0060" };
+        if (!/\d/.test(password)) return { strength: "Must include a number ❌", color: "#FF0060" };
+        if (!/[\W]/.test(password)) return { strength: "Must include a special character ❌", color: " #FF0060" };
         return { strength: "Strong ✅", color: "green" };
     }
 
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
             passwordMatch.style.color = "green";
         } else {
             passwordMatch.textContent = "Passwords do not match ❌";
-            passwordMatch.style.color = "red";
+            passwordMatch.style.color = " #FF0060";
         }
     });
 

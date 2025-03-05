@@ -13,13 +13,13 @@
     <div class="alert alert-success">
         {{ session('success') }}
     </div>
-@endif
+    @endif
 
-@if(session('error'))
+    @if(session('error'))
     <div class="alert alert-danger">
         {{ session('error') }}
     </div>
-@endif
+    @endif
 
 
     <!-- Assigned Labs Dropdown -->
@@ -40,25 +40,27 @@
     </div>
 
     <div class="table-container">
-        <table class="transactions-table">
-            <thead>
-                <tr>
-                    <th>TID</th>
-                    <th>Date</th>
-                    <th>Full Name</th>
-                    <th>Center Name</th>
-                    <th>Amount</th>
-                    <th>Remark</th>
-                    <th>SMS Description</th>
-                    <th>Actions</th> <!-- New column for actions -->
-                </tr>
-            </thead>
-            <tbody id="transactionTableBody">
-                <tr>
-                    <td colspan="8" class="text-center">No data available</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="scrollable-wrapper">
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>TID</th>
+                        <th>Date</th>
+                        <th>Full Name</th>
+                        <th>Center Name</th>
+                        <th>Amount</th>
+                        <th>Remark</th>
+                        <th>SMS Description</th>
+                        <th>Actions</th> <!-- New column for actions -->
+                    </tr>
+                </thead>
+                <tbody id="transactionTableBody">
+                    <tr>
+                        <td colspan="8" class="text-center">No data available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Edit Amount Modal -->
@@ -125,7 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     data.forEach((transaction) => {
                         let smsDescriptions = transaction.sms.length ?
-                            transaction.sms.map((sms) => `<li>${sms.description}</li>`).join('') :
+                            transaction.sms.map((sms) => `<li>${sms.description}</li>`)
+                            .join('') :
                             '<li>N/A</li>';
 
                         transactionTableBody.innerHTML += `
@@ -252,6 +255,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+</script>
+
+<script>
 // Wait for the document to be ready
 document.addEventListener("DOMContentLoaded", function() {
     // Get the search input field and table rows
@@ -274,10 +281,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 const fullName = columns[2].textContent.toLowerCase();
                 const centerName = columns[3].textContent.toLowerCase();
                 const date = columns[1].textContent.toLowerCase(); // Date column
+                // const amount = columns[4].textContent.toLowerCase();
+
+
+                // act numeric part of amount (removes "LRK " and keeps only numbers)
+                        let amount = columns[4].textContent.replace(/[^\d]/g, "").trim(); 
+
+                        // Convert query to number if applicable
+                        let numericQuery = parseFloat(query);
 
                 // Check if any column matches the search query
                 if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) ||
-                    date.includes(query)) {
+                    date.includes(query)  ||
+                    (!isNaN(numericQuery) && amount.includes(query))) {
                     row.style.display = ""; // Show row if there's a match
                     found = true;
                 } else {
@@ -293,10 +309,10 @@ document.addEventListener("DOMContentLoaded", function() {
             tableBody.innerHTML = "";
             tableBody.appendChild(noDataRow);
         }
+
+
     });
 });
-
-
 </script>
 
 
@@ -406,7 +422,7 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 
 .modal {
-    position: fixed;
+    position: fixed;              
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -419,11 +435,15 @@ document.addEventListener("DOMContentLoaded", function() {
 .modal-content {
     display: flex;
     flex-direction: column;
-}
+}   
 
 .modal-content button {
     margin-top: 10px;
     font-size: 14px;
+}
+
+.modal {
+    z-index: 1050 !important; /* Ensure modal is above other elements */
 }
 
 .content {

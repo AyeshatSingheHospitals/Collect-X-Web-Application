@@ -32,25 +32,27 @@
 
 
     <div class="table-container">
-        <table class="transactions-table">
-            <thead>
-                <tr>
-                    <th>TID</th>
-                    <th>Date</th>
-                    <th>Full Name</th>
-                    <th>Center Name</th>
-                    <th>Amount</th>
-                    <th>Remark</th>
-                    <th>SMS Description</th>
-                    <th>Actions</th> <!-- New column for actions -->
-                </tr>
-            </thead>
-            <tbody id="transactionTableBody">
-                <tr>
-                    <td colspan="8" class="text-center">No data available</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="scrollable-wrapper">
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>TID</th>
+                        <th>Date</th>
+                        <th>Full Name</th>
+                        <th>Center Name</th>
+                        <th>Amount</th>
+                        <th>Remark</th>
+                        <th>SMS Description</th>
+                        <th>Actions</th> <!-- New column for actions -->
+                    </tr>
+                </thead>
+                <tbody id="transactionTableBody">
+                    <tr>
+                        <td colspan="8" class="text-center">No data available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <!-- Edit Amount Modal -->
@@ -106,21 +108,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const lid = labDropdown.value;
 
         fetch(`/lab/transactions?lid=${lid}`)
-    .then((response) => response.json())
-    .then((data) => {
-        transactionTableBody.innerHTML = '';
+            .then((response) => response.json())
+            .then((data) => {
+                transactionTableBody.innerHTML = '';
 
-        if (data.length === 0) {
-            transactionTableBody.innerHTML = `<tr>
+                if (data.length === 0) {
+                    transactionTableBody.innerHTML = `<tr>
                         <td colspan="8" class="text-center">No transactions found</td>
                     </tr>`;
-        } else {
-            data.forEach((transaction) => {
-                let smsDescriptions = transaction.sms.length
-                    ? transaction.sms.map((sms) => `<li>${sms.description}</li>`).join('')
-                    : '<li>N/A</li>';
+                } else {
+                    data.forEach((transaction) => {
+                        let smsDescriptions = transaction.sms.length ?
+                            transaction.sms.map((sms) => `<li>${sms.description}</li>`)
+                            .join('') :
+                            '<li>N/A</li>';
 
-                transactionTableBody.innerHTML += `
+                        transactionTableBody.innerHTML += `
                     <tr>
                         <td>${transaction.tid}</td>
                         <td>${transaction.date}</td>
@@ -135,18 +138,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             </button>
                         </td>
                     </tr>`;
-            });
+                    });
 
-            // Attach event listeners to edit buttons
-            attachEditButtonListeners();
-        }
-    })
-    .catch((error) => {
-        console.error('Error fetching transactions:', error);
-        transactionTableBody.innerHTML = `<tr>
+                    // Attach event listeners to edit buttons
+                    attachEditButtonListeners();
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching transactions:', error);
+                transactionTableBody.innerHTML = `<tr>
                     <td colspan="8" class="text-center">Error loading transactions</td>
                 </tr>`;
-    });
+            });
 
     });
 
@@ -162,43 +165,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Open edit modal and populate fields
-function openEditModal(tid, amount) {
-    const editTidInput = document.getElementById('edit-tid');
-    const editAmountInput = document.getElementById('edit-amount');
-    const editForm = document.getElementById('edit-form');
-    const modal = document.getElementById('edit-modal');
+    function openEditModal(tid, amount) {
+        const editTidInput = document.getElementById('edit-tid');
+        const editAmountInput = document.getElementById('edit-amount');
+        const editForm = document.getElementById('edit-form');
+        const modal = document.getElementById('edit-modal');
 
-    if (!editTidInput || !editAmountInput || !editForm || !modal) {
-        console.error("Edit modal elements not found.");
-        return;
+        if (!editTidInput || !editAmountInput || !editForm || !modal) {
+            console.error("Edit modal elements not found.");
+            return;
+        }
+
+        // Ensure the actual amount value is retrieved
+        let actualAmount = parseFloat(amount);
+
+        if (isNaN(actualAmount)) {
+            console.warn("Invalid amount value, setting to 0.000");
+            actualAmount = 0.000; // Default fallback value
+        }
+
+        // Set values in the modal
+        editTidInput.value = tid;
+        editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
+
+        // Set the form's action URL dynamically
+        editForm.action = `/supervisor/transaction/${tid}`;
+
+        // Show the modal
+        modal.style.display = 'block';
     }
 
-    // Ensure the actual amount value is retrieved
-    let actualAmount = parseFloat(amount);
-    
-    if (isNaN(actualAmount)) {
-        console.warn("Invalid amount value, setting to 0.000");
-        actualAmount = 0.000; // Default fallback value
-    }
-
-    // Set values in the modal
-    editTidInput.value = tid;
-    editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
-
-    // Set the form's action URL dynamically
-    editForm.action = `/supervisor/transaction/${tid}`;
-
-    // Show the modal
-    modal.style.display = 'block';
-}
-
-// Close modal when clicking outside
-window.addEventListener('click', (event) => {
-    const modal = document.getElementById('edit-modal');
-    if (modal && event.target === modal) {
-        modal.style.display = 'none';
-    }
-});
+    // Close modal when clicking outside
+    window.addEventListener('click', (event) => {
+        const modal = document.getElementById('edit-modal');
+        if (modal && event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 
     // Close the edit modal
     function closeEditModal() {
@@ -331,10 +334,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 const fullName = columns[2].textContent.toLowerCase();
                 const centerName = columns[3].textContent.toLowerCase();
                 const date = columns[1].textContent.toLowerCase(); // Date column
+                // const amount = columns[4].textContent.toLowerCase();
+
+
+                // act numeric part of amount (removes "LRK " and keeps only numbers)
+                        let amount = columns[4].textContent.replace(/[^\d]/g, "").trim(); 
+
+                        // Convert query to number if applicable
+                        let numericQuery = parseFloat(query);
 
                 // Check if any column matches the search query
                 if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) ||
-                    date.includes(query)) {
+                    date.includes(query)  ||
+                    (!isNaN(numericQuery) && amount.includes(query))) {
                     row.style.display = ""; // Show row if there's a match
                     found = true;
                 } else {
@@ -350,9 +362,13 @@ document.addEventListener("DOMContentLoaded", function() {
             tableBody.innerHTML = "";
             tableBody.appendChild(noDataRow);
         }
+
+
     });
 });
 </script>
+
+
 
 
 <!-- CSS -->
@@ -480,6 +496,11 @@ document.addEventListener("DOMContentLoaded", function() {
     margin-top: 10px;
     font-size: 14px;
 }
+
+.modal {
+    z-index: 1050 !important; /* Ensure modal is above other elements */
+}
+
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
@@ -1267,101 +1288,103 @@ button:active {
 
 
 /* @media (min-width: 1814px) { */
-@media (min-width: 1100px) and (max-width: 1350px){
-.form-group {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
+@media (min-width: 1100px) and (max-width: 1350px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
 
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .dropdown {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 45%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+        font-size: 0.8rem;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 80px;
+
+    }
 }
 
-.dropdown {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 45%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
+@media (min-width: 1338px) and (max-width: 1590px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .dropdown {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 50%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 150px;
+
+    }
 }
-
-.form-control {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 50px;
-    font-size: 0.8rem;
-}
-
-.form-controler {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 3px;
-}
-
-
-/* Container for the cards */
-.row {
-    display: flex;
-    /* flex-wrap: wrap; */
-    /* justify-content: space-between; */
-    gap: 80px;
-
-}}
-
-@media (min-width: 1338px) and (max-width: 1590px){
-.form-group {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
-}
-
-.dropdown {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 50%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
-}
-
-.form-control {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 50px;
-}
-
-.form-controler {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 3px;
-}
-
-
-/* Container for the cards */
-.row {
-    display: flex;
-    /* flex-wrap: wrap; */
-    /* justify-content: space-between; */
-    gap: 150px;
-
-}}
 
 </style>
 
