@@ -219,13 +219,12 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelBtn.addEventListener('click', function() {
         closeEditModal();
     });
-
-    // Submit updated amount
     editForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const tid = document.getElementById('edit-tid').value;
         const amount = document.getElementById('edit-amount').value;
+        const selectedLab = document.getElementById('labDropdown').value; // Get selected Lab
 
         fetch(`/supervisor/transaction/${tid}`, {
                 method: 'PUT',
@@ -237,20 +236,73 @@ document.addEventListener('DOMContentLoaded', function() {
                     amount
                 }),
             })
-            .then((response) => {
-                if (response.ok) {
-                    // Redirect to the transactions page after successful update
-                    window.location.href = '/supervisor/transaction';
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message); // Show success message
+                    closeEditModal(); // Close Modal
+
+                    // Automatically refresh transactions for the selected lab
+                    fetch(`/lab/transactions?lid=${selectedLab}`)
+                        .then(response => response.json())
+                        .then(transactions => {
+                            transactionTableBody.innerHTML = ''; // Clear the table
+
+                            if (transactions.length === 0) {
+                                transactionTableBody.innerHTML =
+                                    `<tr><td colspan="8" class="text-center">No transactions found</td></tr>`;
+                            } else {
+                                transactions.forEach(transaction => {
+                                    let smsDescriptions = transaction.sms.length ?
+                                        transaction.sms.map(sms =>
+                                            `<li>${sms.description}</li>`).join('') :
+                                        '<li>N/A</li>';
+
+                                    transactionTableBody.innerHTML += `
+                                <tr data-tid="${transaction.tid}">
+                                    <td>${transaction.tid}</td>
+                                    <td>${transaction.date}</td>
+                                    <td>${transaction.full_name}</td>
+                                    <td>${transaction.center_name}</td>
+                                    <td>LRK ${transaction.amount}</td>
+                                    <td>${transaction.remark}</td>
+                                    <td>${smsDescriptions}</td>
+                                    <td>
+                                        <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
+                                            <i class='bx bxs-pen'></i>
+                                        </button>
+                                    </td>
+                                </tr>`;
+                                });
+
+                                attachEditButtonListeners
+                            (); // Re-attach event listeners for edit buttons
+
+                                // **Highlight the updated row**
+                                const updatedRow = document.querySelector(
+                                    `tr[data-tid="${tid}"]`);
+                                if (updatedRow) {
+                                    updatedRow.classList.add(
+                                    'highlight'); // Add highlight immediately
+
+                                    setTimeout(() => {
+                                        updatedRow.classList.add(
+                                        'fade-out'); // Start fading out after 3s
+                                    }, 3000);
+
+                                    setTimeout(() => {
+                                        updatedRow.classList.remove('highlight',
+                                            'fade-out'); // Remove all classes after 5s
+                                    }, 5000);
+                                }
+                            }
+                        });
                 } else {
-                    // Handle server-side errors
-                    return response.json().then((data) => {
-                        throw new Error(data.message || 'Failed to update amount.');
-                    });
+                    alert(data.message);
                 }
             })
-            .catch((error) => {
-                console.error('Error updating amount:', error);
-                alert(error.message || 'An unexpected error occurred.');
+            .catch(error => {
+                alert('An unexpected error occurred.');
             });
     });
 });
@@ -318,6 +370,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <!-- CSS -->
 <style>
+    .highlight {
+    background-color: #d4edda !important;
+    /* Light Green */
+    transition: background-color 1s ease-in-out;
+    /* Smooth transition */
+}
+
+.fade-out {
+    background-color: transparent !important;
+    /* Gradual fading */
+}
 .form-group {
     border: 1px solid #ddd;
     border-radius: 50px;

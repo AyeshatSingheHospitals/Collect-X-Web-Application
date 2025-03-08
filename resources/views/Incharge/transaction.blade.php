@@ -1,4 +1,4 @@
-@extends('supervisor.sidebar')
+@extends('incharge.sidebar')
 
 @section('content')
 
@@ -8,6 +8,19 @@
         <h1>Transaction Records</h1>
     </div>
     <br><br>
+
+    @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+    @endif
+
 
     <!-- Assigned Labs Dropdown -->
 
@@ -25,11 +38,6 @@
                 placeholder="Search by TID, Date, Name, or Center Name">
         </div>
     </div>
-
-    <!-- Search Input for Universal Search -->
-    <!-- <div class="form-group">
-        <label for="searchInput" style="color:#7f7f7f">Search Records:</label> -->
-
 
     <div class="table-container">
         <div class="scrollable-wrapper">
@@ -84,15 +92,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const editForm = document.getElementById('edit-form');
 
     // Fetch assigned labs
-    fetch(`/lab/assigned-labs`)
+    fetch('/lab/assigned-labs')
         .then((response) => response.json())
         .then((data) => {
             labDropdown.innerHTML = ''; // Clear existing options
 
             if (data.length === 0) {
-                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
+                labDropdown.innerHTML = '<option value="" disabled selected>No labs assigned</option>';
             } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Select a Lab</option>`;
+                labDropdown.innerHTML = '<option value="" disabled selected>Select a Lab</option>';
                 data.forEach((lab) => {
                     labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
                 });
@@ -100,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch((error) => {
             console.error('Error fetching labs:', error);
-            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
+            labDropdown.innerHTML = '<option value="" disabled selected>Error loading labs</option>';
         });
 
     // Fetch transactions on lab selection
@@ -150,7 +158,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td colspan="8" class="text-center">Error loading transactions</td>
                 </tr>`;
             });
-
     });
 
     // Attach event listeners to edit buttons
@@ -189,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
         editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
 
         // Set the form's action URL dynamically
-        editForm.action = `/supervisor/transaction/${tid}`;
+        editForm.action = `/incharge/transaction/${tid}`;
 
         // Show the modal
         modal.style.display = 'block';
@@ -212,15 +219,14 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelBtn.addEventListener('click', function() {
         closeEditModal();
     });
-
-    // Submit updated amount
     editForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const tid = document.getElementById('edit-tid').value;
         const amount = document.getElementById('edit-amount').value;
+        const selectedLab = document.getElementById('labDropdown').value; // Get selected Lab
 
-        fetch(`/supervisor/transaction/${tid}`, {
+        fetch(`/incharge/transaction/${tid}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -230,85 +236,78 @@ document.addEventListener('DOMContentLoaded', function() {
                     amount
                 }),
             })
-            .then((response) => response.json())
-            .then((data) => {
+            .then(response => response.json())
+            .then(data => {
                 if (data.success) {
-                    alert(data.message);
+                    alert(data.message); // Show success message
+                    closeEditModal(); // Close Modal
 
-                    // Update the amount directly in the table
-                    const row = document.querySelector(`button[data-id="${tid}"]`).closest('tr');
-                    row.querySelector('td:nth-child(5)').textContent = `LRK ${amount}`;
+                    // Automatically refresh transactions for the selected lab
+                    fetch(`/lab/transactions?lid=${selectedLab}`)
+                        .then(response => response.json())
+                        .then(transactions => {
+                            transactionTableBody.innerHTML = ''; // Clear the table
 
-                    // Close the modal
-                    closeEditModal();
+                            if (transactions.length === 0) {
+                                transactionTableBody.innerHTML =
+                                    `<tr><td colspan="8" class="text-center">No transactions found</td></tr>`;
+                            } else {
+                                transactions.forEach(transaction => {
+                                    let smsDescriptions = transaction.sms.length ?
+                                        transaction.sms.map(sms =>
+                                            `<li>${sms.description}</li>`).join('') :
+                                        '<li>N/A</li>';
+
+                                    transactionTableBody.innerHTML += `
+                                <tr data-tid="${transaction.tid}">
+                                    <td>${transaction.tid}</td>
+                                    <td>${transaction.date}</td>
+                                    <td>${transaction.full_name}</td>
+                                    <td>${transaction.center_name}</td>
+                                    <td>LRK ${transaction.amount}</td>
+                                    <td>${transaction.remark}</td>
+                                    <td>${smsDescriptions}</td>
+                                    <td>
+                                        <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
+                                            <i class='bx bxs-pen'></i>
+                                        </button>
+                                    </td>
+                                </tr>`;
+                                });
+
+                                attachEditButtonListeners
+                            (); // Re-attach event listeners for edit buttons
+
+                                // **Highlight the updated row**
+                                const updatedRow = document.querySelector(
+                                    `tr[data-tid="${tid}"]`);
+                                if (updatedRow) {
+                                    updatedRow.classList.add(
+                                    'highlight'); // Add highlight immediately
+
+                                    setTimeout(() => {
+                                        updatedRow.classList.add(
+                                        'fade-out'); // Start fading out after 3s
+                                    }, 3000);
+
+                                    setTimeout(() => {
+                                        updatedRow.classList.remove('highlight',
+                                            'fade-out'); // Remove all classes after 5s
+                                    }, 5000);
+                                }
+                            }
+                        });
                 } else {
-                    alert('Failed to update amount.');
+                    alert(data.message);
                 }
             })
-            .catch((error) => {
-                console.error('Error updating amount:', error);
+            .catch(error => {
                 alert('An unexpected error occurred.');
             });
-
     });
 });
-</script>
 
-<!-- JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const darkModeToggle = document.querySelector('.dark-mode');
-    const body = document.body;
 
-    darkModeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode-active');
-    });
-});
-</script>
-
-<script>
-const sideMenu = document.querySelector('aside');
-const menuBtn = document.getElementById('menu-btn');
-const closeBtn = document.getElementById('close-btn');
-const darkMode = document.querySelector('.dark-mode');
-
-// Toggle dark mode and save preference to local storage
-darkMode.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode-variables');
-    const isDarkMode = document.body.classList.contains('dark-mode-variables');
-
-    // Save the current mode in local storage
-    localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-
-    // Toggle active states on the dark mode icons
-    darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-    darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-});
-
-// Function to apply dark mode based on saved preference
-function applyDarkModePreference() {
-    const darkModePreference = localStorage.getItem('darkMode');
-    if (darkModePreference === 'enabled') {
-        document.body.classList.add('dark-mode-variables');
-        darkMode.querySelector('span:nth-child(1)').classList.remove('active');
-        darkMode.querySelector('span:nth-child(2)').classList.add('active');
-    } else {
-        document.body.classList.remove('dark-mode-variables');
-        darkMode.querySelector('span:nth-child(1)').classList.add('active');
-        darkMode.querySelector('span:nth-child(2)').classList.remove('active');
-    }
-}
-
-// Apply dark mode preference on page load
-window.addEventListener('load', applyDarkModePreference);
-
-menuBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'block';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'none';
-});
 </script>
 
 <script>
@@ -369,10 +368,19 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 
-
-
 <!-- CSS -->
 <style>
+    .highlight {
+    background-color: #d4edda !important;
+    /* Light Green */
+    transition: background-color 1s ease-in-out;
+    /* Smooth transition */
+}
+
+.fade-out {
+    background-color: transparent !important;
+    /* Gradual fading */
+}
 .form-group {
     border: 1px solid #ddd;
     border-radius: 50px;
@@ -477,7 +485,7 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 
 .modal {
-    position: fixed;
+    position: fixed;              
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -490,7 +498,7 @@ document.addEventListener("DOMContentLoaded", function() {
 .modal-content {
     display: flex;
     flex-direction: column;
-}
+}   
 
 .modal-content button {
     margin-top: 10px;
@@ -500,9 +508,6 @@ document.addEventListener("DOMContentLoaded", function() {
 .modal {
     z-index: 1050 !important; /* Ensure modal is above other elements */
 }
-
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 .content {
     margin-left: 90px;
@@ -1385,7 +1390,6 @@ button:active {
 
     }
 }
-
 </style>
 
 @endsection

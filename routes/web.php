@@ -219,9 +219,13 @@ Route::get('incharge/transaction', function () {
 
 // transaction
 
-Route::get('/incharge/transactions', [TransactionController::class, 'indexIncharge'])->name('incharge.transactions.index');
-Route::get('/incharge/transactions/{tid}', [TransactionController::class, 'showIncharge'])->name('incharge.transactions.show');
+// Route::get('/incharge/transactions', [TransactionController::class, 'indexIncharge'])->name('incharge.transactions.index');
+// Route::get('/incharge/transactions/{tid}', [TransactionController::class, 'showIncharge'])->name('incharge.transactions.show');
+// Route::put('/incharge/transaction/{tid}', [TransactionController::class, 'updateAmountIncharge'])->name('incharge.transaction.updateAmount');
+
+Route::get('/incharge/transaction', [TransactionController::class, 'indexIncharge'])->name('incharge.transaction.index');
 Route::put('/incharge/transaction/{tid}', [TransactionController::class, 'updateAmountIncharge'])->name('incharge.transaction.updateAmount');
+
 
 //change password 
 Route::get('incharge/changepassword', function () {

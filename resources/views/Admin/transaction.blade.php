@@ -286,6 +286,63 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <!-- CSS -->
 <style>
+
+.alert {
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    position: relative;
+    opacity: 0.95;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.alert ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.alert ul li {
+    list-style-type: disc;
+}
+
+/* Optional close button styles */
+.alert::after {
+    content: "×";
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 20px;
+    color: inherit;
+}
+
+.alert:hover {
+    opacity: 1;
+}
+
+.alert-success:hover {
+    border-color: #98c68a;
+    background-color: #c3e6cb;
+}
+
+.alert-danger:hover {
+    border-color: #f1a2a5;
+    background-color: #f5c6cb;
+}
 .table-container {
     /* padding: 20px; */
 }

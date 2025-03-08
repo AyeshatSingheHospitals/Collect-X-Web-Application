@@ -62,8 +62,11 @@
                     <h3 class="card-title">{{ $center->centername }}</h3>
                     <p class="card-text"><strong></strong>{{ $center->authorizedperson }}</p>
                     <p class="card-text"><strong></strong>{{ $center->authorizedcontact }}</p>
-                    <p class="card-text"><strong>Lab:</strong> {{ $center->lab->name ?? 'Not Assigned' }}</p>
-                    <p class="card-text"><strong>Route:</strong> {{ $center->route->routename ?? 'Not Assigned' }}</p>
+                    <!-- <p class="card-text"><strong>Lab:</strong> {{ $center->lab->name ?? 'Not Assigned' }}</p> -->
+                    <p class="card-text"><strong>Lab:</strong><span class="{{ optional($center->lab)->name ? '' : 'lab-not-assigned' }}">{{ optional($center->lab)->name ?? 'Lab not Defined' }}</span></p>
+                    <!-- <p class="card-text"><strong>Route:</strong> {{ $center->route->routename ?? 'Not Assigned' }}</p> -->
+                    <p class="card-text"><strong>Route:</strong><span class="{{ optional($center->route)->routename ? '' : 'lab-not-assigned' }}">{{ optional($center->route)->routename ?? 'Route not Defined' }}</span></p>
+
                     <div class="btn-container">
                         <button class="btn edit-btn" onclick="openEditModal({{ json_encode($center) }})">
                             <i class='bx bxs-message-square-edit'></i>
@@ -640,6 +643,7 @@ function filterCards() {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
+
 #labList li {
     padding: 5px;
     background-color: #628ECB;
@@ -651,7 +655,26 @@ function filterCards() {
     color: #202528;
     /* font-weight:bold; */
 }
+#editlabList li {
+    padding: 5px;
+    background-color: #628ECB;
+    color: #fff;
+}
 
+#editlabList li:hover {
+    background-color: #628ECB;
+    color: #202528;
+    /* font-weight:bold; */
+}
+
+.lab-not-assigned {
+    color: #FF0060;
+    font-weight:bold;
+}
+.route-not-assigned {
+    color: #FF0060;
+    font-weight:bold;
+}
 /* Style the textarea */
 textarea#editDescription,
 #description {
