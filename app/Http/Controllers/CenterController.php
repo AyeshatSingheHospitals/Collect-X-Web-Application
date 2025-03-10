@@ -121,23 +121,77 @@ class CenterController extends Controller
                 'latitude' => 'required|string',
                 'longitude' => 'required|string',
             ]);
-
-            // Find and update the record
+    
+            // Find the center to be updated
             $centers = Center::findOrFail($cid);
-            $centers->uid = $request->uid;
-            $centers->rid = $request->rid;
-            $centers->lid = $request->lid;
-            $centers->centername = $request->centername;
-            $centers->authorizedperson = $request->authorizedperson;
-            $centers->authorizedcontact = $request->authorizedcontact;
-            $centers->selectedcontact = $request->selectedcontact;
-            $centers->thirdpartycontact = $request->thirdpartycontact;
-            $centers->description = $request->description;
-            $centers->latitude = $request->latitude;
-            $centers->longitude = $request->longitude;
+    
+            // Check if any fields are actually changed
+            $changesMade = false;
+    
+            if ($centers->uid != $request->uid) {
+                $centers->uid = $request->uid;
+                $changesMade = true;
+            }
+    
+            if ($centers->rid != $request->rid) {
+                $centers->rid = $request->rid;
+                $changesMade = true;
+            }
+    
+            if ($centers->lid != $request->lid) {
+                $centers->lid = $request->lid;
+                $changesMade = true;
+            }
+    
+            if ($centers->centername != $request->centername) {
+                $centers->centername = $request->centername;
+                $changesMade = true;
+            }
+    
+            if ($centers->authorizedperson != $request->authorizedperson) {
+                $centers->authorizedperson = $request->authorizedperson;
+                $changesMade = true;
+            }
+    
+            if ($centers->authorizedcontact != $request->authorizedcontact) {
+                $centers->authorizedcontact = $request->authorizedcontact;
+                $changesMade = true;
+            }
+    
+            if ($centers->selectedcontact != $request->selectedcontact) {
+                $centers->selectedcontact = $request->selectedcontact;
+                $changesMade = true;
+            }
+    
+            if ($centers->thirdpartycontact != $request->thirdpartycontact) {
+                $centers->thirdpartycontact = $request->thirdpartycontact;
+                $changesMade = true;
+            }
+    
+            if ($centers->description != $request->description) {
+                $centers->description = $request->description;
+                $changesMade = true;
+            }
+    
+            if ($centers->latitude != $request->latitude) {
+                $centers->latitude = $request->latitude;
+                $changesMade = true;
+            }
+    
+            if ($centers->longitude != $request->longitude) {
+                $centers->longitude = $request->longitude;
+                $changesMade = true;
+            }
+    
+            // If no changes were made, return with a message
+            if (!$changesMade) {
+                return redirect()->back()->with('info', 'No changes were made.');
+            }
+    
+            // Save the center if there are any changes
             $centers->save();
-
-            // Update a corresponding log entry in the 'centerlogs' table
+    
+            // Create a log entry if updates were made
             CenterLog::create([
                 'cid' => $centers->cid,
                 'uid' => $centers->uid,
@@ -151,15 +205,17 @@ class CenterController extends Controller
                 'description' => $centers->description,
                 'latitude' => $centers->latitude,
                 'longitude' => $centers->longitude,
-                'action' => 'updated',
+                'action' => 'updated', // Log action as 'updated'
             ]);
-
-            // Redirect with success message
+    
+            // Redirect with a success message
             return redirect()->route('admin.center.index')->with('success', 'Center updated successfully!');
         } catch (\Exception $e) {
+            // Return an error if an exception occurs
             return redirect()->route('admin.center.index')->withErrors('Failed to update center: ' . $e->getMessage());
         }
     }
+    
 
     public function destroyCenter($cid)
     {

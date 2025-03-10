@@ -85,55 +85,66 @@ class SystemuserController extends Controller
     }
 
     public function updateUsers(Request $request, $id)
-    {
-        // Validate the request
-        $request->validate([
-            'role' => 'required|string|max:255',
-            'fname' => 'required|string|max:255',
-            'lname' => 'required|string|max:255',
-            'contact' => 'required|digits:10|unique:systemuser,contact,' . $id . ',uid',
-            'epf' => 'required|unique:systemuser,epf,' . $id . ',uid',
-            'username' => 'required|unique:systemuser,username,' . $id . ',uid|max:255',
-            'password' => 'nullable|string|min:8',
-            'status' => 'nullable|in:active,inactive',
-            'image' => 'nullable|image|max:5000',
-        ]);
+{
+    // Validate the request
+    $request->validate([
+        'role' => 'required|string|max:255',
+        'fname' => 'required|string|max:255',
+        'lname' => 'required|string|max:255',
+        'contact' => 'required|digits:10|unique:systemuser,contact,' . $id . ',uid',
+        'epf' => 'required|unique:systemuser,epf,' . $id . ',uid',
+        'username' => 'required|unique:systemuser,username,' . $id . ',uid|max:255',
+        'password' => 'nullable|string|min:8',
+        'status' => 'nullable|in:active,inactive',
+        'image' => 'nullable|image|max:5000',
+    ]);
 
-        $user = Systemuser::findOrFail($id);
+    $user = Systemuser::findOrFail($id);
 
-        // Update the user
-        $user->update([
-            'role' => $request->role,
-            'fname' => $request->fname,
-            'lname' => $request->lname,
-            'contact' => $request->contact,
-            'epf' => $request->epf,
-            'username' => $request->username,
-            'status' => $request->status,
-            'image' => $request->image ? $request->image->store('images', 'public') : $user->image,
-        ]);
+    // Check if any data has changed
+    $updatedData = [
+        'role' => $request->role,
+        'fname' => $request->fname,
+        'lname' => $request->lname,
+        'contact' => $request->contact,
+        'epf' => $request->epf,
+        'username' => $request->username,
+        'status' => $request->status,
+        'image' => $request->image ? $request->image->store('images', 'public') : $user->image,
+    ];
 
-        
-        $loggedUid = session('uid',0); 
+    // Remove unchanged fields
+    $filteredData = array_filter($updatedData, function ($value, $key) use ($user) {
+        return $user->$key !== $value;
+    }, ARRAY_FILTER_USE_BOTH);
 
-
-        SystemuserLog::create([
-            'logged_uid' => $loggedUid,
-            'uid' => $user->uid,
-            'role' => $user->role,
-            'fname' => $user->fname,
-            'lname' => $user->lname,
-            'contact' => $user->contact,
-            'epf' => $user->epf,
-            'username' => $user->username,
-            'password' => $user->password, // Hash the password
-            'status' => $user->status,
-            'image' => $user->image,// Save image if uploaded
-            'action' => 'updated',
-        ]);
-
-        return redirect()->route('admin.user.index')->with('success', 'User updated successfully');
+    // Check if there's actually any change
+    if (empty($filteredData)) {
+        return redirect()->back()->with('info', 'No changes detected.');
     }
+
+    // Update the user
+    $user->update($updatedData);
+
+    // Log the update
+    SystemuserLog::create([
+        'logged_uid' => session('uid', 0),
+        'uid' => $user->uid,
+        'role' => $user->role,
+        'fname' => $user->fname,
+        'lname' => $user->lname,
+        'contact' => $user->contact,
+        'epf' => $user->epf,
+        'username' => $user->username,
+        'password' => $user->password, // Store hashed password if updated
+        'status' => $user->status,
+        'image' => $user->image,
+        'action' => 'updated',
+    ]);
+
+    return redirect()->route('admin.user.index')->with('success', 'User updated successfully');
+}
+
 
     public function getUserNames()
 {

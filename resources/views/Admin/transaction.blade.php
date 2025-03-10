@@ -7,13 +7,7 @@
         <h1>Transaction Records</h1>
     </div>
     <br><br>
-    <div class="form-group">
-        <label for="searchInput" style="color:#7f7f7f">Search Records:</label>
-        <input type="text" id="searchInput" class="form-control"
-            placeholder="Search by Transaction ID, Name, Center Name, or Date">
-    </div>
-
-
+    
     @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -30,6 +24,11 @@
     </div>
     @endif
 
+    <div class="form-group">
+        <label for="searchInput" style="color:#7f7f7f">Search Records:</label>
+        <input type="text" id="searchInput" class="form-control"
+            placeholder="Search by Transaction ID, Name, Center Name, or Date">
+    </div>
 
     <div class="table-container">
         <div class="scrollable-wrapper">

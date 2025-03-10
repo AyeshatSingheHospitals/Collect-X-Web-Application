@@ -371,7 +371,8 @@ document.addEventListener("DOMContentLoaded", function() {
 <!-- CSS -->
 <style>
     .highlight {
-    background-color: #d4edda !important;
+    /* background-color: #d4edda !important; */
+    background-color:rgb(221, 226, 245) !important;
     /* Light Green */
     transition: background-color 1s ease-in-out;
     /* Smooth transition */

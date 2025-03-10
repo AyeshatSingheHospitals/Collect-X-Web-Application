@@ -56,40 +56,51 @@ class RouteController extends Controller
     }
 
     public function updateRoute(Request $request, $rid)
-    {
-        try {
-            // Validate the request data
-            $request->validate([
-                'uid' => 'required|exists:systemuser,uid', 
-                'lid' => 'required|exists:lab,lid',
-                'routename' => 'required|string|max:255',
-                'description' => 'nullable|string',
-            ]);
-        
-            // Find and update the route
-            $routes = Route::findOrFail($rid);
-            $routes->uid = $request->uid;
-            $routes->lid = $request->lid;
-            $routes->routename = $request->routename;
-            $routes->description = $request->description;
-            $routes->save();
+{
+    try {
+        // Validate the request data
+        $request->validate([
+            'uid' => 'required|exists:systemuser,uid', 
+            'lid' => 'required|exists:lab,lid',
+            'routename' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+    
+        // Find the route
+        $routes = Route::findOrFail($rid);
 
-            // Update a corresponding log entry in the 'routelogs' table
-            RouteLog::create([
-                'rid' => $routes->rid,
-                'uid' => $routes->uid,
-                'lid' => $routes->lid,
-                'routename' => $routes->routename,
-                'description' => $routes->description,
-                'action' => 'updated', // Set action as 'updated'
-            ]);
-        
-            // Redirect with success message
-            return redirect()->route('admin.route.index')->with('success', 'Route updated successfully!');
-        } catch (\Exception $e) {
-            return redirect()->route('admin.route.index')->withErrors('Failed to update route: ' . $e->getMessage());
+        // Check if any updates are made
+        if ($routes->uid == $request->uid && 
+            $routes->lid == $request->lid && 
+            $routes->routename == $request->routename && 
+            $routes->description == $request->description) {
+            return redirect()->back()->with('info', 'No changes were made.');
         }
+
+        // Update the route if changes exist
+        $routes->uid = $request->uid;
+        $routes->lid = $request->lid;
+        $routes->routename = $request->routename;
+        $routes->description = $request->description;
+        $routes->save();
+
+        // Create a corresponding log entry in the 'routelogs' table
+        RouteLog::create([
+            'rid' => $routes->rid,
+            'uid' => $routes->uid,
+            'lid' => $routes->lid,
+            'routename' => $routes->routename,
+            'description' => $routes->description,
+            'action' => 'updated', // Set action as 'updated'
+        ]);
+    
+        // Redirect with success message
+        return redirect()->route('admin.route.index')->with('success', 'Route updated successfully!');
+    } catch (\Exception $e) {
+        return redirect()->route('admin.route.index')->withErrors('Failed to update route: ' . $e->getMessage());
     }
+}
+
 
     public function destroyRoute($rid)
     {

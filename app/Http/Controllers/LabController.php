@@ -63,36 +63,46 @@ class LabController extends Controller
     }
 
     public function updateLabs(Request $request, $lid)
-    {
-        try {
-            $request->validate([
-                'uid' => 'required|exists:systemuser,uid',
-                'name' => 'required|string|max:255',
-                'address' => 'required|string|max:255',
-            ]);
+{
+    try {
+        $request->validate([
+            'uid' => 'required|exists:systemuser,uid',
+            'name' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+        ]);
 
-            // Find and update the lab
-            $labs = Lab::findOrFail($lid);
-            $labs->uid = $request->uid;
-            $labs->name = $request->name;
-            $labs->address = $request->address;
-            $labs->save();
+        // Find the lab
+        $labs = Lab::findOrFail($lid);
 
-            // Create a corresponding log entry in the 'lablogs' table
-            LabLog::create([
-                'lid' => $labs->lid,
-                'uid' => $labs->uid,
-                'name' => $labs->name,
-                'address' => $labs->address,
-                'action' => 'updated', // Set action as 'update'
-            ]);
-
-            return redirect()->route('admin.lab.index')->with('success', 'Lab updated successfully!');
-        } catch (\Exception $e) {
-            Log::error("Error updating lab with ID {$lid}: " . $e->getMessage());
-            return redirect()->back()->with('error', 'An error occurred while updating the lab.');
+        // Check if any updates are made
+        if ($labs->uid == $request->uid && 
+            $labs->name == $request->name && 
+            $labs->address == $request->address) {
+            return redirect()->back()->with('info', 'No changes were made.');
         }
+
+        // Update the lab if changes exist
+        $labs->uid = $request->uid;
+        $labs->name = $request->name;
+        $labs->address = $request->address;
+        $labs->save();
+
+        // Create a corresponding log entry in the 'lablogs' table
+        LabLog::create([
+            'lid' => $labs->lid,
+            'uid' => $labs->uid,
+            'name' => $labs->name,
+            'address' => $labs->address,
+            'action' => 'updated',
+        ]);
+
+        return redirect()->route('admin.lab.index')->with('success', 'Lab updated successfully!');
+    } catch (\Exception $e) {
+        Log::error("Error updating lab with ID {$lid}: " . $e->getMessage());
+        return redirect()->back()->with('error', 'An error occurred while updating the lab.');
     }
+}
+
 
     public function destroyLab($lid)
     {

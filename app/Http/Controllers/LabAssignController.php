@@ -102,37 +102,52 @@ class LabAssignController extends Controller
     return redirect()->back()->with('success', 'Lab assignment saved successfully!');
 }
 
-    public function updateLabassign(Request $request)
-    {
-        $validated = $request->validate([
-            'uid' => 'required|exists:systemuser,uid',
-            'uid_assign' => 'required|exists:systemuser,uid',
-            'lid' => 'required|exists:lab,lid',
-            'laid' => 'required|exists:labassign,laid',
+public function updateLabassign(Request $request)
+{
+    // Validate the request data
+    $validated = $request->validate([
+        'uid' => 'required|exists:systemuser,uid',
+        'uid_assign' => 'required|exists:systemuser,uid',
+        'lid' => 'required|exists:lab,lid',
+        'laid' => 'required|exists:labassign,laid',
+    ]);
+
+    try {
+        // Find the existing lab assignment record
+        $labassign = LabAssign::findOrFail($validated['laid']);
+
+        // Check if any changes were made
+        if (
+            $labassign->uid == $validated['uid'] &&
+            $labassign->uid_assign == $validated['uid_assign'] &&
+            $labassign->lid == $validated['lid']
+        ) {
+            // No changes made, return with an info message
+            return redirect()->back()->with('info', 'No changes were made.');
+        }
+
+        // Update the lab assignment if changes exist
+        $labassign->update([
+            'uid' => $validated['uid'],
+            'uid_assign' => $validated['uid_assign'],
+            'lid' => $validated['lid'],
         ]);
 
-        try {
-            $labassign = LabAssign::findOrFail($validated['laid']);
-            $labassign->update([
-                'uid' => $validated['uid'],
-                'uid_assign' => $validated['uid_assign'],
-                'lid' => $validated['lid'],
-            ]);
+        // Create the log for this action
+        LabAssignLog::create([
+            'laid' => $labassign->laid, // Using the newly created `laid`
+            'uid' => $labassign->uid,
+            'uid_assign' => $labassign->uid_assign,
+            'lid' => $labassign->lid,
+            'action' => 'updated',
+        ]);
 
-            // Create the log for this action
-            LabAssignLog::create([
-                'laid' => $labassign->laid, // Using the newly created `laid`
-                'uid' => $labassign->uid,
-                'uid_assign' => $labassign->uid_assign,
-                'lid' => $labassign->lid,
-                'action' => 'updated',
-            ]);
-
-            return redirect()->back()->with('success', 'Lab assignment updated successfully!');
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Failed to update lab assignment.']);
-        }
+        return redirect()->back()->with('success', 'Lab assignment updated successfully!');
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => 'Failed to update lab assignment.']);
     }
+}
+
 
     public function destroyLabassign($id)
     {

@@ -5,10 +5,10 @@
 <!-- Registration Form -->
 <main>
     <div class="container1">
-    <div class="top-bar">
-        <h1>Assigned Labs</h1>
-    </div>
-    <br><br>
+        <div class="top-bar">
+            <h1>Assigned Labs</h1>
+        </div>
+        <br><br>
         <!-- Left Section (Cards) -->
         <div class="row">
             <input type="hidden" name="uid" value="{{ session('uid') }}">
@@ -35,9 +35,15 @@
     <div class="left-section">
 
         <div id="cardContainer" class="card-container">
-
             <!-- Cards will be dynamically added here -->
         </div>
+    </div>
+
+    <div id="loadingGif">
+        <!-- <img src="path/to/your/loading.gif" alt="Loading..." /> -->
+        <img src="{{ asset('../image/assignedlabs.gif') }}" alt="Loading..."
+            style="max-width: 500px; border-radius:50%; text-align:center; display:block;">
+        <!-- </div> -->
     </div>
 
 </main>
@@ -46,6 +52,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     const uid = document.querySelector('input[name="uid"]').value;
     const labDropdown = document.getElementById('labDropdown');
+    const cardContainer = document.getElementById('cardContainer');
+    const loadingGif = document.getElementById('loadingGif');
+
+    loadingGif.style.display = 'block';
+cardContainer.classList.add('show-container'); // Instead of display = 'block'
+
 
     // Fetch assigned labs
     fetch(`/lab/assigned-labs`)
@@ -110,6 +122,10 @@ document.getElementById('labDropdown').addEventListener('change', function() {
                     `;
 
                     cardContainer.appendChild(card);
+
+                    loadingGif.style.display = 'none';
+                    cardContainer.classList.add('show-container'); // Instead of display = 'block'
+
                 });
             })
             .catch((error) => console.error('Error fetching assignments:', error));
@@ -143,6 +159,49 @@ function filterCards() {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+#loadingGif {
+    display: flex;
+    justify-content: center;
+    /* Horizontally center */
+    align-items: center;
+    /* Vertically center */
+    text-align: center;
+    /* Align the text in the center */
+    flex-direction: column;
+    /* Stack the image and text vertically */
+    /* padding-top: 9%; */
+    padding-left: 28%;
+}
+
+#cardContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* Adjust as needed */
+    gap: 7rem 1.8rem;
+    height: auto;
+    /* Adjusted */
+    padding-top: 1px;
+
+    visibility: hidden;
+    /* Initially hidden but retains grid structure */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    /* Smooth transition */
+}
+
+#loadingGif {
+    text-align: center;
+    display: block;
+    /* Ensure it's visible while loading */
+}
+
+/* Show the card container smoothly */
+.show-container {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 
 /* -------------------------------------------------------------Popup------------------------------------------------------------------ */
 .search-container {
@@ -215,7 +274,7 @@ input:focus {
     background-color: var(--color-white);
     color: var(--color-dark);
     padding-left: 50px;
-    
+
 }
 
 /* Container for the cards */
@@ -368,7 +427,7 @@ input:focus {
 
 <style>
 /* Left Section (Cards) */
-.card-container {
+#cardContainer {
     display: grid;
     grid-template-columns: 0.5fr 0.5fr 0.5fr;
     gap: 7rem 1.8rem;
@@ -460,101 +519,102 @@ input:focus {
 
 /* Right Section (Form) */
 /* @media (min-width: 1814px) { */
-@media (min-width: 1100px) and (max-width: 1350px){
-.form-group {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
+@media (min-width: 1100px) and (max-width: 1350px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
 
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-group1 {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 65%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 100px;
+
+    }
 }
 
-.form-group1 {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 65%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
+@media (min-width: 1338px) and (max-width: 1590px) {
+    .form-group {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-group1 {
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        padding: 12px 20px;
+        font-size: 1rem;
+        margin-bottom: 15px;
+        width: 40%;
+        height: 43px;
+        transition: border 0.3s ease;
+        background-color: var(--color-white);
+    }
+
+    .form-control {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 50px;
+    }
+
+    .form-controler {
+        background-color: var(--color-white);
+        color: var(--color-dark);
+        padding-left: 3px;
+    }
+
+
+    /* Container for the cards */
+    .row {
+        display: flex;
+        /* flex-wrap: wrap; */
+        /* justify-content: space-between; */
+        gap: 150px;
+
+    }
 }
-
-.form-control {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 50px;
-}
-
-.form-controler {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 3px;
-}
-
-
-/* Container for the cards */
-.row {
-    display: flex;
-    /* flex-wrap: wrap; */
-    /* justify-content: space-between; */
-    gap: 100px;
-
-}}
-
-@media (min-width: 1338px) and (max-width: 1590px){
-.form-group {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
-}
-
-.form-group1 {
-    border: 1px solid #ddd;
-    border-radius: 50px;
-    padding: 12px 20px;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    width: 40%;
-    height: 43px;
-    transition: border 0.3s ease;
-    background-color: var(--color-white);
-}
-
-.form-control {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 50px;
-}
-
-.form-controler {
-    background-color: var(--color-white);
-    color: var(--color-dark);
-    padding-left: 3px;
-}
-
-
-/* Container for the cards */
-.row {
-    display: flex;
-    /* flex-wrap: wrap; */
-    /* justify-content: space-between; */
-    gap: 150px;
-
-}}
-
 </style>
 
 @endsection
