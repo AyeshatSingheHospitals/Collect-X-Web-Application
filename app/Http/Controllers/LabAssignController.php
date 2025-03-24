@@ -18,6 +18,46 @@ class LabAssignController extends Controller
 
 //---------------------------------------------admin's function---------------------------------------------------
 
+
+public function getUserNames()
+{
+    // Fetch all system users
+    $users = Systemuser::where('status', 'active')->whereIn('role', ['Incharge', 'Supervisor','RO'])->select('uid', 'fname', 'lname', 'epf')->get();
+
+    // Create a list of full names with EPF and UID
+    $userDetails = $users->map(function ($user) {
+        return [
+            'uid' => $user->uid,
+            'full_name' => $user->fname . ' ' . $user->lname,
+            'epf' => $user->epf,
+        ];
+    });
+
+    // Return the user details as a JSON response
+    return response()->json($userDetails);
+}
+
+public function getLabNames()
+{
+    try {
+        // Fetch all system users
+        $labs = Lab::select('lid', 'name')->get();
+
+        // Create a list of full names with IDs
+        $labsDetails = $labs->map(function ($labs) {
+            return [
+                'lid' => $labs->lid,
+                'name' => $labs->name,
+            ];
+        });
+
+        return response()->json($labsDetails);
+    } catch (\Exception $e) {
+        Log::error("Error fetching lab names: " . $e->getMessage());
+        return response()->json(['error' => 'An error occurred while fetching lab names.'], 500);
+    }
+}
+
     public function indexLabassign()
     {
         // Fetch lab assignments with related systemuser and lab data

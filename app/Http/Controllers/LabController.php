@@ -126,24 +126,5 @@ class LabController extends Controller
         }
     }
 
-    public function getLabNames()
-    {
-        try {
-            // Fetch all system users
-            $labs = Lab::select('lid', 'name')->get();
-
-            // Create a list of full names with IDs
-            $labsDetails = $labs->map(function ($labs) {
-                return [
-                    'lid' => $labs->lid,
-                    'name' => $labs->name,
-                ];
-            });
-
-            return response()->json($labsDetails);
-        } catch (\Exception $e) {
-            Log::error("Error fetching lab names: " . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while fetching lab names.'], 500);
-        }
-    }
+  
 }

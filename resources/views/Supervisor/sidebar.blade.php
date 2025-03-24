@@ -90,9 +90,18 @@
                                 <p>Hey, <b>{{ session('fname', 'Guest') }}</b></p>
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
-                            <div class="profile-photo">
+                            <!-- <div class="profile-photo">
                                 <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
                                     onerror="this.style.display='none'; this.parentNode.innerHTML += '<i class=\'bx bxs-user-circle\' style=\'font-size: 40px; color: rgb(156,161,221);\'></i>';">
+                            </div> -->
+
+                            <div class="profile-photo">
+                                @if(Session::has('image') && Session::get('image'))
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
+                                    onerror="this.onerror=null; this.src='{{ asset('image/default-profile.png') }}';">
+                                @else
+                                <img src="{{ asset('image/default-profile.png') }}" alt="Default Profile">
+                                @endif
                             </div>
 
                             <!-- Dropdown Menu -->
@@ -165,6 +174,21 @@
         sideMenu.style.display = 'none';
     });
     </script>
+
+<script>
+    function checkSession() {
+        fetch("{{ url('/check-session') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "session_expired") {
+                    alert(data.message);
+                    window.location.href = "{{ route('logout') }}"; // Redirect to logout
+                }
+            });
+    }
+
+    setInterval(checkSession, 1 * 60 * 1000); // Check session every 5 minutes
+</script>
 
 </body>
 

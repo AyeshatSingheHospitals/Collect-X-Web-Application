@@ -17,7 +17,10 @@
             @foreach($labassigns as $labassign)
             <div class="card">
                 <div class="image">
-                    <img src="{{ asset('storage/' . $labassign->systemuser->image) }}" alt="Employee Image" />
+                    <!-- <img src="{{ asset('storage/' . $labassign->systemuser->image) }}" alt="Employee Image" /> -->
+                    <img src="{{ asset($labassign->systemuser->image ? 'storage/' . $labassign->systemuser->image : 'image/default-profile.png') }}"
+                        alt="Employee Image" />
+
                 </div>
 
                 <div class="content1">
@@ -77,70 +80,76 @@
             </div>
             @endif
 
-            <form id="labAssignForm" action="{{ route('admin.labassigns.store') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-    @csrf
-    <input type="hidden" name="_method" id="formMethod" value="POST">
-    <input type="hidden" name="laid" id="laid">
+            <form id="labAssignForm" action="{{ route('admin.labassigns.store') }}" method="POST"
+                enctype="multipart/form-data" onsubmit="return validateForm()">
+                @csrf
+                <input type="hidden" name="_method" id="formMethod" value="POST">
+                <input type="hidden" name="laid" id="laid">
 
-    <!-- Input for Username -->
-    <div class="form-group form-group-full-width">
-        <label for="uid" class="form-label">Username</label>
-        <input type="text" name="uid" id="uid" class="form-control rounded-pill" value="{{ session('username') }}" required readonly>
-    </div>
-    <br>
+                <!-- Input for Username -->
+                <div class="form-group form-group-full-width">
+                    <label for="uid" class="form-label">Username</label>
+                    <input type="text" name="uid" id="uid" class="form-control rounded-pill"
+                        value="{{ session('username') }}" required readonly>
+                </div>
+                <br>
 
-    <input type="hidden" name="uid" value="{{ session('uid') }}">
+                <input type="hidden" name="uid" value="{{ session('uid') }}">
 
-    <!-- Input for Name -->
-    <div class="form-group form-group-full-width">
-        <label for="assign_name">Name</label>
-        <input type="text" id="assign_name" name="assign_name" class="form-control" placeholder="Type to search name..." required readonly onclick="openUserModal()">
-        <small id="assignNameError" class="text-danger"></small>
-    </div>
-    <br>
+                <!-- Input for Name -->
+                <div class="form-group form-group-full-width">
+                    <label for="assign_name">Name</label>
+                    <input type="text" id="assign_name" name="assign_name" class="form-control"
+                        placeholder="Type to search name..." required readonly onclick="openUserModal()">
+                    <small id="assignNameError" class="text-danger"></small>
+                </div>
+                <br>
 
-    <input type="hidden" name="uid_assign" id="uid_assign">
+                <input type="hidden" name="uid_assign" id="uid_assign">
 
-    <!-- Modal for User Selection -->
-    <div id="userModal" class="popup-modal hidden">
-        <div class="popup-content">
-            <h5>Select a User</h5>
-            <input type="text" id="searchUserBar" class="form-control" placeholder="Search by name or EPF..." onkeyup="filterUsers()" />
-            <ul id="userList" class="list-group"></ul>
-            <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Close</button>
-        </div>
-    </div>
+                <!-- Modal for User Selection -->
+                <div id="userModal" class="popup-modal hidden">
+                    <div class="popup-content">
+                        <h5>Select a User</h5>
+                        <input type="text" id="searchUserBar" class="form-control"
+                            placeholder="Search by name or EPF..." onkeyup="filterUsers()" />
+                        <ul id="userList" class="list-group"></ul>
+                        <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Close</button>
+                    </div>
+                </div>
 
-    <!-- Input for EPF -->
-    <div class="form-group form-group-full-width">
-        <label for="epf">EPF</label>
-        <input type="text" id="epf" name="epf" class="form-control" required readonly>
-        <small id="epfError" class="text-danger"></small>
-    </div>
-    <br>
+                <!-- Input for EPF -->
+                <div class="form-group form-group-full-width">
+                    <label for="epf">EPF</label>
+                    <input type="text" id="epf" name="epf" class="form-control" required readonly>
+                    <small id="epfError" class="text-danger"></small>
+                </div>
+                <br>
 
-    <!-- Input for Lab Name -->
-    <div class="form-group form-group-full-width">
-        <label for="lab_name">Lab name</label>
-        <input type="text" id="lab_name" name="lab_name" class="form-control" placeholder="Type to search lab name..." required readonly onclick="openLabModal()">
-        <small id="labNameError" class="text-danger"></small>
-    </div>
+                <!-- Input for Lab Name -->
+                <div class="form-group form-group-full-width">
+                    <label for="lab_name">Lab name</label>
+                    <input type="text" id="lab_name" name="lab_name" class="form-control"
+                        placeholder="Type to search lab name..." required readonly onclick="openLabModal()">
+                    <small id="labNameError" class="text-danger"></small>
+                </div>
 
-    <input type="hidden" name="lid" id="lid">
+                <input type="hidden" name="lid" id="lid">
 
-    <!-- Modal for Lab Selection -->
-    <div id="labModal" class="popup-modal hidden">
-        <div class="popup-content">
-            <h5>Select a Lab</h5>
-            <input type="text" id="searchLabBar" class="form-control" placeholder="Search by lab name..." onkeyup="filterLabs()" />
-            <ul id="labList" class="list-group"></ul>
-            <button type="button" class="btn btn-secondary" onclick="closeLabModal()">Close</button>
-        </div>
-    </div>
+                <!-- Modal for Lab Selection -->
+                <div id="labModal" class="popup-modal hidden">
+                    <div class="popup-content">
+                        <h5>Select a Lab</h5>
+                        <input type="text" id="searchLabBar" class="form-control" placeholder="Search by lab name..."
+                            onkeyup="filterLabs()" />
+                        <ul id="labList" class="list-group"></ul>
+                        <button type="button" class="btn btn-secondary" onclick="closeLabModal()">Close</button>
+                    </div>
+                </div>
 
-    <br><br><br>
-    <button type="submit" class="btn btn-primary form-group">Register</button><br><br>
-</form>
+                <br><br><br>
+                <button type="submit" class="btn btn-primary form-group">Register</button><br><br>
+            </form>
         </div>
     </div>
 </main>
@@ -148,31 +157,31 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    function validateForm() {
-        let isValid = true;
-        let assignName = document.getElementById('assign_name').value;
-        let epf = document.getElementById('epf').value;
-        let labName = document.getElementById('lab_name').value;
+function validateForm() {
+    let isValid = true;
+    let assignName = document.getElementById('assign_name').value;
+    let epf = document.getElementById('epf').value;
+    let labName = document.getElementById('lab_name').value;
 
-        document.getElementById('assignNameError').textContent = "";
-        document.getElementById('epfError').textContent = "";
-        document.getElementById('labNameError').textContent = "";
+    document.getElementById('assignNameError').textContent = "";
+    document.getElementById('epfError').textContent = "";
+    document.getElementById('labNameError').textContent = "";
 
-        if (!assignName) {
-            document.getElementById('assignNameError').textContent = "Please select a user.";
-            isValid = false;
-        }
-        if (!epf) {
-            document.getElementById('epfError').textContent = "EPF cannot be empty.";
-            isValid = false;
-        }
-        if (!labName) {
-            document.getElementById('labNameError').textContent = "Please select a lab.";
-            isValid = false;
-        }
-        
-        return isValid;
+    if (!assignName) {
+        document.getElementById('assignNameError').textContent = "Please select a user.";
+        isValid = false;
     }
+    if (!epf) {
+        document.getElementById('epfError').textContent = "EPF cannot be empty.";
+        isValid = false;
+    }
+    if (!labName) {
+        document.getElementById('labNameError').textContent = "Please select a lab.";
+        isValid = false;
+    }
+
+    return isValid;
+}
 </script>
 
 <script>

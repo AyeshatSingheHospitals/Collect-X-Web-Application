@@ -2,6 +2,17 @@
 <html lang="en">
 
 <head>
+
+<!-- <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="Fri, 01 Jan 1990 00:00:00 GMT"> -->
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -24,7 +35,9 @@
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
     </style>
 
-<script type="text/javascript" src="../js/sidebar.js"></script>
+    <script type="text/javascript" src="../js/sidebar.js"></script>
+
+    
 </head>
 
 <body>
@@ -110,10 +123,21 @@
                                 <p>Hey, <b>{{ session('fname', 'Guest') }}</b></p>
                                 <small class="text-muted">{{ session('role', 'Unknown Role') }}</small>
                             </div>
-                            <div class="profile-photo">
+                            <!-- <div class="profile-photo">
                                 <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
                                     onerror="this.style.display='none'; this.parentNode.innerHTML += '<i class=\'bx bxs-user-circle\' style=\'font-size: 40px; color: rgb(156,161,221);\'></i>';">
+                            </div> -->
+
+                            <div class="profile-photo">
+                                @if(Session::has('image') && Session::get('image'))
+                                <img src="{{ asset('storage/' . Session::get('image')) }}" alt="Profile"
+                                    onerror="this.onerror=null; this.src='{{ asset('image/default-profile.png') }}';">
+                                @else
+                                <img src="{{ asset('image/default-profile.png') }}" alt="Default Profile">
+                                @endif
                             </div>
+
+
 
                             <!-- Dropdown Menu -->
                             <div class="dropdown-menu">
@@ -189,7 +213,44 @@
     });
     </script>
 
+<script>
+    function checkSession() {
+        fetch("{{ url('/check-session') }}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "session_expired") {
+                    alert(data.message);
+                    window.location.href = "{{ route('logout') }}"; // Redirect to logout
+                }
+            });
+    }
+
+    setInterval(checkSession, 1 * 60 * 1000); // Check session every 5 minutes
+</script>
+
+
+<script>
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+    
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            window.location.href = "{{ url('/') }}"; // Redirect to login page
+        }
+    };
+</script>
+
+
+<!-- <script>
+    history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.go(1);
+    };
+</script> -->
 
 </body>
+
+
 
 </html>

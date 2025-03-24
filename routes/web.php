@@ -166,6 +166,9 @@ Route::post('/admin/labassigns/store', [LabAssignController::class, 'storeLabass
 Route::put('/admin/labassigns/{laid}', [LabAssignController::class, 'updateLabassign'])->name('admin.labassigns.update');
 Route::delete('/admin/labassigns/{id}', [LabAssignController::class, 'destroyLabassign'])->name('admin.labassigns.destroy');
 
+Route::get('/get-user-names', [LabAssignController::class, 'getUserNames'])->name('get.user.names');
+Route::get('/get-lab-names', [LabAssignController::class, 'getLabNames'])->name('get.lab.names');
+
 //Route Assign
 Route::get('admin/routeassigns', function () {
     return view('admin.rassign');
@@ -174,8 +177,6 @@ Route::get('admin/route-assign/search', [RouteAssignController::class, 'searchLa
 Route::get('admin/routeassigns', [RouteAssignController::class, 'showAssignedRoutes']);
 Route::post('admin/route-assign/store', [RouteAssignController::class, 'storeAssignments'])->name('route.assign.store');
 
-Route::get('/get-user-names', [SystemuserController::class, 'getUserNames'])->name('get.user.names');
-Route::get('/get-lab-names', [LabController::class, 'getLabNames'])->name('get.lab.names');
 
 // transaction
 Route::get('/admin/transactions', [TransactionController::class, 'index'])->name('transactions.index');
@@ -293,6 +294,9 @@ Route::get('/lab/transactions', [TransactionController::class, 'getTransactions'
 
 
 Route::post('/dashboard/lab-details', [DashboardController::class, 'getLabDetails']);
+
+Route::get('/check-session', [AuthController::class, 'checkSession']);
+
 
 
 

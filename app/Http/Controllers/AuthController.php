@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use App\Models\Systemuser; // Your Systemuser model
 
+use Illuminate\Support\Facades\Cookie;
+
+
 class AuthController extends Controller
 {
 
@@ -29,7 +32,7 @@ class AuthController extends Controller
         
 
         // Hardcoded Admin Credentials
-        if ($role === 'Admin' && $username === 'admin' && $password === env('ADMIN_PASSWORD', 'Singhe@123')) {
+        if ($role === 'Admin' && $username === 'admin' && $password === env('ADMIN_PASSWORD', 'admin@123')) {
             Session::put('role', 'Admin');
             Session::put('username', $username);
             Session::put('fname', 'Admin');
@@ -89,12 +92,42 @@ class AuthController extends Controller
     //     return redirect('/')->with('success', 'Logged out successfully.');
     // }
 
-    public function logout()
+//     public function logout()
+// {
+//     Session::flush(); // Clear all session data
+//     Auth::logout(); // Log out the user
+
+//     return redirect('/')->with('success', 'Logged out successfully.');
+// }
+
+
+public function logout()
 {
     Session::flush(); // Clear all session data
     Auth::logout(); // Log out the user
 
-    return redirect('/')->with('success', 'Logged out successfully.');
+    return redirect('/')->with('success', 'Logged out successfully.')
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        ->header('Pragma', 'no-cache')
+        ->header('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
 }
+
+
+
+
+
+
+
+public function checkSession()
+{
+    if (!Session::has('username')) {
+        Auth::logout();
+        Session::flush();
+        return response()->json(['status' => 'session_expired', 'message' => 'Session expired. Please log in again.']);
+    }
+
+    return response()->json(['status' => 'active']);
+}
+
 
 }

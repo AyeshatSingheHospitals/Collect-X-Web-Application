@@ -129,64 +129,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// document.addEventListener('DOMContentLoaded', function() {
-//     // Dark mode toggle functionality (as already provided)
-//     const darkModeToggle = document.querySelector('.dark-mode');
-//     const body = document.body;
-
-//     darkModeToggle.addEventListener('click', function() {
-//         body.classList.toggle('dark-mode-active');
-//     });
-// });
-
-// Search Functionality
-const searchInput = document.getElementById('search-input');
-const tableBody = document.getElementById('transactions-table-body');
-
-searchInput.addEventListener('input', function() {
-    const query = searchInput.value.toLowerCase();
-    const rows = tableBody.querySelectorAll('tr');
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        let rowText = '';
-        cells.forEach(cell => {
-            rowText += cell.textContent.toLowerCase();
-        });
-
-        if (rowText.includes(query)) {
-            row.style.display = ''; // Show the row if it matches the search
-        } else {
-            row.style.display = 'none'; // Hide the row if it doesn't match
-        }
-    });
-});
 
 
-// Function to apply dark mode based on saved preference
-function applyDarkModePreference() {
-    const darkModePreference = localStorage.getItem('darkMode');
-    if (darkModePreference === 'enabled') {
-        document.body.classList.add('dark-mode-variables');
-        darkMode.querySelector('span:nth-child(1)').classList.remove('active');
-        darkMode.querySelector('span:nth-child(2)').classList.add('active');
-    } else {
-        document.body.classList.remove('dark-mode-variables');
-        darkMode.querySelector('span:nth-child(1)').classList.add('active');
-        darkMode.querySelector('span:nth-child(2)').classList.remove('active');
-    }
-}
 
-// Apply dark mode preference on page load
-window.addEventListener('load', applyDarkModePreference);
-
-menuBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'block';
-});
-
-closeBtn.addEventListener('click', () => {
-    sideMenu.style.display = 'none';
-});
 </script>
 
 <script>
@@ -236,51 +181,6 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
-</script>
-
-<script>
-    const sideMenu = document.querySelector('aside');
-    const menuBtn = document.getElementById('menu-btn');
-    const closeBtn = document.getElementById('close-btn');
-    const darkMode = document.querySelector('.dark-mode');
-
-    // Toggle dark mode and save preference to local storage
-    darkMode.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode-variables');
-        const isDarkMode = document.body.classList.contains('dark-mode-variables');
-
-        // Save the current mode in local storage
-        localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-
-        // Toggle active states on the dark mode icons
-        darkMode.querySelector('span:nth-child(1)').classList.toggle('active');
-        darkMode.querySelector('span:nth-child(2)').classList.toggle('active');
-    });
-
-    // Function to apply dark mode based on saved preference
-    function applyDarkModePreference() {
-        const darkModePreference = localStorage.getItem('darkMode');
-        if (darkModePreference === 'enabled') {
-            document.body.classList.add('dark-mode-variables');
-            darkMode.querySelector('span:nth-child(1)').classList.remove('active');
-            darkMode.querySelector('span:nth-child(2)').classList.add('active');
-        } else {
-            document.body.classList.remove('dark-mode-variables');
-            darkMode.querySelector('span:nth-child(1)').classList.add('active');
-            darkMode.querySelector('span:nth-child(2)').classList.remove('active');
-        }
-    }
-
-    // Apply dark mode preference on page load
-    window.addEventListener('load', applyDarkModePreference);
-
-    menuBtn.addEventListener('click', () => {
-        sideMenu.style.display = 'block';
-    });
-
-    closeBtn.addEventListener('click', () => {
-        sideMenu.style.display = 'none';
-    });
 </script>
 
 <!-- CSS -->

@@ -82,24 +82,82 @@ cardContainer.classList.add('show-container'); // Instead of display = 'block'
 
 
 //get ro's related to selected lab
+// document.getElementById('labDropdown').addEventListener('change', function() {
+//     const labId = this.value; // Get the selected lab ID
+//     const cardContainer = document.getElementById('cardContainer'); // Container for the cards
+
+//     // Clear existing cards
+//     cardContainer.innerHTML = '';
+
+//     if (labId) {
+//         // Make an AJAX request to fetch the lab assignments
+//         fetch(`/lab/assignments?lid=${labId}`)
+//             .then((response) => response.json())
+//             .then((assignments) => {
+//                 assignments.forEach((assignment) => {
+//                     const officer = assignment.systemuser;
+
+//                     // Determine the status color
+//                     const statusColor = officer.status.toLowerCase() === 'inactive' ? '#FF0060' :
+//                         '#628ECB';
+
+//                     // Create a new card for each officer
+//                     const card = document.createElement('div');
+//                     card.classList.add('card');
+
+//                     card.innerHTML = `
+//                         <div class="image">
+//                          <img src="/storage/${officer.image || 'image/default-profile.png'}" alt="${officer.fname}" />
+
+//                         </div>
+//                         <div class="content1">
+//                             <h2 class="name">${officer.fname + " " + officer.lname}</h2>
+//                             <p class="job">${officer.role}</p>
+//                             <p class="job">${officer.contact}</p>
+
+//                             <p class="job" style="color: ${statusColor};">${officer.status.toUpperCase()}</p>
+
+                            
+//                         </div>
+//                     `;
+
+//                     cardContainer.appendChild(card);
+
+//                     loadingGif.style.display = 'none';
+//                     cardContainer.classList.add('show-container'); // Instead of display = 'block'
+
+//                 });
+//             })
+//             .catch((error) => console.error('Error fetching assignments:', error));
+//     }
+// });
 document.getElementById('labDropdown').addEventListener('change', function() {
     const labId = this.value; // Get the selected lab ID
     const cardContainer = document.getElementById('cardContainer'); // Container for the cards
+    const defaultImagePath = "{{ asset('image/default-profile.png') }}"; // Corrected path
 
     // Clear existing cards
     cardContainer.innerHTML = '';
 
     if (labId) {
+        // Show a loading indicator (optional)
+        cardContainer.innerHTML = '<p>Loading...</p>';
+
         // Make an AJAX request to fetch the lab assignments
         fetch(`/lab/assignments?lid=${labId}`)
             .then((response) => response.json())
             .then((assignments) => {
+                // Clear loading text before adding new cards
+                cardContainer.innerHTML = '';
+
                 assignments.forEach((assignment) => {
                     const officer = assignment.systemuser;
 
                     // Determine the status color
-                    const statusColor = officer.status.toLowerCase() === 'inactive' ? '#FF0060' :
-                        '#628ECB';
+                    const statusColor = officer.status.toLowerCase() === 'inactive' ? '#FF0060' : '#628ECB';
+
+                    // Use officer's image if available, otherwise use default image
+                    const officerImage = officer.image ? `/storage/${officer.image}` : defaultImagePath;
 
                     // Create a new card for each officer
                     const card = document.createElement('div');
@@ -107,28 +165,30 @@ document.getElementById('labDropdown').addEventListener('change', function() {
 
                     card.innerHTML = `
                         <div class="image">
-                         <img src="/storage/${officer.image || 'images/default.jpg'}" alt="${officer.fname}" />
-
+                            <img src="${officerImage}" alt="${officer.fname}" 
+                                 onerror="this.onerror=null; this.src='${defaultImagePath}';" />
                         </div>
                         <div class="content1">
                             <h2 class="name">${officer.fname + " " + officer.lname}</h2>
                             <p class="job">${officer.role}</p>
                             <p class="job">${officer.contact}</p>
-
                             <p class="job" style="color: ${statusColor};">${officer.status.toUpperCase()}</p>
-
-                            
                         </div>
                     `;
 
                     cardContainer.appendChild(card);
 
                     loadingGif.style.display = 'none';
-                    cardContainer.classList.add('show-container'); // Instead of display = 'block'
-
+                    cardContainer.classList.add('show-container');
                 });
+
+                // Hide loading indicator
+                cardContainer.classList.add('show-container');
             })
-            .catch((error) => console.error('Error fetching assignments:', error));
+            .catch((error) => {
+                console.error('Error fetching assignments:', error);
+                cardContainer.innerHTML = '<p style="color: red;">Failed to load data.</p>';
+            });
     }
 });
 
@@ -150,6 +210,7 @@ function filterCards() {
 </script>
 
 
+<!-- Define the default image path in a hidden Blade variable -->
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

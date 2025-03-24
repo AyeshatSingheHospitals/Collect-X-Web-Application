@@ -146,25 +146,6 @@ class SystemuserController extends Controller
 }
 
 
-    public function getUserNames()
-{
-    // Fetch all system users
-    $users = Systemuser::where('status', 'active')->select('uid', 'fname', 'lname', 'epf')->get();
-
-    // Create a list of full names with EPF and UID
-    $userDetails = $users->map(function ($user) {
-        return [
-            'uid' => $user->uid,
-            'full_name' => $user->fname . ' ' . $user->lname,
-            'epf' => $user->epf,
-        ];
-    });
-
-    // Return the user details as a JSON response
-    return response()->json($userDetails);
-}
-
-
 public function updatePassword(Request $request)
 {
     // Validate the request
