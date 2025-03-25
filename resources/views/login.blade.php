@@ -250,6 +250,27 @@
                     {{ session('error') }}
                 </div>
                 @endif
+                <!-- <div class="role-icons">
+                    <div class="role-container">
+                        <div class="role-btn" data-role="Admin">
+                            <i class='bx bx-cog'></i>
+                            <span class="role-label">Admin</span>
+                        </div>
+                    </div>
+                    <div class="role-container">
+                        <div class="role-btn" data-role="Supervisor">
+                            <i class='bx bxs-user'></i>
+                            <span class="role-label">Supervisor</span>
+                        </div>
+                    </div>
+                    <div class="role-container">
+                        <div class="role-btn" data-role="Incharge">
+                            <i class='bx bxs-user-circle'></i>
+                            <span class="role-label">Incharge</span>
+                        </div>
+                    </div>
+                </div> -->
+
                 <div class="role-icons">
                     <div class="role-container">
                         <div class="role-btn" data-role="Admin">
@@ -271,21 +292,56 @@
                     </div>
                 </div>
 
+                <!-- Hidden input to store selected role -->
+                <!-- <input type="hidden" id="selectedRole" name="role"> -->
+
                 <br><br>
 
                 <input type="hidden" id="selectedRole" name="role" value="" />
 
                 <div class="form-group">
-                    <input type="text" name="username" id="username"  placeholder="Username" required />
+                    <input type="text" name="username" id="username" placeholder="Username" required />
                 </div>
                 <div class="form-group">
                     <input type="password" name="password" id="password" placeholder="Password" required />
                 </div>
-                <button class="btn" type="submit">Sign In</button>
+                <button class="btn" type="submit" id="loginSubmit">Sign In</button>
             </form>
 
         </div>
     </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let selectedRole = "";
+        const roleButtons = document.querySelectorAll(".role-btn");
+        const hiddenRoleInput = document.getElementById("selectedRole");
+        const loginButton = document.getElementById("loginSubmit");
+
+        // Role selection event
+        roleButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                selectedRole = this.getAttribute("data-role");
+                hiddenRoleInput.value = selectedRole; // Update hidden input value
+
+                // Remove active class from all buttons
+                roleButtons.forEach(btn => btn.classList.remove("active"));
+
+                // Add active class to the selected button
+                this.classList.add("active");
+            });
+        });
+
+        // Form submission validation
+        loginButton.addEventListener("click", function (event) {
+            if (!hiddenRoleInput.value) {
+                event.preventDefault(); // Stop form submission
+                alert("Please select a role before submitting."); // Show alert
+            }
+        });
+    });
+</script>
+
 
     <script>
     // Get all role buttons
