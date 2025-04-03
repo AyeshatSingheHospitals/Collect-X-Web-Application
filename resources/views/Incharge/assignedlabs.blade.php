@@ -1,4 +1,4 @@
-@extends('supervisor.sidebar')
+@extends('incharge.sidebar')
 
 @section('content')
 

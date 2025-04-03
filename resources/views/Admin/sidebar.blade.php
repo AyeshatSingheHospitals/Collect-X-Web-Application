@@ -84,9 +84,13 @@
                     <span class="material-symbols-sharp">check_circle</span>
                     <h3>Route Assign</h3>
                 </a>
-                <a href="/admin/transactions" class="{{ request()->is('/admin/transactions') ? 'active' : '' }}">
+                <a href="/admin/transactions" class="{{ request()->is('admin/transactions') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">attach_money</span>
                     <h3>Transactions</h3>
+                </a>
+                <a href="/admin/shortage-excess" class="{{ request()->is('admin/shortage-excess') ? 'active' : '' }}">
+                    <span class="material-symbols-sharp">currency_exchange</span>
+                    <h3>Sortage & excess</h3>
                 </a>
                 <a href="{{ route('logout') }}">
                     <span class="material-symbols-sharp">logout</span>

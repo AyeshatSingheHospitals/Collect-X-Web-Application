@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('uid')->constrained('systemuser')->onDelete('cascade');
             $table->foreignId('rid')->constrained('route')->onDelete('cascade');
             $table->foreignId('cid')->constrained('center')->onDelete('cascade');
+            $table->double('bill_amount');
             $table->double('amount');
+            $table->double('difference_amount');
             $table->string('remark');
             $table->string('action');
 

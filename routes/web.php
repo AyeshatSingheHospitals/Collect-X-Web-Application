@@ -13,6 +13,7 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\RouteAssignController;
 use App\Http\Controllers\RouteAssignByInchargeController;
 use App\Http\Controllers\RouteAssignBySupervisorController;
+use App\Http\Controllers\ShortageController;
 
 
 use App\Http\Controllers\DashboardController;
@@ -129,6 +130,11 @@ Route::get('/lab', function () {
 Route::get('/labassign', function () {
     return view('admin.labassign');
 });
+
+Route::get('/admin/shortage', function () {
+    return view('admin.shortage');
+});
+
 
 // ------------------------ [ Admin ]------------------------------
 
@@ -297,6 +303,16 @@ Route::post('/dashboard/lab-details', [DashboardController::class, 'getLabDetail
 
 Route::get('/check-session', [AuthController::class, 'checkSession']);
 
+// Route::get('/admin/transaction/{tid}', [TransactionController::class,'showTransactionDetails'])->name('admin.transaction.details');
 
+// Route::get('/transactions/{tid}', [TransactionController::class, 'show'])
+//     ->name('transactions.show');
 
+// Route::get('/admin/transactions/{tid}', [TransactionController::class, 'show'])->name('admin.transaction.details');
+
+Route::get('/admin/shortage-excess', [ShortageController::class, 'index'])->name('admin.shortage-excess');
+
+Route::get('/incharge/shortage-excess', [ShortageController::class, 'indexIncharge'])->name('incharge.shortage-excess');
+
+Route::get('/supervisor/shortage-excess', [ShortageController::class, 'indexSupervisor'])->name('supervisor.shortage-excess');
 

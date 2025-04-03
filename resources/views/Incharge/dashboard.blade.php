@@ -1488,7 +1488,7 @@ h1 {
             <div class="status">
                 <div class="info">
                     <h3>Total Relationship Officers</h3>
-                    <h1 id="totalIncharges"></h1>
+                    <h1 id="totalROs"></h1>
                 </div>
                 <div class="progresss">
                     <svg>
@@ -1572,7 +1572,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         .toLocaleString();
                     document.getElementById('totalCenters').textContent = data.totalCenters
                         .toLocaleString();
-                    document.getElementById('totalIncharges').textContent = data.totalIncharges
+                    document.getElementById('totalROs').textContent = data.totalROs
                         .toLocaleString();
 
                     // Hide the loading GIF and show the analysis section

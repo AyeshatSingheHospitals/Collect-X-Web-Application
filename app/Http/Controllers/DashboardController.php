@@ -8,6 +8,7 @@ use App\Models\Route;
 use App\Models\Center;
 use App\Models\SystemUser;
 use App\Models\LabAssign;
+use App\Models\RouteAssign;
 use App\Models\Transaction;
 use Carbon\Carbon;
 
@@ -20,6 +21,7 @@ class DashboardController extends Controller
         $routeCount = Route::count();
         $centerCount = Center::count();
         $labassignCount = LabAssign::count();
+        $routeassignCount = RouteAssign::count();
         $supervisorCount = SystemUser::where('role', 'Supervisor')->count();
         $inchargeCount = SystemUser::where('role', 'Incharge')->count();
         $roCount = SystemUser::where('role', 'RO')->count();
@@ -34,7 +36,7 @@ class DashboardController extends Controller
         return view('Admin.dashboard', compact(
             'labCount', 'routeCount', 'centerCount', 
             'supervisorCount', 'inchargeCount', 'roCount', 
-            'labassignCount', 'totalSales', 'todaySales'
+            'labassignCount','routeassignCount', 'totalSales', 'todaySales'
         ));
     }
 
@@ -55,14 +57,19 @@ class DashboardController extends Controller
         // Sum of amounts for the selected center
         $totalRoutes = Route::where('lid', $labId)->count(); // Count of routes for the selected lab
         $totalCenters = Center::where('lid', $labId)->count(); // Count of centers for the selected lab
-        $totalIncharges = LabAssign::where('lid', $labId)->count(); // Count of relationship officers for the selected lab
+        $totalROs = LabAssign::where('lid', $labId)
+        ->whereHas('systemuser', function ($query) {
+            $query->where('role', 'RO');
+        })
+        ->count();
+     // Count of relationship officers for the selected lab
 
         // Return the data as JSON response
         return response()->json([
             'totalSales' => $totalSales,
             'totalRoutes' => $totalRoutes,
             'totalCenters' => $totalCenters,
-            'totalIncharges' => $totalIncharges,
+            'totalROs' => $totalROs,
         ]);
     }
 }

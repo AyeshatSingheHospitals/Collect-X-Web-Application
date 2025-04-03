@@ -17,7 +17,9 @@ class Transaction extends Model
         'uid',
         'rid',
         'cid',
+        'bill_amount',
         'amount',
+        'difference_amount',
         'remark',
     ];
 
@@ -42,6 +44,6 @@ class Transaction extends Model
     // Relationship to SMS
     public function sms()
     {
-        return $this->hasOne(SMS::class, 'tid', 'tid'); // Correct relationship
+        return $this->hasMany(SMS::class, 'tid', 'tid'); // Correct relationship
     }
 }

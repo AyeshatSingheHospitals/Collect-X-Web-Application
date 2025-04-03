@@ -21,9 +21,6 @@
     </div>
     @endif
 
-
-    <!-- Assigned Labs Dropdown -->
-
     <div class="row">
         <div class="dropdown">
             <input type="hidden" name="uid" value="{{ session('uid') }}">
@@ -48,15 +45,17 @@
                         <th>Date</th>
                         <th>Full Name</th>
                         <th>Center Name</th>
-                        <th>Amount</th>
+                        <th>Bill Amount</th>
+                        <th>Collected Amount</th>
+                        <th>Difference</th>
                         <th>Remark</th>
-                        <th>SMS Description</th>
-                        <th>Actions</th> <!-- New column for actions -->
+                        <!-- <th>SMS Description</th> -->
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="transactionTableBody">
                     <tr>
-                        <td colspan="8" class="text-center">No data available</td>
+                        <td colspan="10" class="text-center">No data available</td>
                     </tr>
                 </tbody>
             </table>
@@ -72,15 +71,99 @@
                 @method('PUT')
                 <input type="hidden" name="uid" value="{{ session('uid') }}">
                 <input type="hidden" name="tid" id="edit-tid">
-                <label for="edit-amount">New Amount:</label>
+                
+                <label for="edit-bill_amount">New Bill Amount:</label>
+                <input type="number" name="bill_amount" id="edit-bill_amount" step="0.01" required>
+                
+                <label for="edit-amount">Collected Amount:</label>
                 <input type="number" name="amount" id="edit-amount" step="0.01" required>
-
-                <button type="submit">Update</button>
-                <button type="button" id="cancel-btn">Cancel</button>
+                <hr>
+                <p><label for="edit-difference_amount">Difference Amount:</label>
+                <input type="number" id="edit-difference_amount" name="difference_amount" readonly class="difference-amount">
+                </p>
+                <hr>
+                
+                    <button type="submit">Update</button>
+                    <button type="button" id="cancel-btn">Cancel</button>
+                
             </form>
         </div>
     </div>
 </main>
+
+<style>
+.difference-amount {
+    font-weight: bold;
+    /* Default color for zero */
+    color: #333;
+}
+
+.difference-amount.negative {
+    color: #FF0060;
+    /* Red for negative */
+}
+
+.difference-amount.positive {
+    color: #ADC865;
+    /* Green for positive */
+}
+
+.difference-amount.zero {
+    color: #333;
+    /* Default for zero */
+}
+</style>
+
+<style>
+hr {
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    /* Light gray color */
+    margin: 20px 0;
+    /* Add margin above and below the line */
+}
+
+.sms-container {
+    padding: 15px;
+    background-color: var(--color-background);
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
+.sms-message {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    border-left: 4px solid #4e73df;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-white);
+
+}
+
+.sms-message small {
+    /* color: #6c757d; */
+    font-size: 0.85rem;
+    /* color: var(--color-dark); */
+
+}
+.sms-container p {
+    /* color: #6c757d; */
+    /* font-size: 0.85rem; */
+    color: var(--color-dark);
+
+}
+
+.main-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.main-row:hover {
+    background-color: #f5f5f5;
+}
+
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -90,6 +173,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('edit-modal');
     const cancelBtn = document.getElementById('cancel-btn');
     const editForm = document.getElementById('edit-form');
+    
+    // Elements for amount calculation
+    const billAmountInput = document.getElementById('edit-bill_amount');
+    const amountInput = document.getElementById('edit-amount');
+    const differenceAmountInput = document.getElementById('edit-difference_amount');
+
+    // Function to calculate and update difference amount
+    function calculateDifference() {
+        const billAmount = parseFloat(billAmountInput.value) || 0;
+        const amount = parseFloat(amountInput.value) || 0;
+        const difference = amount - billAmount;
+        
+        differenceAmountInput.value = difference.toFixed(2);
+        
+        // Update color based on value
+        differenceAmountInput.classList.remove('positive', 'negative', 'zero');
+        if (difference > 0) {
+            differenceAmountInput.classList.add('positive');
+        } else if (difference < 0) {
+            differenceAmountInput.classList.add('negative');
+        } else {
+            differenceAmountInput.classList.add('zero');
+        }
+    }
+
+    // Event listeners for automatic calculation
+    billAmountInput.addEventListener('input', calculateDifference);
+    amountInput.addEventListener('input', calculateDifference);
 
     // Fetch assigned labs
     fetch('/lab/assigned-labs')
@@ -112,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
     // Fetch transactions on lab selection
+    // Modify the transaction display part to include SMS details
     labDropdown.addEventListener('change', function() {
         const lid = labDropdown.value;
 
@@ -122,40 +234,95 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (data.length === 0) {
                     transactionTableBody.innerHTML = `<tr>
-                        <td colspan="8" class="text-center">No transactions found</td>
+                        <td colspan="10" class="text-center">No transactions found</td>
                     </tr>`;
                 } else {
                     data.forEach((transaction) => {
-                        let smsDescriptions = transaction.sms.length ?
-                            transaction.sms.map((sms) => `<li>${sms.description}</li>`)
-                            .join('') :
-                            '<li>N/A</li>';
+                        // Calculate difference for display
+                        const difference = transaction.amount - transaction.bill_amount;
+                        let differenceClass = '';
+                        if (difference > 0) differenceClass = 'positive';
+                        else if (difference < 0) differenceClass = 'negative';
+                        else differenceClass = 'zero';
+
+                        // Build SMS messages HTML
+                        let smsMessages = '';
+                        if (transaction.sms && transaction.sms.length > 0) {
+                            smsMessages = transaction.sms.map(sms => `
+                                <div class="sms-message">
+                                    <p>${sms.description || 'No description'}</p>
+                                    <small>Sent to: 
+                                        ${sms.phonenumber1 || ''}
+                                        ${sms.phonenumber2 ? ', ' + sms.phonenumber2 : ''}
+                                        ${sms.phonenumber3 ? ', ' + sms.phonenumber3 : ''}
+                                    </small>
+                                </div>
+                            `).join('');
+                        } else {
+                            smsMessages = '<p>No SMS messages found for this transaction</p>';
+                        }
 
                         transactionTableBody.innerHTML += `
-                    <tr>
-                        <td>${transaction.tid}</td>
-                        <td>${transaction.date}</td>
-                        <td>${transaction.full_name}</td>
-                        <td>${transaction.center_name}</td>
-                        <td>LRK ${transaction.amount}</td>
-                        <td>${transaction.remark}</td>
-                        <td>${smsDescriptions}</td> 
-                        <td>
-                            <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
-                                <i class='bx bxs-pen'></i>
-                            </button>
-                        </td>
-                    </tr>`;
+                            <tr class="main-row" data-id="${transaction.tid}">
+                                <td>${transaction.tid}</td>
+                                <td>${transaction.date}</td>
+                                <td>${transaction.full_name}</td>
+                                <td>${transaction.center_name}</td>
+                                <td>LKR ${parseFloat(transaction.bill_amount).toFixed(2)}</td>
+                                <td>LKR ${parseFloat(transaction.amount).toFixed(2)}</td>
+                                <td class="${differenceClass}">LKR ${difference.toFixed(2)}</td>
+                                <td>${transaction.remark}</td>
+                                <td>
+                                    <button class="edit-btn" data-id="${transaction.tid}" 
+                                            data-bill_amount="${transaction.bill_amount}"
+                                            data-amount="${transaction.amount}"
+                                            style="font-size:1.2rem;">
+                                        <i class='bx bxs-pen'></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="sms-details-row" style="display: none;" data-id="${transaction.tid}">
+                                <td colspan="9">
+                                    <div class="sms-container">
+                                        <h4>SMS Messages (TID: ${transaction.tid})</h4>
+                                        ${smsMessages}
+                                    </div>
+                                </td>
+                            </tr>`;
                     });
 
                     // Attach event listeners to edit buttons
                     attachEditButtonListeners();
+                    
+                    // Add row click handlers for showing SMS messages
+                    document.querySelectorAll('.main-row').forEach(row => {
+                        row.addEventListener('click', function(e) {
+                            // Don't trigger if clicking on the edit button
+                            if (e.target.closest('.edit-btn')) {
+                                return;
+                            }
+
+                            const tid = this.getAttribute('data-id');
+                            const smsRow = document.querySelector(`.sms-details-row[data-id="${tid}"]`);
+
+                            // Toggle display
+                            smsRow.style.display = smsRow.style.display === 'none' ? 'table-row' : 'none';
+
+                            // Scroll to the expanded row if showing
+                            if (smsRow.style.display === 'table-row') {
+                                smsRow.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'nearest'
+                                });
+                            }
+                        });
+                    });
                 }
             })
             .catch((error) => {
                 console.error('Error fetching transactions:', error);
                 transactionTableBody.innerHTML = `<tr>
-                    <td colspan="8" class="text-center">Error loading transactions</td>
+                    <td colspan="10" class="text-center">Error loading transactions</td>
                 </tr>`;
             });
     });
@@ -165,36 +332,22 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.edit-btn').forEach((button) => {
             button.addEventListener('click', function() {
                 const tid = this.getAttribute('data-id');
+                const billAmount = this.getAttribute('data-bill_amount');
                 const amount = this.getAttribute('data-amount');
-                openEditModal(tid, amount);
+                openEditModal(tid, billAmount, amount);
             });
         });
     }
 
     // Open edit modal and populate fields
-    function openEditModal(tid, amount) {
-        const editTidInput = document.getElementById('edit-tid');
-        const editAmountInput = document.getElementById('edit-amount');
-        const editForm = document.getElementById('edit-form');
-        const modal = document.getElementById('edit-modal');
-
-        if (!editTidInput || !editAmountInput || !editForm || !modal) {
-            console.error("Edit modal elements not found.");
-            return;
-        }
-
-        // Ensure the actual amount value is retrieved
-        let actualAmount = parseFloat(amount);
-
-        if (isNaN(actualAmount)) {
-            console.warn("Invalid amount value, setting to 0.000");
-            actualAmount = 0.000; // Default fallback value
-        }
-
-        // Set values in the modal
-        editTidInput.value = tid;
-        editAmountInput.value = actualAmount.toFixed(2); // Ensures 3 decimal places
-
+    function openEditModal(tid, billAmount, amount) {
+        document.getElementById('edit-tid').value = tid;
+        billAmountInput.value = parseFloat(billAmount).toFixed(2);
+        amountInput.value = parseFloat(amount).toFixed(2);
+        
+        // Calculate initial difference
+        calculateDifference();
+        
         // Set the form's action URL dynamically
         editForm.action = `/supervisor/transaction/${tid}`;
 
@@ -204,9 +357,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Close modal when clicking outside
     window.addEventListener('click', (event) => {
-        const modal = document.getElementById('edit-modal');
-        if (modal && event.target === modal) {
-            modal.style.display = 'none';
+        if (event.target === modal) {
+            closeEditModal();
         }
     });
 
@@ -216,15 +368,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Close modal on cancel button click
-    cancelBtn.addEventListener('click', function() {
-        closeEditModal();
-    });
+    cancelBtn.addEventListener('click', closeEditModal);
+
+    // Form submission handler
     editForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const tid = document.getElementById('edit-tid').value;
+        const billAmount = document.getElementById('edit-bill_amount').value;
         const amount = document.getElementById('edit-amount').value;
-        const selectedLab = document.getElementById('labDropdown').value; // Get selected Lab
+        const selectedLab = document.getElementById('labDropdown').value;
 
         fetch(`/supervisor/transaction/${tid}`, {
                 method: 'PUT',
@@ -233,140 +386,65 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                 },
                 body: JSON.stringify({
-                    amount
+                    bill_amount: billAmount,
+                    amount: amount,
+                    difference_amount: document.getElementById('edit-difference_amount').value
                 }),
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(data.message); // Show success message
-                    closeEditModal(); // Close Modal
-
-                    // Automatically refresh transactions for the selected lab
-                    fetch(`/lab/transactions?lid=${selectedLab}`)
-                        .then(response => response.json())
-                        .then(transactions => {
-                            transactionTableBody.innerHTML = ''; // Clear the table
-
-                            if (transactions.length === 0) {
-                                transactionTableBody.innerHTML =
-                                    `<tr><td colspan="8" class="text-center">No transactions found</td></tr>`;
-                            } else {
-                                transactions.forEach(transaction => {
-                                    let smsDescriptions = transaction.sms.length ?
-                                        transaction.sms.map(sms =>
-                                            `<li>${sms.description}</li>`).join('') :
-                                        '<li>N/A</li>';
-
-                                    transactionTableBody.innerHTML += `
-                                <tr data-tid="${transaction.tid}">
-                                    <td>${transaction.tid}</td>
-                                    <td>${transaction.date}</td>
-                                    <td>${transaction.full_name}</td>
-                                    <td>${transaction.center_name}</td>
-                                    <td>LRK ${transaction.amount}</td>
-                                    <td>${transaction.remark}</td>
-                                    <td>${smsDescriptions}</td>
-                                    <td>
-                                        <button class="edit-btn" data-id="${transaction.tid}" data-amount="${transaction.amount}" style="font-size:1.2rem;">
-                                            <i class='bx bxs-pen'></i>
-                                        </button>
-                                    </td>
-                                </tr>`;
-                                });
-
-                                attachEditButtonListeners
-                            (); // Re-attach event listeners for edit buttons
-
-                                // **Highlight the updated row**
-                                const updatedRow = document.querySelector(
-                                    `tr[data-tid="${tid}"]`);
-                                if (updatedRow) {
-                                    updatedRow.classList.add(
-                                    'highlight'); // Add highlight immediately
-
-                                    setTimeout(() => {
-                                        updatedRow.classList.add(
-                                        'fade-out'); // Start fading out after 3s
-                                    }, 3000);
-
-                                    setTimeout(() => {
-                                        updatedRow.classList.remove('highlight',
-                                            'fade-out'); // Remove all classes after 5s
-                                    }, 5000);
-                                }
-                            }
-                        });
+                    alert(data.message);
+                    closeEditModal();
+                    
+                    // Refresh transactions for the selected lab
+                    if (selectedLab) {
+                        labDropdown.dispatchEvent(new Event('change'));
+                    }
                 } else {
                     alert(data.message);
                 }
             })
             .catch(error => {
                 alert('An unexpected error occurred.');
+                console.error('Error:', error);
             });
     });
-});
 
-
-</script>
-
-<script>
-// Wait for the document to be ready
-document.addEventListener("DOMContentLoaded", function() {
-    // Get the search input field and table rows
+    // Search functionality
     const searchInput = document.getElementById("searchInput");
-    const tableBody = document.getElementById("transactionTableBody");
-
-    // Listen for input event on the search field
     searchInput.addEventListener("input", function() {
-        const query = searchInput.value.toLowerCase(); // Get search query in lowercase
-        const rows = tableBody.getElementsByTagName("tr");
-
+        const query = searchInput.value.toLowerCase();
+        const rows = document.querySelectorAll("#transactionTableBody tr");
         let found = false;
 
-        // Loop through each table row
-        for (let row of rows) {
-            const columns = row.getElementsByTagName("td");
+        rows.forEach(row => {
+            const columns = row.querySelectorAll("td");
             if (columns.length > 0) {
-                // Extract the text content of relevant columns (TID, Full Name, Center Name, Date)
                 const tid = columns[0].textContent.toLowerCase();
                 const fullName = columns[2].textContent.toLowerCase();
                 const centerName = columns[3].textContent.toLowerCase();
-                const date = columns[1].textContent.toLowerCase(); // Date column
-                // const amount = columns[4].textContent.toLowerCase();
+                const date = columns[1].textContent.toLowerCase();
+                const billAmount = columns[4].textContent.replace(/[^\d.]/g, "");
+                const amount = columns[5].textContent.replace(/[^\d.]/g, "");
 
-
-                // act numeric part of amount (removes "LRK " and keeps only numbers)
-                        let amount = columns[4].textContent.replace(/[^\d]/g, "").trim(); 
-
-                        // Convert query to number if applicable
-                        let numericQuery = parseFloat(query);
-
-                // Check if any column matches the search query
-                if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) ||
-                    date.includes(query)  ||
-                    (!isNaN(numericQuery) && amount.includes(query))) {
-                    row.style.display = ""; // Show row if there's a match
+                if (tid.includes(query) || fullName.includes(query) || 
+                    centerName.includes(query) || date.includes(query) ||
+                    billAmount.includes(query) || amount.includes(query)) {
+                    row.style.display = "";
                     found = true;
                 } else {
-                    row.style.display = "none"; // Hide row if there's no match
+                    row.style.display = "none";
                 }
             }
+        });
+
+        if (!found && rows.length > 0) {
+            transactionTableBody.innerHTML = `<tr><td colspan="10" class="text-center">No data found</td></tr>`;
         }
-
-        // If no records are found, display "No data found" message
-        if (!found) {
-            const noDataRow = document.createElement("tr");
-            noDataRow.innerHTML = `<td colspan="8" class="text-center">No data found</td>`;
-            tableBody.innerHTML = "";
-            tableBody.appendChild(noDataRow);
-        }
-
-
     });
 });
 </script>
-
 
 <!-- CSS -->
 <style>
@@ -499,15 +577,19 @@ document.addEventListener("DOMContentLoaded", function() {
 .modal-content {
     display: flex;
     flex-direction: column;
+    line-height:2.2;
 }   
 
 .modal-content button {
     margin-top: 10px;
     font-size: 14px;
+   
 }
 
 .modal {
-    z-index: 1050 !important; /* Ensure modal is above other elements */
+    z-index: 1050 !important; 
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 .content {
@@ -1162,6 +1244,11 @@ input[type="email"] {
     width: 100%;
     font-family: 'Poppins', sans-serif;
     transition: border 0.3s ease;
+}
+
+input[type="number"]{
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 
 input:focus {

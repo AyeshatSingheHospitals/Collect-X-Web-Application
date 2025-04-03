@@ -1502,7 +1502,7 @@ h1 {
             <div class="status">
                 <div class="info">
                     <h3>Total Route Assigns</h3>
-                    <h1>0</h1>
+                    <h1>{{ number_format($routeassignCount) }}</h1>
                 </div>
                 <div class="progresss">
                     <svg>

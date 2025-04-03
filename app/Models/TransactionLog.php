@@ -17,7 +17,9 @@ class TransactionLog extends Model
         'uid',
         'rid',
         'cid',
+        'bill_amount',
         'amount',
+        'difference_amount',
         'remark',
         'action',
     ];

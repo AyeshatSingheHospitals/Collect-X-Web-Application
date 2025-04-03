@@ -26,6 +26,6 @@ class SMS extends Model
     // Relationship to Transaction
     public function transaction()
     {
-        return $this->belongsTo(Transaction::class, 'tid', 'tid');
+        return $this->hasOne(Transaction::class, 'tid', 'tid');
     }
 }

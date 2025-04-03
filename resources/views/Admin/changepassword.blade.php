@@ -30,25 +30,28 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="old_password"><b>Old Password</b></label>
-                                <input type="password" name="old_password" id="old_password" class="form-control"
-                                    placeholder="Old Password" required>
-                                <p class="error-message"></p>
-                               
+                                <input type="password" name="old_password" id="old_password"
+                                    class="form-control @error('old_password') is-invalid @enderror"
+                                    placeholder="Old Password" required value="{{ old('old_password') }}">
+                                @error('old_password')
+                                <p class="error-message text-danger">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
                         <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="new_password"><b>New Password</b></label>
-                                <input type="password" name="new_password" id="new_password" class="form-control"
-                                    placeholder="New Password" required>
-                                <!-- <p class="error-message" id="password-strength"></p> -->
-                                 <p id="password-strength" class="message"></p>
-                               
+                                <input type="password" name="new_password" id="new_password"
+                                    class="form-control @error('new_password') is-invalid @enderror"
+                                    placeholder="New Password" required value="{{ old('new_password') }}">
+                                <p id="password-strength" class="message"></p>
+                                @error('new_password')
+                                <p class="error-message text-danger">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
@@ -56,13 +59,14 @@
                             <div class="mb-3">
                                 <label for="confirm_password"><b>Confirm Password</b></label>
                                 <input type="password" name="confirm_password" id="confirm_password"
-                                    class="form-control" placeholder="Confirm Password" required>
-                                <!-- <p class="error-message" id="password-match"></p> -->
+                                    class="form-control @error('confirm_password') is-invalid @enderror"
+                                    placeholder="Confirm Password" required value="{{ old('confirm_password') }}">
                                 <p id="password-match" class="message"></p>
-
+                                @error('confirm_password')
+                                <p class="error-message text-danger">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -75,9 +79,10 @@
     </div>
 </main>
 
-<!-- Strong Password Validation Script -->
+<!-- Enhanced Password Validation Script -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
+    const oldPassword = document.getElementById("old_password");
     const newPassword = document.getElementById("new_password");
     const confirmPassword = document.getElementById("confirm_password");
     const passwordStrength = document.getElementById("password-strength");
@@ -86,51 +91,132 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to check password strength
     function checkPasswordStrength(password) {
-        if (password.length < 8) return { strength: "Too short ❌", color: " #FF0060" };
-        if (!/[A-Z]/.test(password)) return { strength: "Must include an uppercase letter ❌", color: " #FF0060" };
-        if (!/[a-z]/.test(password)) return { strength: "Must include a lowercase letter ❌", color: " #FF0060" };
-        if (!/\d/.test(password)) return { strength: "Must include a number ❌", color: " #FF0060" };
-        if (!/[\W]/.test(password)) return { strength: "Must include a special character ❌", color: " #FF0060" };
-        return { strength: "Strong ✅", color: "green" };
+        if (password.length === 0) return {
+            strength: "",
+            color: ""
+        };
+        if (password.length < 8) return {
+            strength: "Too short ❌",
+            color: "#FF0060"
+        };
+        if (!/[A-Z]/.test(password)) return {
+            strength: "Must include uppercase ❌",
+            color: "#FF0060"
+        };
+        if (!/[a-z]/.test(password)) return {
+            strength: "Must include lowercase ❌",
+            color: "#FF0060"
+        };
+        if (!/\d/.test(password)) return {
+            strength: "Must include number ❌",
+            color: "#FF0060"
+        };
+        if (!/[\W]/.test(password)) return {
+            strength: "Must include special char ❌",
+            color: "#FF0060"
+        };
+        return {
+            strength: "Strong ✅",
+            color: "green"
+        };
     }
 
     // Password strength validation
-    newPassword.addEventListener("input", function () {
-        const { strength, color } = checkPasswordStrength(newPassword.value);
+    newPassword.addEventListener("input", function() {
+        const {
+            strength,
+            color
+        } = checkPasswordStrength(newPassword.value);
         passwordStrength.textContent = strength;
         passwordStrength.style.color = color;
     });
 
     // Confirm password validation
-    confirmPassword.addEventListener("input", function () {
-        if (confirmPassword.value === newPassword.value) {
-            passwordMatch.textContent = "Passwords match ✅";
-            passwordMatch.style.color = "green";
+    function validatePasswordMatch() {
+        if (newPassword.value && confirmPassword.value) {
+            if (confirmPassword.value === newPassword.value) {
+                passwordMatch.textContent = "Passwords match ✅";
+                passwordMatch.style.color = "green";
+            } else {
+                passwordMatch.textContent = "Passwords don't match ❌";
+                passwordMatch.style.color = "#FF0060";
+            }
         } else {
-            passwordMatch.textContent = "Passwords do not match ❌";
-            passwordMatch.style.color = " #FF0060";
+            passwordMatch.textContent = "";
         }
-    });
+    }
 
-    // Prevent form submission if validation fails
-    form.addEventListener("submit", function (event) {
+    newPassword.addEventListener("input", validatePasswordMatch);
+    confirmPassword.addEventListener("input", validatePasswordMatch);
+
+    // Form submission validation
+    form.addEventListener("submit", function(event) {
+        let isValid = true;
+
+        // Clear previous error highlights
+        [oldPassword, newPassword, confirmPassword].forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+
+        // Validate old password
+        if (!oldPassword.value.trim()) {
+            oldPassword.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        // Validate new password strength
         const passwordValidation = checkPasswordStrength(newPassword.value);
         if (passwordValidation.strength.includes("❌")) {
-            alert("New Password is too weak! Please follow the password rules.");
-            event.preventDefault(); // Stop form submission
-            return;
+            newPassword.classList.add('is-invalid');
+            isValid = false;
         }
 
+        // Validate password match
         if (newPassword.value !== confirmPassword.value) {
-            alert("Confirm Password does not match New Password.");
-            event.preventDefault(); // Stop form submission
-            return;
+            confirmPassword.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+            // Focus on first invalid field
+            const firstInvalid = form.querySelector('.is-invalid');
+            if (firstInvalid) {
+                firstInvalid.focus();
+            }
         }
     });
+
+    // Initialize validation messages if old values exist
+    if (newPassword.value) {
+        const {
+            strength,
+            color
+        } = checkPasswordStrength(newPassword.value);
+        passwordStrength.textContent = strength;
+        passwordStrength.style.color = color;
+    }
+    validatePasswordMatch();
 });
 </script>
 
 <style>
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+.message {
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+    min-height: 1.2em;
+}
+
 /* Input Field Styling */
 input[type="text"],
 input[type="password"],

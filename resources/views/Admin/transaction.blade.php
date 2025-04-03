@@ -7,7 +7,7 @@
         <h1>Transaction Records</h1>
     </div>
     <br><br>
-    
+
     @if(session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -39,45 +39,56 @@
                         <th>Date</th>
                         <th>Full Name</th>
                         <th>Center Name</th>
-                        <th>Amount</th>
+                        <th>Bill_Amount</th>
+                        <th>Collected_Amount</th>
+                        <th>Difference_Amount</th>
                         <th>Remark</th>
-                        <th>SMS Description</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="transactionTableBody">
-                    @if (isset($transactions) && $transactions->isNotEmpty())
-                        @foreach ($transactions as $transaction)
-                            <tr data-id="{{ $transaction->tid }}">
-                                <td>{{ $transaction->tid }}</td>
-                                <td>{{ $transaction->created_at }}</td>
-                                <td>{{ $transaction->systemuser->full_name }}</td>
-                                <td>{{ $transaction->center->centername }}</td>
-                                <td class="amount-cell">LRK {{ number_format($transaction->amount, 2) }}</td>
-                                <td>{{ $transaction->remark }}</td>
-                                <td>
-                                    @if ($transaction->sms->isNotEmpty())
-                                        <ul>
-                                            @foreach ($transaction->sms as $sms)
-                                                <li>{{ $sms->description ?? 'No Description' }}</li>
-                                            @endforeach
-                                        </ul>
-                                    @else
-                                        N/A
-                                    @endif
-                                </td>
-                                <td>
-                                    <button class="edit-btn" data-id="{{ $transaction->tid }}" data-amount="{{ $transaction->amount }}">
-                                        <i class='bx bxs-pen'></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="8" class="text-center">No transactions available</td>
-                        </tr>
-                    @endif
+                    @forelse ($transactions as $transaction)
+                    <tr class="main-row" data-id="{{ $transaction->tid }}">
+                        <td>{{ $transaction->tid }}</td>
+                        <td>{{ $transaction->created_at }}</td>
+                        <td>{{ $transaction->systemuser->fname }} {{ $transaction->systemuser->lname }}</td>
+                        <td>{{ $transaction->center->centername }}</td>
+                        <td class="amount-cell">LRK {{ number_format($transaction->bill_amount, 2) }}</td>
+                        <td class="amount-cell">LRK {{ number_format($transaction->amount, 2) }}</td>
+                        <td class="amount-cell">LRK {{ number_format($transaction->difference_amount, 2) }}</td>
+                        <td>{{ $transaction->remark }}</td>
+                        <td>
+                            <button class="edit-btn" data-id="{{ $transaction->tid }}"
+                                data-amount="{{ $transaction->amount }}"
+                                data-bill_amount="{{ $transaction->bill_amount }}">
+                                <i class='bx bxs-pen'></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="sms-details-row" style="display: none;" data-id="{{ $transaction->tid }}">
+                        <td colspan="9">
+                            <div class="sms-container">
+                                <h4>SMS Messages (TID: {{ $transaction->tid }})</h4>
+                                @forelse ($transaction->sms as $sms)
+                                <div class="sms-message">
+                                    <p>{{ $sms->description ?? 'No description' }}</p>
+                                    <small>Sent to:
+                                        @isset($sms->phonenumber1) {{ $sms->phonenumber1 }} @endisset
+                                        @isset($sms->phonenumber2) , {{ $sms->phonenumber2 }} @endisset
+                                        @isset($sms->phonenumber3) , {{ $sms->phonenumber3 }} @endisset
+                                    </small>
+                                </div>
+                                @empty
+                                <p>No SMS messages found for this transaction</p>
+                                @endforelse
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="9" class="text-center">No transactions available</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -92,8 +103,18 @@
                 @method('PUT')
                 <input type="hidden" name="uid" value="{{ session('uid') }}">
                 <input type="hidden" name="tid" id="edit-tid">
-                <label for="amount">New Amount:</label>
+
+                <label for="bill_amount">New Bill Amount:</label>
+                <input type="number" name="bill_amount" id="edit-bill_amount" step="0.01" required>
+
+                <label for="amount">Collected Amount:</label>
                 <input type="number" name="amount" id="edit-amount" step="0.01" required>
+                <hr>
+                <p><label for="difference_amount">Difference Amount:</label>
+                    <input type="number" id="edit-difference_amount" name="difference_amount" readonly
+                        class="difference-amount">
+                </p>
+                <hr>
                 <button type="submit">Update</button>
                 <button type="button" id="cancel-btn">Cancel</button>
             </form>
@@ -101,37 +122,157 @@
     </div>
 </main>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const differenceAmountInput = document.getElementById('edit-difference_amount');
+    const billAmountInput = document.getElementById('edit-bill_amount');
+    const amountInput = document.getElementById('edit-amount');
+
+    // Function to calculate and update difference amount with color
+    function updateDifferenceAmount() {
+        const billAmount = parseFloat(billAmountInput.value) || 0;
+        const amount = parseFloat(amountInput.value) || 0;
+        const difference = amount - billAmount;
+
+        differenceAmountInput.value = difference.toFixed(2);
+
+
+        updateDifferenceAmountColor();
+    }
+
+    // Function to update the color based on value
+    function updateDifferenceAmountColor() {
+        const value = parseFloat(differenceAmountInput.value);
+
+        // Remove all color classes first
+        differenceAmountInput.classList.remove('negative', 'positive', 'zero');
+
+        if (value < 0) {
+            differenceAmountInput.classList.add('negative');
+        } else if (value > 0) {
+            differenceAmountInput.classList.add('positive');
+        } else {
+            differenceAmountInput.classList.add('zero');
+        }
+    }
+
+    // Event listeners for automatic calculation
+    billAmountInput.addEventListener('input', updateDifferenceAmount);
+    amountInput.addEventListener('input', updateDifferenceAmount);
+
+    // Initialize when modal opens (if needed)
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // ... your existing modal open code ...
+            updateDifferenceAmount(); // Calculate initial difference
+        });
+    });
+});
+</script>
+
+<!-- Script for message loading -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle row clicks to show/hide SMS messages
+    document.querySelectorAll('.main-row').forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't trigger if clicking on the edit button
+            if (e.target.closest('.edit-btn')) {
+                return;
+            }
+
+            const tid = this.getAttribute('data-id');
+            const smsRow = document.querySelector(`.sms-details-row[data-id="${tid}"]`);
+
+            // Toggle display
+            smsRow.style.display = smsRow.style.display === 'none' ? 'table-row' : 'none';
+
+            // Scroll to the expanded row if showing
+            if (smsRow.style.display === 'table-row') {
+                smsRow.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }
+        });
+    });
+
+    // Handle edit button clicks (prevent row click event)
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            // Your existing edit button logic here
+            const tid = this.getAttribute('data-id');
+            const amount = this.getAttribute('data-amount');
+            console.log('Edit transaction:', tid, amount);
+            // Add your edit modal or form handling here
+        });
+    });
+});
+</script>
+<!-- Script for message loading -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".clickable-row").forEach(row => {
+        row.addEventListener("click", function(event) {
+            // Prevent clicking on the Edit button inside the row
+            if (!event.target.closest('.edit-btn')) {
+                window.location.href = this.dataset.href;
+            }
+        });
+    });
+});
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('edit-modal');
     const cancelBtn = document.getElementById('cancel-btn');
+    const billAmountInput = document.getElementById('edit-bill_amount');
+    const amountInput = document.getElementById('edit-amount');
+    const differenceAmountInput = document.getElementById('edit-difference_amount');
 
     // Open modal and populate fields
     document.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener('click', function() {
             const tid = this.dataset.id;
-            const amount = this.dataset.amount;
+            const bill_amount = parseFloat(this.dataset.bill_amount) || 0;
+            const amount = parseFloat(this.dataset.amount) || 0;
+            const difference_amount = amount - bill_amount; // Calculate difference
+
             document.getElementById('edit-tid').value = tid;
-            document.getElementById('edit-amount').value = amount;
+            billAmountInput.value = bill_amount;
+            amountInput.value = amount;
+            differenceAmountInput.value = difference_amount.toFixed(2); // Display formatted value
+            
 
             // Set the form's action URL dynamically
-            const form = document.getElementById('edit-form');
-            form.action = `/admin/transaction/${tid}`; // Set the action dynamically with tid
+            document.getElementById('edit-form').action = `/admin/transaction/${tid}`;
 
             modal.style.display = 'block';
         });
     });
+
+    // Function to calculate the difference
+    function calculateDifference() {
+        const billAmount = parseFloat(billAmountInput.value) || 0;
+        const amount = parseFloat(amountInput.value) || 0;
+        const difference = amount - billAmount;
+        differenceAmountInput.value = difference.toFixed(2); // Display formatted value
+
+
+    }
+
+    // Listen for input changes and recalculate the difference
+    billAmountInput.addEventListener('input', calculateDifference);
+    amountInput.addEventListener('input', calculateDifference);
 
     // Close modal
     cancelBtn.addEventListener('click', function() {
         modal.style.display = 'none';
     });
 });
-
-
-
-
 </script>
 
 <script>
@@ -163,11 +304,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 const cleanedAmount = cleanAmount(amount); // Clean the amount
 
                 // Check if any column matches the search query
-                if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) || date.includes(query) || cleanedAmount.includes(query)) {
-                    row.style.display = "";  // Show row if match
+                if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) ||
+                    date.includes(query) || cleanedAmount.includes(query)) {
+                    row.style.display = ""; // Show row if match
                     found = true;
                 } else {
-                    row.style.display = "none";  // Hide row if no match
+                    row.style.display = "none"; // Hide row if no match
                 }
             }
         }
@@ -176,8 +318,8 @@ document.addEventListener("DOMContentLoaded", function() {
         if (!found) {
             const noDataRow = document.createElement("tr");
             noDataRow.innerHTML = `<td colspan="8" class="text-center">No data found</td>`;
-            tableBody.innerHTML = "";  // Clear table
-            tableBody.appendChild(noDataRow);  // Add "No data found" row
+            tableBody.innerHTML = ""; // Clear table
+            tableBody.appendChild(noDataRow); // Add "No data found" row
         }
     });
 });
@@ -185,7 +327,83 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <!-- CSS -->
 <style>
+.difference-amount {
+    font-weight: bold;
+    /* Default color for zero */
+    color: #333;
+}
 
+.difference-amount.negative {
+    color: #FF0060;
+    /* Red for negative */
+}
+
+.difference-amount.positive {
+    color: #ADC865;
+    /* Green for positive */
+}
+
+.difference-amount.zero {
+    color: #333;
+    /* Default for zero */
+}
+</style>
+
+<!-- CSS for message showing-->
+<style>
+hr {
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    /* Light gray color */
+    margin: 20px 0;
+    /* Add margin above and below the line */
+}
+
+.sms-container {
+    padding: 15px;
+    background-color: var(--color-background);
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
+.sms-message {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+    border-left: 4px solid #4e73df;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-white);
+
+}
+
+.sms-message small {
+    /* color: #6c757d; */
+    font-size: 0.85rem;
+    /* color: var(--color-dark); */
+
+}
+.sms-container p {
+    /* color: #6c757d; */
+    /* font-size: 0.85rem; */
+    color: var(--color-dark);
+
+}
+
+.main-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.main-row:hover {
+    background-color: #f5f5f5;
+}
+
+
+</style>
+<!-- CSS for message showing-->
+
+<style>
 .alert {
     padding: 15px;
     margin: 20px 0;
@@ -242,6 +460,7 @@ document.addEventListener("DOMContentLoaded", function() {
     border-color: #f1a2a5;
     background-color: #f5c6cb;
 }
+
 .table-container {
     /* padding: 20px; */
 }
@@ -314,8 +533,11 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 
 .modal-content {
+    background-color: var(--color-white);
+    color: var(--color-dark);
     display: flex;
     flex-direction: column;
+    line-height: 2.2;
 }
 
 .modal-content button {
@@ -324,8 +546,13 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 
 .modal {
-    z-index: 1050 !important; /* Ensure modal is above other elements */
+    background-color: var(--color-white);
+    color: var(--color-dark);
+    z-index: 1050 !important;
+    /* Ensure modal is above other elements */
 }
+
+
 
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
@@ -783,6 +1010,7 @@ h1 {
 }
 
 .popup-content {
+    
     background-color: #fff;
     margin: 15% auto;
     /* 15% from the top and centered */
@@ -985,7 +1213,13 @@ input[type="email"] {
     width: 100%;
     font-family: 'Poppins', sans-serif;
     transition: border 0.3s ease;
+   
 }
+input[type="number"]{
+    background-color: var(--color-white);
+    color: var(--color-dark);
+}
+
 
 input:focus {
     border-color: rgb(65, 143, 207);
@@ -1114,10 +1348,10 @@ button:active {
     color: var(--color-warning);
 }
 
-#searchInput{
- /* background-color:var(--color-white: #202528); */
- background-color: var(--color-white);
- color: var(--color-dark);
+#searchInput {
+    /* background-color:var(--color-white: #202528); */
+    background-color: var(--color-white);
+    color: var(--color-dark);
 }
 </style>
 
