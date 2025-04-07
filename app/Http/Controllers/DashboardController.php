@@ -40,31 +40,29 @@ class DashboardController extends Controller
         ));
     }
 
-     public function getLabDetails(Request $request)
+    public function getLabDetails(Request $request)
     {
         $labId = $request->input('lid');
-
+    
         if (!$labId) {
             return response()->json(['error' => 'Lab ID is required'], 400);
         }
-
-        $totalSales = Transaction::sum('amount');
-
-
-        // Fetch data based on the selected lab ID
-        $totalSales = Transaction::where('cid', $labId)->whereDate('created_at', Carbon::today())->sum('amount'); 
-        // $totalSales = Transaction::whereDate('created_at', Carbon::today())->sum('amount'); // Sum of amounts for the selected center
-        // Sum of amounts for the selected center
-        $totalRoutes = Route::where('lid', $labId)->count(); // Count of routes for the selected lab
-        $totalCenters = Center::where('lid', $labId)->count(); // Count of centers for the selected lab
+    
+        // Total Sales: Only from centers (cid) under the selected lab (lid) for today
+        $totalSales = Transaction::whereHas('center', function ($query) use ($labId) {
+                $query->where('lid', $labId);
+            })
+            ->whereDate('created_at', Carbon::today())
+            ->sum('amount');
+    
+        $totalRoutes = Route::where('lid', $labId)->count();
+        $totalCenters = Center::where('lid', $labId)->count();
         $totalROs = LabAssign::where('lid', $labId)
-        ->whereHas('systemuser', function ($query) {
-            $query->where('role', 'RO');
-        })
-        ->count();
-     // Count of relationship officers for the selected lab
-
-        // Return the data as JSON response
+            ->whereHas('systemuser', function ($query) {
+                $query->where('role', 'RO');
+            })
+            ->count();
+    
         return response()->json([
             'totalSales' => $totalSales,
             'totalRoutes' => $totalRoutes,

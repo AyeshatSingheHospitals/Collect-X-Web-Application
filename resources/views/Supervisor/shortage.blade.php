@@ -40,17 +40,18 @@
     <!-- Cards (Initially Hidden) -->
     <div class="raw" id="cardContainer">
         @foreach($centerBalances as $center)
-        <div class="card" data-cid="{{ $center->cid }}" style="display: none;">
+        <div class="card" data-cid="{{ $center->cid }}" data-lid="{{ $center->lid }}" style="display: none;">
             <div class="card-details">
                 <p class="text-title">{{ $center->centername }}</p>
                 <p class="text-body">
-                    @if($center->total_difference < 0)
-                        <span style="color: #FF0060;">Shortage: </span><br>
-                        <span style="color: #FF0060; font-weight:bold; font-size:13px;"> {{ number_format($center->total_difference, 2) }} LKR</span>
-                    @else
-                        <span style="color:rgb(141, 187, 16);">Excess:  </span><br>
-                        <span style="color: rgb(141, 187, 16); font-weight:bold; font-size:13px;"> +{{ number_format($center->total_difference, 2) }} LKR</span>
-                    @endif
+                    @if($center->total_difference < 0) <span style="color: #FF0060;">Shortage: </span><br>
+                        <span style="color: #FF0060; font-weight:bold; font-size:13px;">
+                            {{ number_format($center->total_difference, 2) }} LKR</span>
+                        @else
+                        <span style="color:rgb(141, 187, 16);">Excess: </span><br>
+                        <span style="color: rgb(141, 187, 16); font-weight:bold; font-size:13px;">
+                            +{{ number_format($center->total_difference, 2) }} LKR</span>
+                        @endif
                 </p>
             </div>
             <button class="card-button"
@@ -64,54 +65,46 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const labDropdown = document.getElementById('labDropdown');
-    const cardContainer = document.getElementById('cardContainer');
     const loadingGif = document.getElementById('loadingGif');
+
+    // Initially hide all cards and show loading
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.display = 'none';
+    });
+    loadingGif.style.display = 'block';
 
     // Fetch assigned labs
     fetch(`/lab/assigned-labs`)
         .then(response => response.json())
         .then(data => {
-            labDropdown.innerHTML = ''; // Clear existing options
+            labDropdown.innerHTML = '<option value="" disabled selected>Select Lab</option>';
 
-            if (data.length === 0) {
-                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
-            } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Lab Names</option>`;
-                data.forEach(lab => {
-                    labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
-                });
-            }
+            data.forEach(lab => {
+                labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
+            });
+
+            // Hide loading after labs are loaded (cards remain hidden until lab is selected)
+            loadingGif.style.display = 'none';
         })
         .catch(error => {
             console.error('Error fetching labs:', error);
-            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
+            labDropdown.innerHTML = '<option value="" disabled selected>Error loading labs</option>';
+            loadingGif.style.display = 'none';
         });
 
-    // Listen for changes in the dropdown and filter cards
+    // Filter cards when lab is selected
     labDropdown.addEventListener('change', function() {
-        filterCardsByLab();
+        const selectedLabId = this.value;
+        const cards = document.querySelectorAll('.card');
+
+        if (!selectedLabId) return;
+
+        cards.forEach(card => {
+            const centerLabId = card.getAttribute('data-lid');
+            card.style.display = centerLabId === selectedLabId ? '' : 'none';
+        });
     });
 });
-
-// Function to filter cards based on selected lab
-function filterCardsByLab() {
-    const selectedLabId = document.getElementById('labDropdown').value;
-    const cards = document.querySelectorAll('.raw .card');
-    const loadingGif = document.getElementById('loadingGif');
-
-    // Hide loading GIF and show cards
-    loadingGif.style.display = 'none'; // Hide loading gif
-    cards.forEach(card => {
-        const centerId = card.getAttribute('data-cid'); // Get the data-cid of the card
-
-        // Show cards that match the selected lab
-        if (!selectedLabId || centerId === selectedLabId) {
-            card.style.display = ''; // Show card
-        } else {
-            card.style.display = 'none'; // Hide card
-        }
-    });
-}
 
 // Function to filter cards by search input
 function filterCards() {

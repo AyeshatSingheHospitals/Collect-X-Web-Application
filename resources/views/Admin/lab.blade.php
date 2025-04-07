@@ -158,7 +158,7 @@
 
                 <div class="form-group">
                     <label for="address">Address</label>
-                    <input type="text" name="address" id="address" class="form-control" required>
+                    <input type="text" name="address" id="address" class="form-control"  value="N/A" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Create Laboratory</button>

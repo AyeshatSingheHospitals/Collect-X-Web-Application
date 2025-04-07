@@ -91,13 +91,14 @@ class TransactionController extends Controller
                 'action' => 'updated',
             ]);
     
+          
             // Prepare SMS message in the new format
-            $message ="User: " . $user->fname . " " . $user->lname . " - " .
-               "Bill Amount: LKR " . number_format($originalBillAmount, 2) . " to " . number_format($request->bill_amount, 2) . " - " .
-               "Hand Over Amount: LKR " . number_format($originalAmount, 2) . " to " . number_format($request->amount, 2) . " - " .
-               "Difference Amount: LKR " . number_format($originalDifferenceAmount, 2) . " to " . number_format($differenceAmount, 2) . " - " .
-               "Center: " . $center->centername;
-    
+            $message = "Txn Updated: {$center->centername} - {$user->fname} {$user->lname}\n" .
+                     "Bill: LKR " . number_format($request->bill_amount, 2) . "\n" .
+                     "Collected: LKR " . number_format($request->amount, 2) . "\n" .
+                     "Diff: " . ($request->difference_amount >= 0 ? '+' : '-') . 
+                     " LKR " . number_format(abs($request->difference_amount), 2);
+                     
             // Create SMS record
             $sms = Sms::create([
                 'tid' => $transaction->tid,
