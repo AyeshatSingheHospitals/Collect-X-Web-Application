@@ -157,8 +157,6 @@ public function login(Request $request)
     }
     }
 
-
-
     /**
      * Logout the user
      */
@@ -188,12 +186,6 @@ public function logout()
         ->header('Pragma', 'no-cache')
         ->header('Expires', 'Fri, 01 Jan 1990 00:00:00 GMT');
 }
-
-
-
-
-
-
 
 public function checkSession()
 {

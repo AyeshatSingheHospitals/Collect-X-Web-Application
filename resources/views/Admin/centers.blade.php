@@ -315,6 +315,49 @@
 
 </main>
 
+<script>
+function filterCards() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.custom-card');
+
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(input)) {
+            card.parentElement.style.display = 'block'; // show parent column
+        } else {
+            card.parentElement.style.display = 'none'; // hide parent column
+        }
+    });
+}
+</script>
+<!-- 
+<script>
+
+function filterCards() {
+    // Get the search input value
+    const query = document.getElementById('searchInput').value.toLowerCase();
+
+    // Get all the cards
+    const cards = document.querySelectorAll('.card');
+
+    // Loop through each card and hide or show based on search query
+    cards.forEach(card => {
+        // Check if the card contains the search query
+        const centerName = card.querySelector('.card-title').textContent.toLowerCase();
+        const authorizedPerson = card.querySelector('.card-text').textContent.toLowerCase();
+        const lab = card.querySelector('.card-text:nth-of-type(2)').textContent.toLowerCase();
+        const route = card.querySelector('.card-text:nth-of-type(3)').textContent.toLowerCase();
+
+        // If any field contains the search query, show the card
+        if (centerName.includes(query) || authorizedPerson.includes(query) || lab.includes(query) || route.includes(query)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script> -->
+
 
 <!-- JavaScript -->
 <script>
@@ -602,32 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.closeEditModal = closeEditModal;
 });
 </script>
-<script>
 
-function filterCards() {
-    // Get the search input value
-    const query = document.getElementById('searchInput').value.toLowerCase();
-
-    // Get all the cards
-    const cards = document.querySelectorAll('.card');
-
-    // Loop through each card and hide or show based on search query
-    cards.forEach(card => {
-        // Check if the card contains the search query
-        const centerName = card.querySelector('.card-title').textContent.toLowerCase();
-        const authorizedPerson = card.querySelector('.card-text').textContent.toLowerCase();
-        const lab = card.querySelector('.card-text:nth-of-type(2)').textContent.toLowerCase();
-        const route = card.querySelector('.card-text:nth-of-type(3)').textContent.toLowerCase();
-
-        // If any field contains the search query, show the card
-        if (centerName.includes(query) || authorizedPerson.includes(query) || lab.includes(query) || route.includes(query)) {
-            card.style.display = '';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-</script>
 
 
 

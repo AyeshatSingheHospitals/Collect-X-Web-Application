@@ -66,12 +66,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     const labDropdown = document.getElementById('labDropdown');
     const loadingGif = document.getElementById('loadingGif');
+    const cardContainer = document.getElementById('cardContainer');
 
-    // Initially hide all cards and show loading
-    document.querySelectorAll('.card').forEach(card => {
-        card.style.display = 'none';
-    });
+    // Initially show loading GIF and hide cards
     loadingGif.style.display = 'block';
+    cardContainer.style.display = 'none';
 
     // Fetch assigned labs
     fetch(`/lab/assigned-labs`)
@@ -83,13 +82,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
             });
 
-            // Hide loading after labs are loaded (cards remain hidden until lab is selected)
-            loadingGif.style.display = 'none';
+            // We don't hide loading here anymore - it will hide when lab is selected
         })
         .catch(error => {
             console.error('Error fetching labs:', error);
             labDropdown.innerHTML = '<option value="" disabled selected>Error loading labs</option>';
-            loadingGif.style.display = 'none';
+            // Keep loading GIF visible even on error until selection is made
         });
 
     // Filter cards when lab is selected
@@ -99,12 +97,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!selectedLabId) return;
 
+        // Hide loading GIF and show card container when lab is selected
+        loadingGif.style.display = 'none';
+        cardContainer.style.display = '';
+
         cards.forEach(card => {
             const centerLabId = card.getAttribute('data-lid');
             card.style.display = centerLabId === selectedLabId ? '' : 'none';
         });
     });
 });
+
 
 // Function to filter cards by search input
 function filterCards() {
@@ -147,182 +150,6 @@ function filterCards() {
 
 /* You can add more CSS to style the cards and loading GIF */
 </style>
-
-
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uid = document.querySelector('input[name="uid"]').value;
-    const labDropdown = document.getElementById('labDropdown');
-   
-    // Fetch assigned labs
-    fetch(`/lab/assigned-labs`)
-        .then(response => response.json())
-        .then(data => {
-            labDropdown.innerHTML = ''; // Clear existing options
-
-            if (data.length === 0) {
-                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
-            } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Lab Names</option>`;
-                data.forEach(lab => {
-                    labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching labs:', error);
-            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
-        });
-});
-
-
-
-//search function
-function filterCards() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('#cardContainer .card');
-
-    cards.forEach(card => {
-        const name = card.querySelector('.name').textContent.toLowerCase();
-
-        if (name.includes(searchInput)) {
-            card.style.display = ''; // Show card
-        } else {
-            card.style.display = 'none'; // Hide card
-        }
-    });
-}
-</script> -->
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const uid = document.querySelector('input[name="uid"]').value;
-    const labDropdown = document.getElementById('labDropdown');
-
-    // Fetch assigned labs
-    fetch(`/lab/assigned-labs`)
-        .then(response => response.json())
-        .then(data => {
-            labDropdown.innerHTML = ''; // Clear existing options
-
-            if (data.length === 0) {
-                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
-            } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Lab Names</option>`;
-                data.forEach(lab => {
-                    labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching labs:', error);
-            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
-        });
-
-    // Listen for changes in the dropdown and filter cards
-    labDropdown.addEventListener('change', function() {
-        filterCardsByLab();
-    });
-});
-
-// Function to filter cards based on selected lab
-function filterCardsByLab() {
-    const selectedLabId = document.getElementById('labDropdown').value;
-    const cards = document.querySelectorAll('.raw .card');
-
-    cards.forEach(card => {
-        // Assuming the card contains a data attribute like `data-cid` matching the lab's `cid`
-        const centerId = card.getAttribute('data-cid');
-
-        if (!selectedLabId || centerId === selectedLabId) {
-            card.style.display = ''; // Show card
-        } else {
-            card.style.display = 'none'; // Hide card
-        }
-    });
-}
-
-// Function to filter cards by search input
-function filterCards() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('.raw .card');
-
-    cards.forEach(card => {
-        const name = card.querySelector('.text-title').textContent.toLowerCase();
-
-        if (name.includes(searchInput)) {
-            card.style.display = ''; // Show card
-        } else {
-            card.style.display = 'none'; // Hide card
-        }
-    });
-}
-</script> -->
-
-<!-- <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const labDropdown = document.getElementById('labDropdown');
-   
-    // Fetch assigned labs
-    fetch(`/lab/assigned-labs`)
-        .then(response => response.json())
-        .then(data => {
-            labDropdown.innerHTML = ''; // Clear existing options
-
-            if (data.length === 0) {
-                labDropdown.innerHTML = `<option value="" disabled selected>No labs assigned</option>`;
-            } else {
-                labDropdown.innerHTML = `<option value="" disabled selected>Lab Names</option>`;
-                data.forEach(lab => {
-                    labDropdown.innerHTML += `<option value="${lab.lid}">${lab.name}</option>`;
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching labs:', error);
-            labDropdown.innerHTML = `<option value="" disabled selected>Error loading labs</option>`;
-        });
-
-    // Listen for changes in the dropdown and filter cards
-    labDropdown.addEventListener('change', function() {
-        filterCardsByLab();
-    });
-});
-
-// Function to filter cards based on selected lab
-function filterCardsByLab() {
-    const selectedLabId = document.getElementById('labDropdown').value;
-    const cards = document.querySelectorAll('.raw .card');
-
-    // Loop through all cards and show/hide based on lab selection
-    cards.forEach(card => {
-        const centerId = card.getAttribute('data-cid'); // Get the data-cid of the card
-
-        if (!selectedLabId || centerId === selectedLabId) {
-            card.style.display = ''; // Show card
-        } else {
-            card.style.display = 'none'; // Hide card
-        }
-    });
-}
-
-// Function to filter cards by search input
-function filterCards() {
-    const searchInput = document.getElementById('searchInput').value.toLowerCase();
-    const cards = document.querySelectorAll('.raw .card');
-
-    cards.forEach(card => {
-        const name = card.querySelector('.text-title').textContent.toLowerCase();
-
-        if (name.includes(searchInput)) {
-            card.style.display = ''; // Show card
-        } else {
-            card.style.display = 'none'; // Hide card
-        }
-    });
-}
-</script> -->
-
-
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

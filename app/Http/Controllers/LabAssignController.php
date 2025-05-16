@@ -85,109 +85,128 @@ public function getLabNames()
     }
 
     public function storeLabassign(Request $request)
-{
-    try {
-        // Validate the necessary fields
-        $validated = $request->validate([
-            'uid' => 'required|exists:systemuser,uid', // Validate user ID exists in `systemuser` table
-            'uid_assign' => 'required|exists:systemuser,uid', // Assigned user ID exists in `systemuser` table
-            'lid' => 'required|exists:lab,lid', // Validate lab ID exists in `lab` table
-        ]);
-    } catch (ValidationException $e) {
-        return redirect()->back()->withErrors($e->validator->errors())->withInput();
-    }
-
-    try {
-        // Ensure the assigned user exists
-        $user = Systemuser::find($validated['uid_assign']);
-        if (!$user) {
-            return redirect()->back()->withErrors(['error' => 'Assigned user not found.'])->withInput();
+    {
+        try {
+            // Validate the necessary fields
+            $validated = $request->validate([
+                'uid' => 'required|exists:systemuser,uid', // Validate user ID exists in `systemuser` table
+                'uid_assign' => 'required|exists:systemuser,uid', // Assigned user ID exists in `systemuser` table
+                'lid' => 'required|exists:lab,lid', // Validate lab ID exists in `lab` table
+            ]);
+        } catch (ValidationException $e) {
+            return redirect()->back()->withErrors($e->validator->errors())->withInput();
         }
 
-        // Check if the user being assigned has the role 'RO'
-        if ($user->role == 'RO') {
-            $existingLabAssign = LabAssign::where('uid_assign', $validated['uid_assign'])->first();
-            if ($existingLabAssign) {
-                return redirect()->back()->withErrors(['error' => 'RO user cannot be assigned more than one lab.'])->withInput();
+        try {
+            // Ensure the assigned user exists
+            $user = Systemuser::find($validated['uid_assign']);
+            if (!$user) {
+                return redirect()->back()->withErrors(['error' => 'Assigned user not found.'])->withInput();
             }
-        }
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'Error checking user role: ' . $e->getMessage()])->withInput();
-    }
 
-    try {
-        // Create the new lab assignment
-        $labassign = LabAssign::create([
-            'uid' => $validated['uid'],
-            'uid_assign' => $validated['uid_assign'],
-            'lid' => $validated['lid'],
-        ]);
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'Database error while creating lab assignment: ' . $e->getMessage()])->withInput();
-    }
-
-    try {
-        // Create the log for this action
-        LabAssignLog::create([
-            'laid' => $labassign->laid, // Using the newly created `laid`
-            'uid' => $labassign->uid,
-            'uid_assign' => $labassign->uid_assign,
-            'lid' => $labassign->lid,
-            'action' => 'inserted',
-        ]);
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'Failed to create log entry: ' . $e->getMessage()])->withInput();
-    }
-
-    return redirect()->back()->with('success', 'Lab assignment saved successfully!');
-}
-
-public function updateLabassign(Request $request)
-{
-    // Validate the request data
-    $validated = $request->validate([
-        'uid' => 'required|exists:systemuser,uid',
-        'uid_assign' => 'required|exists:systemuser,uid',
-        'lid' => 'required|exists:lab,lid',
-        'laid' => 'required|exists:labassign,laid',
-    ]);
-
-    try {
-        // Find the existing lab assignment record
-        $labassign = LabAssign::findOrFail($validated['laid']);
-
-        // Check if any changes were made
-        if (
-            $labassign->uid == $validated['uid'] &&
-            $labassign->uid_assign == $validated['uid_assign'] &&
-            $labassign->lid == $validated['lid']
-        ) {
-            // No changes made, return with an info message
-            return redirect()->back()->with('info', 'No changes were made.');
+            // Check if the user being assigned has the role 'RO'
+            if ($user->role == 'RO') {
+                $existingLabAssign = LabAssign::where('uid_assign', $validated['uid_assign'])->first();
+                if ($existingLabAssign) {
+                    return redirect()->back()->withErrors(['error' => 'RO user cannot be assigned more than one lab.'])->withInput();
+                }
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Error checking user role: ' . $e->getMessage()])->withInput();
         }
 
-        // Update the lab assignment if changes exist
-        $labassign->update([
-            'uid' => $validated['uid'],
-            'uid_assign' => $validated['uid_assign'],
-            'lid' => $validated['lid'],
-        ]);
+        try {
+            // Create the new lab assignment
+            $labassign = LabAssign::create([
+                'uid' => $validated['uid'],
+                'uid_assign' => $validated['uid_assign'],
+                'lid' => $validated['lid'],
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Database error while creating lab assignment: ' . $e->getMessage()])->withInput();
+        }
 
-        // Create the log for this action
-        LabAssignLog::create([
-            'laid' => $labassign->laid, // Using the newly created `laid`
-            'uid' => $labassign->uid,
-            'uid_assign' => $labassign->uid_assign,
-            'lid' => $labassign->lid,
-            'action' => 'updated',
-        ]);
+        try {
+            // Create the log for this action
+            LabAssignLog::create([
+                'laid' => $labassign->laid, // Using the newly created `laid`
+                'uid' => $labassign->uid,
+                'uid_assign' => $labassign->uid_assign,
+                'lid' => $labassign->lid,
+                'action' => 'inserted',
+            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Failed to create log entry: ' . $e->getMessage()])->withInput();
+        }
 
-        return redirect()->back()->with('success', 'Lab assignment updated successfully!');
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'Failed to update lab assignment.']);
+        return redirect()->back()->with('success', 'Lab assignment saved successfully!');
     }
-}
 
+    public function updateLabassign(Request $request)
+    {
+        // Validate the request data
+        $validated = $request->validate([
+            'uid' => 'required|exists:systemuser,uid',
+            'uid_assign' => 'required|exists:systemuser,uid',
+            'lid' => 'required|exists:lab,lid',
+            'laid' => 'required|exists:labassign,laid',
+        ]);
+
+        try {
+            // Find the existing lab assignment record
+            $labassign = LabAssign::findOrFail($validated['laid']);
+
+            // Check if the assigned user is being changed to an RO user
+            if ($validated['uid_assign'] != $labassign->uid_assign) {
+                $user = Systemuser::find($validated['uid_assign']);
+                
+                // Check if the new assigned user has the role 'RO'
+                if ($user && $user->role == 'RO') {
+                    $existingLabAssign = LabAssign::where('uid_assign', $validated['uid_assign'])
+                        ->where('laid', '!=', $validated['laid']) // Exclude current record
+                        ->first();
+                    
+                    if ($existingLabAssign) {
+                        return redirect()->back()
+                            ->withErrors(['error' => 'RO user cannot be assigned more than one lab.'])
+                            ->withInput();
+                    }
+                }
+            }
+
+            // Check if any changes were made
+            if (
+                $labassign->uid == $validated['uid'] &&
+                $labassign->uid_assign == $validated['uid_assign'] &&
+                $labassign->lid == $validated['lid']
+            ) {
+                // No changes made, return with an info message
+                return redirect()->back()->with('info', 'No changes were made.');
+            }
+
+            // Update the lab assignment if changes exist
+            $labassign->update([
+                'uid' => $validated['uid'],
+                'uid_assign' => $validated['uid_assign'],
+                'lid' => $validated['lid'],
+            ]);
+
+            // Create the log for this action
+            LabAssignLog::create([
+                'laid' => $labassign->laid,
+                'uid' => $labassign->uid,
+                'uid_assign' => $labassign->uid_assign,
+                'lid' => $labassign->lid,
+                'action' => 'updated',
+            ]);
+
+            return redirect()->back()->with('success', 'Lab assignment updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Failed to update lab assignment: ' . $e->getMessage()])
+                ->withInput();
+        }
+    }
 
     public function destroyLabassign($id)
     {

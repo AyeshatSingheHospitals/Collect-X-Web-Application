@@ -36,6 +36,8 @@
                 onkeyup="searchLabs()">
         </div>
 
+        <div id="searchError" class="text-danger mt-2" style="display: none;"></div>
+
         <!-- Loading GIF -->
         <div id="loadingIndicator">
             <img src="{{ asset('../image/rassign.gif') }}" alt="No Records" class="img-fluid mb-3"
@@ -79,34 +81,41 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const assignForm = document.getElementById('assignForm');
         const submitButtonContainer = document.getElementById('submitButtonContainer');
-        const tableContainer = document.querySelector('.table-container');
+        const searchError = document.getElementById('searchError'); // Get the error container
+
+        // Clear previous errors
+        searchError.style.display = 'none';
+        searchError.textContent = '';
 
         if (!searchQuery) {
-            assignForm.style.display = 'none'; // Hide form if the search query is empty
-            loadingIndicator.style.display = 'block'; // Show the loading GIF
+            assignForm.style.display = 'none';
+            loadingIndicator.style.display = 'block';
             return;
         }
 
-        loadingIndicator.style.display = 'block'; // Show loading indicator
+        loadingIndicator.style.display = 'block';
 
         try {
             const response = await fetch(`/admin/route-assign/search?name=${searchQuery}`);
             const data = await response.json();
 
             if (response.ok) {
-                assignForm.style.display = 'block'; // Show form after data is loaded
-                loadingIndicator.style.display = 'none'; // Hide the loading GIF
+                assignForm.style.display = 'block';
+                loadingIndicator.style.display = 'none';
                 renderTable(data.users, data.routes, data.assignments);
-                // Update the hidden search input
                 document.getElementById('searchQuery').value = searchQuery;
             } else {
-                alert(data.message || 'Lab not found');
-                assignForm.style.display = 'none'; // Hide form if lab is not found
-                loadingIndicator.style.display = 'none'; // Hide the loading GIF
+                // Show error message below search box
+                searchError.textContent = data.message || 'Lab not found';
+                searchError.style.display = 'block';
+                assignForm.style.display = 'none';
+                loadingIndicator.style.display = 'none';
             }
         } catch (error) {
             console.error('Error fetching data:', error);
-            loadingIndicator.style.display = 'none'; // Hide the loading GIF in case of an error
+            searchError.textContent = 'An error occurred while searching. Please try again.';
+            searchError.style.display = 'block';
+            loadingIndicator.style.display = 'none';
         }
     }
 
@@ -290,6 +299,14 @@
 .alert-danger:hover {
     border-color: #f1a2a5;
     background-color: #f5c6cb;
+}
+
+#searchError {
+    padding: 8px 12px;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-top: 5px;
 }
 
 

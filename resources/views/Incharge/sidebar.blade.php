@@ -59,7 +59,7 @@
                 </a>
                 <a href="/incharge/shortage-excess" class="{{ request()->is('incharge/shortage-excess') ? 'active' : '' }}">
                     <span class="material-symbols-sharp">currency_exchange</span>
-                    <h3>Sortage & excess</h3>
+                    <h3>Shortage & Excess</h3>
                 </a>
                 <a href="/">
                     <span class="material-symbols-sharp">logout</span>

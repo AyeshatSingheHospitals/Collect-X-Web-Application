@@ -122,6 +122,7 @@
     </div>
 </main>
 
+<!-- Script for calculations -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const differenceAmountInput = document.getElementById('edit-difference_amount');
@@ -169,6 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<!-- Script for calculations -->
 
 <!-- Script for message loading -->
 <script>
@@ -210,7 +212,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-<!-- Script for message loading -->
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
@@ -224,7 +225,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
+<!-- Script for message loading -->
 
+<!-- Script for edit popup -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('edit-modal');
@@ -274,56 +277,107 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<!-- Script for edit popup -->
 
+<!-- Script for searching table -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("searchInput");
     const tableBody = document.getElementById("transactionTableBody");
+    const originalRows = Array.from(tableBody.querySelectorAll("tr.main-row, tr.sms-details-row"));
+    let noDataRow = null;
+
+    // Create a no data row if it doesn't exist
+    function createNoDataRow() {
+        if (!noDataRow) {
+            noDataRow = document.createElement("tr");
+            noDataRow.innerHTML = `<td colspan="9" class="text-center">No data found</td>`;
+        }
+        return noDataRow;
+    }
+
+    // Function to clean and normalize text for comparison
+    function normalizeText(text) {
+        return text.toLowerCase().trim();
+    }
+
+    // Function to clean amount by removing currency symbols and formatting
+    function cleanAmount(amountText) {
+        return amountText.replace(/[^0-9.]/g, '');
+    }
 
     searchInput.addEventListener("input", function() {
-        const query = searchInput.value.toLowerCase();
-        const rows = tableBody.getElementsByTagName("tr");
+        const query = normalizeText(searchInput.value);
+        let hasVisibleRows = false;
 
-        let found = false;
+        // Clear the table body
+        tableBody.innerHTML = '';
 
-        // Function to clean amount by removing non-numeric characters
-        function cleanAmount(amount) {
-            return amount.replace(/[^0-9.]/g, ''); // Remove anything that is not a number or dot
+        if (query === '') {
+            // If search is empty, restore all original rows
+            originalRows.forEach(row => {
+                tableBody.appendChild(row);
+            });
+            return;
         }
 
-        // Loop through each table row
-        for (let row of rows) {
-            const columns = row.getElementsByTagName("td");
-            if (columns.length > 0) {
-                // Extract text content of relevant columns
-                const tid = columns[0].textContent.toLowerCase();
-                const fullName = columns[2].textContent.toLowerCase();
-                const centerName = columns[3].textContent.toLowerCase();
-                const date = columns[1].textContent.toLowerCase();
-                const amount = columns[4].textContent.toLowerCase();
-                const cleanedAmount = cleanAmount(amount); // Clean the amount
+        // Filter and display matching rows
+        originalRows.forEach(row => {
+            if (row.classList.contains('main-row')) {
+                const columns = row.querySelectorAll("td");
+                if (columns.length > 0) {
+                    // Extract and normalize data from each relevant column
+                    const tid = normalizeText(columns[0].textContent);
+                    const date = normalizeText(columns[1].textContent);
+                    const fullName = normalizeText(columns[2].textContent);
+                    const centerName = normalizeText(columns[3].textContent);
+                    const billAmount = cleanAmount(columns[4].textContent);
+                    const collectedAmount = cleanAmount(columns[5].textContent);
+                    const differenceAmount = cleanAmount(columns[6].textContent);
+                    const remark = normalizeText(columns[7].textContent);
 
-                // Check if any column matches the search query
-                if (tid.includes(query) || fullName.includes(query) || centerName.includes(query) ||
-                    date.includes(query) || cleanedAmount.includes(query)) {
-                    row.style.display = ""; // Show row if match
-                    found = true;
-                } else {
-                    row.style.display = "none"; // Hide row if no match
+                    // Check if any column matches the search query
+                    if (tid.includes(query) || 
+                        date.includes(query) || 
+                        fullName.includes(query) || 
+                        centerName.includes(query) || 
+                        billAmount.includes(query) || 
+                        collectedAmount.includes(query) || 
+                        differenceAmount.includes(query) ||
+                        remark.includes(query)) {
+                        
+                        // Add the main row
+                        tableBody.appendChild(row);
+                        hasVisibleRows = true;
+                        
+                        // Find and add the corresponding sms-details-row if it exists
+                        const rowId = row.getAttribute('data-id');
+                        const smsRow = originalRows.find(r => 
+                            r.classList.contains('sms-details-row') && 
+                            r.getAttribute('data-id') === rowId
+                        );
+                        
+                        if (smsRow) {
+                            tableBody.appendChild(smsRow);
+                        }
+                    }
                 }
             }
-        }
+        });
 
-        // If no records are found, display "No data found"
-        if (!found) {
-            const noDataRow = document.createElement("tr");
-            noDataRow.innerHTML = `<td colspan="8" class="text-center">No data found</td>`;
-            tableBody.innerHTML = ""; // Clear table
-            tableBody.appendChild(noDataRow); // Add "No data found" row
+        // If no rows matched the search, show "No data found" message
+        if (!hasVisibleRows) {
+            tableBody.appendChild(createNoDataRow());
         }
+    });
+
+    // Initialize the table with all rows
+    originalRows.forEach(row => {
+        tableBody.appendChild(row);
     });
 });
 </script>
+<!-- Script for searching table -->
 
 <!-- CSS -->
 <style>

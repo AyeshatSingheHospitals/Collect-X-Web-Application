@@ -411,40 +411,51 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     });
 
-    // Search functionality
-    const searchInput = document.getElementById("searchInput");
-    searchInput.addEventListener("input", function() {
-        const query = searchInput.value.toLowerCase();
-        const rows = document.querySelectorAll("#transactionTableBody tr");
-        let found = false;
+    // // Search functionality
+    // Universal search functionality
+// document.getElementById('searchInput').addEventListener('input', function () {
+//     const query = this.value.toLowerCase();
+//     const rows = document.querySelectorAll('#transactionTableBody tr.main-row');
 
-        rows.forEach(row => {
-            const columns = row.querySelectorAll("td");
-            if (columns.length > 0) {
-                const tid = columns[0].textContent.toLowerCase();
-                const fullName = columns[2].textContent.toLowerCase();
-                const centerName = columns[3].textContent.toLowerCase();
-                const date = columns[1].textContent.toLowerCase();
-                const billAmount = columns[4].textContent.replace(/[^\d.]/g, "");
-                const amount = columns[5].textContent.replace(/[^\d.]/g, "");
+//     rows.forEach(row => {
+//         const smsRow = document.querySelector(`.sms-details-row[data-id="${row.dataset.id}"]`);
+//         const text = row.textContent.toLowerCase();
 
-                if (tid.includes(query) || fullName.includes(query) || 
-                    centerName.includes(query) || date.includes(query) ||
-                    billAmount.includes(query) || amount.includes(query)) {
-                    row.style.display = "";
-                    found = true;
-                } else {
-                    row.style.display = "none";
-                }
-            }
-        });
+//         if (text.includes(query)) {
+//             row.style.display = '';
+//             if (smsRow) smsRow.style.display = 'none'; // hide SMS details if open
+//         } else {
+//             row.style.display = 'none';
+//             if (smsRow) smsRow.style.display = 'none';
+//         }
+//     });
+// });
 
-        if (!found && rows.length > 0) {
-            transactionTableBody.innerHTML = `<tr><td colspan="10" class="text-center">No data found</td></tr>`;
+    
+});
+</script>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function () {
+    const filter = this.value.toLowerCase();
+    const mainRows = document.querySelectorAll('.main-row');
+
+    mainRows.forEach(row => {
+        const smsRow = document.querySelector(`.sms-details-row[data-id="${row.dataset.id}"]`);
+        const rowText = row.textContent.toLowerCase();
+
+        if (rowText.includes(filter)) {
+            row.style.display = '';
+            if (smsRow) smsRow.style.display = 'none'; // keep SMS row hidden unless clicked
+        } else {
+            row.style.display = 'none';
+            if (smsRow) smsRow.style.display = 'none'; // hide SMS row too
         }
     });
 });
 </script>
+
+
 
 <!-- CSS -->
 <style>
